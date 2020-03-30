@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+  external_labels:
+    monitor: 'saba-monitor'
+
+rule_files:
+
+scrape_configs:
+  - job_name: 'sabadb01'
+    static_configs:
+      - targets: ['10.99.99.54:29101']
+
+  - job_name: 'sabadb02'
+    static_configs:
+      - targets: ['10.99.99.53:29102']
+
+  - job_name: 'sabaarcdb01'
+    static_configs:
+      - targets: ['10.99.99.53:29151']
