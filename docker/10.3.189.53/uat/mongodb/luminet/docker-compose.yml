@@ -1,0 +1,51 @@
+version: '3.3'
+services:
+  saba_uat_db01:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: SabaUATDB01
+    hostname: saba_uat_db01
+    restart: always
+    networks:
+      sabauatdb_network:
+        ipv4_address: 172.32.0.101
+    ports:
+      - '0.0.0.0:27251:27251'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ../.storage/mongodb01/db:/data/db:rw
+      - ../.storage/mongodb01/backup:/data/backup:rw
+      - ../.storage/mongodb01/log:/var/log/mongodb:rw
+      - ./config/mongod.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet SabaUAT --auth
+
+  saba_uat_dbexporter01:
+    build:
+      context: .
+      dockerfile: Dockerfile_exporter
+    container_name: SabaUATDBExporter01
+    hostname: saba_uat_dbexporter01
+    restart: always
+    networks:
+      sabauatdb_network:
+        ipv4_address: 172.32.0.11
+    ports:
+      - '172.132.0.1:9221:9216'
+    environment:
+      MONGODB_URI: 'mongodb://@172.32.0.101:27251/?replicaSet=SabaUAT'
+    command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+networks:
+  sabauatdb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.32.0.0/16
