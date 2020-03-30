@@ -1,0 +1,84 @@
+version: '3.3'
+services:
+  saba_db02:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: SabaDB02
+    hostname: saba_db02
+    restart: always
+    networks:
+      sabadb_network:
+        ipv4_address: 172.39.0.102
+    ports:
+      - '0.0.0.0:27102:27102'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ../.storage/mongodb02/db:/data/db:rw
+      - ../.storage/mongodb02/backup:/data/backup:rw
+      - ../.storage/mongodb02/log:/var/log/mongodb:rw
+      - ./config/mongod.sec.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf
+
+  saba_db03:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: SabaDB03
+    hostname: saba_db03
+    restart: always
+    networks:
+      sabadb_network:
+        ipv4_address: 172.39.0.103
+    ports:
+      - '0.0.0.0:27103:27103'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ../.storage/mongodb03/db:/data/db:rw
+      - ../.storage/mongodb03/backup:/data/backup:rw
+      - ../.storage/mongodb03/log:/var/log/mongodb:rw
+      - ./config/mongod.arb.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf
+
+  saba_arc_db01:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: SabaArcDB01
+    hostname: saba_arc_db01
+    restart: always
+    networks:
+      sabadb_network:
+        ipv4_address: 172.39.0.151
+    ports:
+      - '0.0.0.0:27151:27151'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ../.storage/mongoarcdb01/db:/data/db:rw
+      - ../.storage/mongoarcdb01/backup:/data/backup:rw
+      - ../.storage/mongoarcdb01/log:/var/log/mongodb:rw
+      - ./config/mongod.arc.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  sabadb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.39.0.0/16
