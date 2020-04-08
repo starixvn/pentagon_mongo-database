@@ -1,0 +1,77 @@
+version: '3.3'
+services:
+  saba_sit_db02:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: SabaSITDB02
+    hostname: saba_sit_db02
+    restart: always
+    networks:
+      sabasitdb_network:
+        ipv4_address: 172.35.0.102
+    ports:
+      - '0.0.0.0:27202:27202'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ../.storage/mongodb02/db:/data/db:rw
+      - ../.storage/mongodb02/backup:/data/backup:rw
+      - ../.storage/mongodb02/log:/var/log/mongodb:rw
+      - ./config/mongod.sec.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet SabaSIT --auth
+
+  saba_sit_db03:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: SabaSITDB03
+    hostname: saba_sit_db03
+    restart: always
+    networks:
+      sabasitdb_network:
+        ipv4_address: 172.35.0.103
+    ports:
+      - '0.0.0.0:27203:27203'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ../.storage/mongodb03/db:/data/db:rw
+      - ../.storage/mongodb03/backup:/data/backup:rw
+      - ../.storage/mongodb03/log:/var/log/mongodb:rw
+      - ./config/mongod.arb.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet SabaSIT --auth
+
+  saba_sit_dbexporter02:
+    build:
+      context: .
+      dockerfile: Dockerfile_exporter
+    container_name: SabaSITDBExporter02
+    hostname: saba_sit_dbexporter02
+    restart: always
+    networks:
+      sabasitdb_network:
+        ipv4_address: 172.35.0.12
+    ports:
+      - '10.99.99.54:29202:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:@10.3.189.54:27202/'
+    command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  sabasitdb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.35.0.0/16

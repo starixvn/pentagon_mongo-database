@@ -35,9 +35,9 @@ services:
       sabasitdb_network:
         ipv4_address: 172.35.0.11
     ports:
-      - '172.132.0.1:9251:9216'
+      - '10.99.99.53:29201:9216'
     environment:
-      MONGODB_URI: 'mongodb://@172.35.0.101:27201/?replicaSet=SabaSIT'
+      MONGODB_URI: 'mongodb://mongodb_exporter:@10.3.189.53:27201/'
     command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
 
 secrets:
