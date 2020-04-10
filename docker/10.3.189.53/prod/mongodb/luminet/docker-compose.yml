@@ -72,6 +72,22 @@ services:
       - keyFile
     command: --config /etc/mongod.conf --auth
 
+  saba_dbexporter02:
+    build:
+      context: .
+      dockerfile: Dockerfile_exporter
+    container_name: SabaDBExporter02
+    hostname: saba_dbexporter02
+    restart: always
+    networks:
+      sabadb_network:
+        ipv4_address: 172.39.0.12
+    ports:
+      - '10.99.99.53:29102:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:@172.39.0.102:27102/'
+    command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+
   saba_arc_dbexporter01:
     build:
       context: .

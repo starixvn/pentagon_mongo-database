@@ -27,6 +27,8 @@ services:
     networks:
       monitor_network:
         ipv4_address: 172.132.0.12
+    ports:
+      - '10.99.99.53:9090:9090'
     volumes:
       - ../.storage/prometheus/data:/prometheus:rw
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
