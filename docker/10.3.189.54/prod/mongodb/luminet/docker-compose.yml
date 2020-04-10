@@ -19,7 +19,7 @@ services:
       - ../.storage/mongodb01/db:/data/db:rw
       - ../.storage/mongodb01/backup:/data/backup:rw
       - ../.storage/mongodb01/log:/var/log/mongodb:rw
-      - ./config/mongod.conf:/etc/mongod.conf:ro
+      - ./config/mongod.pri.conf:/etc/mongod.conf:ro
     secrets:
       - keyFile
     command: --config /etc/mongod.conf --replSet SabaMain --auth
@@ -35,9 +35,9 @@ services:
       sabadb_network:
         ipv4_address: 172.39.0.11
     ports:
-      - '172.132.0.1:29101:9216'
+      - '10.99.99.54:29101:9216'
     environment:
-      MONGODB_URI: 'mongodb://@172.39.0.101:27101/?replicaSet=SabaMain'
+      MONGODB_URI: 'mongodb://mongodb_exporter:@172.39.0.101:27101/'
     command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
 
 secrets:
