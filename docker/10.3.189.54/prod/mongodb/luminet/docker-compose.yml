@@ -40,6 +40,22 @@ services:
       MONGODB_URI: 'mongodb://mongodb_exporter:@172.39.0.101:27101/'
     command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
 
+  saba_bi01:
+    build:
+      context: .
+      dockerfile: Dockerfile_mongobi
+    container_name: SabaBI01
+    hostname: saba_bi01
+    restart: always
+    networks:
+      sabadb_network:
+        ipv4_address: 172.39.0.21
+    ports:
+      - '10.99.99.54:28101:28101'
+    volumes:
+      - ../.storage/mongobi01/log:/var/log/mongosqld:rw
+      - ./config/mongosqld.pri.conf:/etc/mongosqld.conf:ro
+
 secrets:
   keyFile:
     file: ./secret/keyFile
