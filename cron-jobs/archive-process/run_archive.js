@@ -15,6 +15,7 @@ log = function(label, str) {
 cutoff = new Date((Math.floor(Date.now() / 3600000) - 24) * 3600000);
 log("Cutoff Time", cutoff.toISOString());
 
+
 // Xoc xoc
 archiveXocXoc = function(phiens, phiens_id) {
 	try {
@@ -84,6 +85,7 @@ archiveXocXoc = function(phiens, phiens_id) {
 	);
 	archiveXocXoc(phiens, phiens_id);
 }
+
 
 // Tai xiu
 archiveTaiXiu = function(phiens, phiens_id) {
@@ -186,6 +188,7 @@ archiveTaiXiu = function(phiens, phiens_id) {
 	archiveTaiXiu(phiens, phiens_id);
 }
 
+
 // Bau cua
 archiveBauCua = function(phiens, phiens_id) {
 	try {
@@ -255,6 +258,313 @@ archiveBauCua = function(phiens, phiens_id) {
 	);
 	archiveBauCua(phiens, phiens_id);
 }
+
+
+// Tai xiu Turbo
+archiveTaiXiuTurbo = function(phiens, phiens_id) {
+	try {
+		db_arc.txturbo_phiens_bk.insertMany(phiens, {ordered: false});
+	} catch (e) {}
+
+	// Get all cuocs related to archived phiens
+	cuocs = [];
+	cuocs_cnt = 0;
+	db_active.txturbo_cuocs.find({phien: {$in: phiens_id}}).forEach(
+		function (cuoc) {
+			// Save cuocs into an array
+			cuocs.push(cuoc);
+			cuocs_cnt++;
+
+			// Archive by batch of 1000 documents
+			if (cuocs_cnt % 1000 === 0) {
+				try {
+					db_arc.txturbo_cuocs_bk.insertMany(cuocs, {ordered: false});
+				} catch (e) {}
+				cuocs = [];
+			}
+
+			// Report every 10 batches
+			if (cuocs_cnt % 10000 === 0) {
+				// Keep active connection open
+				db_active.runCommand({ping: 1});
+				log("txturbo", "- Archiving " + cuocs_cnt + " cuocs");
+			}
+		}
+	);
+	try {
+		db_arc.txturbo_cuocs_bk.insertMany(cuocs, {ordered: false});
+		log("txturbo", "- Archived " + cuocs_cnt + " cuocs");
+	} catch (e) {}
+
+	// Get all ones related to archived phiens
+	ones = [];
+	ones_cnt = 0;
+	db_active.txturbo_ones.find({phien: {$in: phiens_id}}).forEach(
+		function (one) {
+			// Save cuocs into an array
+			ones.push(one);
+			ones_cnt++;
+
+			// Archive by batch of 1000 documents
+			if (ones_cnt % 1000 === 0) {
+				try {
+					db_arc.txturbo_ones_bk.insertMany(ones, {ordered: false});
+				} catch (e) {}
+				ones = [];
+			}
+
+			// Report every 10 batches
+			if (ones_cnt % 10000 === 0) {
+				// Keep active connection open
+				db_active.runCommand({ping: 1});
+				log("txturbo", "- Archiving " + ones_cnt + " ones");
+			}
+		}
+	);
+	try {
+		db_arc.txturbo_ones_bk.insertMany(ones, {ordered: false});
+		log("txturbo", "- Archived " + ones_cnt + " ones");
+	} catch (e) {}
+
+	{
+		bulkUpdatePipe = [];
+		phiens.forEach(
+			function(phien) {
+				bulkUpdatePipe.push({updateMany: {filter: {phien: phien.id}, update: {$set: {'__archive.eventtime': phien.time}}}})
+			}
+		);
+		db_active.txturbo_cuocs.bulkWrite(bulkUpdatePipe, {ordered : false});
+		db_active.txturbo_ones.bulkWrite(bulkUpdatePipe, {ordered : false});
+	}
+	db_active.txturbo_phiens.updateMany({id: {$in: phiens_id}}, [{$set: {'__archive.eventtime': "$time"}}]);
+	log("txturbo", "Archived " + phiens_id.length + " phiens with " + cuocs_cnt + " cuocs & " + ones_cnt + " ones.");
+}
+// Run archive
+{
+	// Get all phiens that to be archived
+	phiens = [];
+	phiens_id = [];
+	db_active.txturbo_phiens.find({time: {$lt: cutoff}, '__archive.eventtime': {$exists: false}}).forEach(
+		function(phien) {
+			phiens.push(phien);
+			phiens_id.push(phien.id);
+
+			// Archive by batch of 1000 phiens
+			if (phiens_id.length % 1000 === 0) {
+				archiveTaiXiuTurbo(phiens, phiens_id);
+
+				phiens = [];
+				phiens_id = [];
+			}
+		}
+	);
+	archiveTaiXiuTurbo(phiens, phiens_id);
+}
+
+
+// Chan le
+archiveChanLe = function(phiens, phiens_id) {
+	try {
+		db_arc.chanle_phiens_bk.insertMany(phiens, {ordered: false});
+	} catch (e) {}
+
+	// Get all cuocs related to archived phiens
+	cuocs = [];
+	cuocs_cnt = 0;
+	db_active.chanle_cuocs.find({phien: {$in: phiens_id}}).forEach(
+		function (cuoc) {
+			// Save cuocs into an array
+			cuocs.push(cuoc);
+			cuocs_cnt++;
+
+			// Archive by batch of 1000 documents
+			if (cuocs_cnt % 1000 === 0) {
+				try {
+					db_arc.chanle_cuocs_bk.insertMany(cuocs, {ordered: false});
+				} catch (e) {}
+				cuocs = [];
+			}
+
+			// Report every 10 batches
+			if (cuocs_cnt % 10000 === 0) {
+				// Keep active connection open
+				db_active.runCommand({ping: 1});
+				log("chanle", "- Archiving " + cuocs_cnt + " cuocs");
+			}
+		}
+	);
+	try {
+		db_arc.chanle_cuocs_bk.insertMany(cuocs, {ordered: false});
+		log("chanle", "- Archived " + cuocs_cnt + " cuocs");
+	} catch (e) {}
+
+	// Get all ones related to archived phiens
+	ones = [];
+	ones_cnt = 0;
+	db_active.chanle_ones.find({phien: {$in: phiens_id}}).forEach(
+		function (one) {
+			// Save cuocs into an array
+			ones.push(one);
+			ones_cnt++;
+
+			// Archive by batch of 1000 documents
+			if (ones_cnt % 1000 === 0) {
+				try {
+					db_arc.chanle_ones_bk.insertMany(ones, {ordered: false});
+				} catch (e) {}
+				ones = [];
+			}
+
+			// Report every 10 batches
+			if (ones_cnt % 10000 === 0) {
+				// Keep active connection open
+				db_active.runCommand({ping: 1});
+				log("chanle", "- Archiving " + ones_cnt + " ones");
+			}
+		}
+	);
+	try {
+		db_arc.chanle_ones_bk.insertMany(ones, {ordered: false});
+		log("chanle", "- Archived " + ones_cnt + " ones");
+	} catch (e) {}
+
+	{
+		bulkUpdatePipe = [];
+		phiens.forEach(
+			function(phien) {
+				bulkUpdatePipe.push({updateMany: {filter: {phien: phien.id}, update: {$set: {'__archive.eventtime': phien.time}}}})
+			}
+		);
+		db_active.chanle_cuocs.bulkWrite(bulkUpdatePipe, {ordered : false});
+		db_active.chanle_ones.bulkWrite(bulkUpdatePipe, {ordered : false});
+	}
+	db_active.chanle_phiens.updateMany({id: {$in: phiens_id}}, [{$set: {'__archive.eventtime': "$time"}}]);
+	log("chanle", "Archived " + phiens_id.length + " phiens with " + cuocs_cnt + " cuocs & " + ones_cnt + " ones.");
+}
+// Run archive
+{
+	// Get all phiens that to be archived
+	phiens = [];
+	phiens_id = [];
+	db_active.chanle_phiens.find({time: {$lt: cutoff}, '__archive.eventtime': {$exists: false}}).forEach(
+		function(phien) {
+			phiens.push(phien);
+			phiens_id.push(phien.id);
+
+			// Archive by batch of 1000 phiens
+			if (phiens_id.length % 1000 === 0) {
+				archiveChanLe(phiens, phiens_id);
+
+				phiens = [];
+				phiens_id = [];
+			}
+		}
+	);
+	archiveChanLe(phiens, phiens_id);
+}
+
+
+// Chan le Turbo
+archiveChanLeTurbo = function(phiens, phiens_id) {
+	try {
+		db_arc.chanleturbo_phiens_bk.insertMany(phiens, {ordered: false});
+	} catch (e) {}
+
+	// Get all cuocs related to archived phiens
+	cuocs = [];
+	cuocs_cnt = 0;
+	db_active.chanleturbo_cuocs.find({phien: {$in: phiens_id}}).forEach(
+		function (cuoc) {
+			// Save cuocs into an array
+			cuocs.push(cuoc);
+			cuocs_cnt++;
+
+			// Archive by batch of 1000 documents
+			if (cuocs_cnt % 1000 === 0) {
+				try {
+					db_arc.chanleturbo_cuocs_bk.insertMany(cuocs, {ordered: false});
+				} catch (e) {}
+				cuocs = [];
+			}
+
+			// Report every 10 batches
+			if (cuocs_cnt % 10000 === 0) {
+				// Keep active connection open
+				db_active.runCommand({ping: 1});
+				log("chanleturbo", "- Archiving " + cuocs_cnt + " cuocs");
+			}
+		}
+	);
+	try {
+		db_arc.chanleturbo_cuocs_bk.insertMany(cuocs, {ordered: false});
+		log("chanleturbo", "- Archived " + cuocs_cnt + " cuocs");
+	} catch (e) {}
+
+	// Get all ones related to archived phiens
+	ones = [];
+	ones_cnt = 0;
+	db_active.chanleturbo_ones.find({phien: {$in: phiens_id}}).forEach(
+		function (one) {
+			// Save cuocs into an array
+			ones.push(one);
+			ones_cnt++;
+
+			// Archive by batch of 1000 documents
+			if (ones_cnt % 1000 === 0) {
+				try {
+					db_arc.chanleturbo_ones_bk.insertMany(ones, {ordered: false});
+				} catch (e) {}
+				ones = [];
+			}
+
+			// Report every 10 batches
+			if (ones_cnt % 10000 === 0) {
+				// Keep active connection open
+				db_active.runCommand({ping: 1});
+				log("chanleturbo", "- Archiving " + ones_cnt + " ones");
+			}
+		}
+	);
+	try {
+		db_arc.chanleturbo_ones_bk.insertMany(ones, {ordered: false});
+		log("chanleturbo", "- Archived " + ones_cnt + " ones");
+	} catch (e) {}
+
+	{
+		bulkUpdatePipe = [];
+		phiens.forEach(
+			function(phien) {
+				bulkUpdatePipe.push({updateMany: {filter: {phien: phien.id}, update: {$set: {'__archive.eventtime': phien.time}}}})
+			}
+		);
+		db_active.chanleturbo_cuocs.bulkWrite(bulkUpdatePipe, {ordered : false});
+		db_active.chanleturbo_ones.bulkWrite(bulkUpdatePipe, {ordered : false});
+	}
+	db_active.chanleturbo_phiens.updateMany({id: {$in: phiens_id}}, [{$set: {'__archive.eventtime': "$time"}}]);
+	log("chanleturbo", "Archived " + phiens_id.length + " phiens with " + cuocs_cnt + " cuocs & " + ones_cnt + " ones.");
+}
+// Run archive
+{
+	// Get all phiens that to be archived
+	phiens = [];
+	phiens_id = [];
+	db_active.chanleturbo_phiens.find({time: {$lt: cutoff}, '__archive.eventtime': {$exists: false}}).forEach(
+		function(phien) {
+			phiens.push(phien);
+			phiens_id.push(phien.id);
+
+			// Archive by batch of 1000 phiens
+			if (phiens_id.length % 1000 === 0) {
+				archiveChanLeTurbo(phiens, phiens_id);
+
+				phiens = [];
+				phiens_id = [];
+			}
+		}
+	);
+	archiveChanLeTurbo(phiens, phiens_id);
+}
+
 
 
 // Log
