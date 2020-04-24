@@ -1,0 +1,5 @@
+1 * * * * mongo --nodb --quiet /var/crontab/mongodb/luminet/sit/archive-process/run_archive.sit.js >> /var/crontab/mongodb/luminet/sit/archive-process/archive.log 2>&1
+
+1 * * * * mongo --nodb --quiet /var/crontab/mongodb/luminet/uat/archive-process/run_archive.uat.js >> /var/crontab/mongodb/luminet/uat/archive-process/archive.log 2>&1
+
+1 * * * * mongo --nodb --quiet /var/crontab/mongodb/luminet/prod/archive-process/run_archive.prod.js >> /var/crontab/mongodb/luminet/prod/archive-process/archive.log 2>&1
