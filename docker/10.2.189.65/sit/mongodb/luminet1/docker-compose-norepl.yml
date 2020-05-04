@@ -1,33 +1,35 @@
 version: '3.3'
 services:
-  mongodb:
+  sabal1_sit_db01:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: SabaSITDB01
-    hostname: saba_sit_db01
+    container_name: SabaL1SITDB01
+    hostname: sabal1_sit_db01
     restart: always
     networks:
-      sabasitdb_network:
-        ipv4_address: 172.35.0.101
+      sabal1sitdb_network:
+        ipv4_address: 172.35.0.201
     ports:
       - '0.0.0.0:27201:27201'
     environment:
       MONGO_INITDB_ROOT_USERNAME: ''
       MONGO_INITDB_ROOT_PASSWORD: ''
     volumes:
-      - ../.storage/mongodb01/db:/data/db:rw
-      - ../.storage/mongodb01/backup:/data/backup:rw
-      - ../.storage/mongodb01/log:/var/log/mongodb:rw
-      - ./config/mongod.conf:/etc/mongod.conf:ro
+      - ../.storage/mongodbl101/db:/data/db:rw
+      - ../.storage/mongodbl101/backup:/data/backup:rw
+      - ../.storage/mongodbl101/log:/var/log/mongodb:rw
+      - ./config/mongod.l1.pri.conf:/etc/mongod.conf:ro
     secrets:
       - keyFile
     command: --config /etc/mongod.conf
+
 secrets:
   keyFile:
     file: ./secret/keyFile
+
 networks:
-  sabasitdb_network:
+  sabal1sitdb_network:
     driver: bridge
     ipam:
       config:
