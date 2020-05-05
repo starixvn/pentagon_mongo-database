@@ -61,6 +61,7 @@ INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 WHERE	b.vendorID = @VendorId
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
+	AND	b.statusID <> 101 --Reject
 GROUP BY b.gameId, g.typenamee, b.CurrencyName
 ';
 
