@@ -67,6 +67,11 @@ db.getSiblingDB('script').system.js.save({
                 var ones_cnt = 0;
 
                 fromDB[coll.one].find({phien: {$in: phiens_id}}).forEach((one) => {
+                    // Add currency
+                    if (users && users[one.uid]) {
+                        one.currency = users[one.uid].currency;
+                    }
+
                     ones.push(one);
                     ones_cnt++;
 
@@ -99,6 +104,11 @@ db.getSiblingDB('script').system.js.save({
                 var cuocs_cnt = 0;
 
                 fromDB[coll.cuoc].find({phien: {$in: phiens_id}}).forEach((cuoc) => {
+                    // Add currency
+                    if (users && users[cuoc.uid]) {
+                        cuoc.currency = users[cuoc.uid].currency;
+                    }
+
                     cuocs.push(cuoc);
                     cuocs_cnt++;
 
@@ -129,6 +139,12 @@ db.getSiblingDB('script').system.js.save({
             log('I', 'ARCHIVE', group, 'Archived ' + phiens_id.length + ' phiens with ' + cuocs_cnt + ' cuocs & ' + ones_cnt + ' ones.');
         }
 
+        var users = {};
+        fromDB['userinfos'].find({type: false}, {_id: 0, id: 1, currency: 1}).forEach((user) => {
+            users[user.id] = {currency: user.currency};
+        });
+
+        // Running archive
         var phiens = [];
         var phiens_id = [];
 
