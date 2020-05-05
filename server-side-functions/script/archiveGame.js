@@ -72,8 +72,10 @@ db.getSiblingDB('script').system.js.save({
                         one.currency = users[one.uid].currency;
                     }
 
-                    ones.push(one);
-                    ones_cnt++;
+                    if (one.memberId > 0) {
+                        ones.push(one);
+                        ones_cnt++;
+                    }
 
                     if (ones_cnt % 1000 == 0) {
                         try {
@@ -109,8 +111,10 @@ db.getSiblingDB('script').system.js.save({
                         cuoc.currency = users[cuoc.uid].currency;
                     }
 
-                    cuocs.push(cuoc);
-                    cuocs_cnt++;
+                    if (cuoc.memberId > 0) {
+                        cuocs.push(cuoc);
+                        cuocs_cnt++;
+                    }
 
                     if (cuocs_cnt % 1000 == 0) {
                         try {
