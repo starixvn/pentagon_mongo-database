@@ -77,7 +77,7 @@ db.getSiblingDB('script').system.js.save({
                         ones_cnt++;
                     }
 
-                    if (ones_cnt % 1000 == 0) {
+                    if (ones_cnt > 0 && ones_cnt % 1000 == 0) {
                         try {
                             toDB[coll_bk.one].insertMany(ones, {ordered: false});
                         } catch (e) {
@@ -86,7 +86,7 @@ db.getSiblingDB('script').system.js.save({
                         ones = [];
                     }
 
-                    if (ones_cnt % 10000 == 0) {
+                    if (ones_cnt > 0 && ones_cnt % 10000 == 0) {
                         log('I', 'ARCHIVE', group, '- Archiving ' + ones_cnt + ' ones');
                     }
                 })
@@ -116,7 +116,7 @@ db.getSiblingDB('script').system.js.save({
                         cuocs_cnt++;
                     }
 
-                    if (cuocs_cnt % 1000 == 0) {
+                    if (cuocs_cnt > 0 && cuocs_cnt % 1000 == 0) {
                         try {
                             toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                         } catch (e) {
@@ -125,7 +125,7 @@ db.getSiblingDB('script').system.js.save({
                         cuocs = [];
                     }
 
-                    if (cuocs_cnt % 10000 == 0) {
+                    if (cuocs_cnt > 0 && cuocs_cnt % 10000 == 0) {
                         log('I', 'ARCHIVE', group, '- Archiving ' + cuocs_cnt + ' cuocs');
                     }
                 })
