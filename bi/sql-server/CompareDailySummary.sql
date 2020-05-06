@@ -84,13 +84,14 @@ SELECT	1612 AS gameTypeId
 	,	SUM(b.bet) AS stake
 	,	SUM(CASE WHEN b.win = true THEN b.betwin ELSE b.tralai - b.bet END) AS winLost
 FROM		minigame.taixiu_phiens AS g
-INNER JOIN	minigame.taixiu_ones AS b
+LEFT JOIN	minigame.taixiu_ones AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
 	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 UNION
@@ -101,13 +102,14 @@ SELECT	1613 AS gameTypeId
 	,	SUM(b.chan + b.le + b.red3 + b.red4 + b.white3 + b.white4) AS stake
 	,	SUM(b.betwin - (b.chan + b.le + b.red3 + b.red4 + b.white3 + b.white4)) AS winLost
 FROM		minigame.xocxoc_phiens AS g
-INNER JOIN	minigame.xocxoc_cuocs AS b
+LEFT JOIN	minigame.xocxoc_cuocs AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
 	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 UNION
@@ -118,13 +120,14 @@ SELECT	1614 AS gameTypeId
 	,	SUM(b.`0` + b.`1` + b.`2` + b.`3` + b.`4` + b.`5`) AS stake
 	,	SUM(b.betwin - (b.`0` + b.`1` + b.`2` + b.`3` + b.`4` + b.`5`)) AS winLost
 FROM		minigame.baucua_phiens AS g
-INNER JOIN	minigame.baucua_cuocs AS b
+LEFT JOIN	minigame.baucua_cuocs AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
 	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 UNION
@@ -135,13 +138,14 @@ SELECT	1615 AS gameTypeId
 	,	SUM(b.bet) AS stake
 	,	SUM(CASE WHEN b.win = true THEN b.betwin ELSE b.tralai - b.bet END) AS winLost
 FROM		minigame.txturbo_phiens AS g
-INNER JOIN	minigame.txturbo_ones AS b
+LEFT JOIN	minigame.txturbo_ones AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
 	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 UNION
@@ -152,13 +156,14 @@ SELECT	1616 AS gameTypeId
 	,	SUM(b.bet) AS stake
 	,	SUM(CASE WHEN b.win = true THEN b.betwin ELSE b.tralai - b.bet END) AS winLost
 FROM		minigame.chanle_phiens AS g
-INNER JOIN	minigame.chanle_ones AS b
+LEFT JOIN	minigame.chanle_ones AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
 	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 UNION
@@ -169,13 +174,14 @@ SELECT	1617 AS gameTypeId
 	,	SUM(b.bet) AS stake
 	,	SUM(CASE WHEN b.win = true THEN b.betwin ELSE b.tralai - b.bet END) AS winLost
 FROM		minigame.chanleturbo_phiens AS g
-INNER JOIN	minigame.chanleturbo_ones AS b
+LEFT JOIN	minigame.chanleturbo_ones AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
---	AND	b.thanhtoan = true
+	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 UNION
@@ -186,13 +192,14 @@ SELECT	1618 AS gameTypeId
 	,	SUM(b.dragon + b.tie + b.tiger) AS stake
 	,	SUM(b.betwin - (b.dragon + b.tie + b.tiger)) AS winLost
 FROM		minigame.minidragontiger_phiens AS g
-INNER JOIN	minigame.minidragontiger_cuocs AS b
+LEFT JOIN	minigame.minidragontiger_cuocs AS b
 		ON	g.id = b.phien
-INNER JOIN	minigame.userinfos AS u
+LEFT JOIN	minigame.userinfos AS u
 		ON	b.uid = u.id
 WHERE	g.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 	AND	g.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @ReportDate), 127) + N'''
 	AND	b.thanhtoan = true
+	AND	b.memberId > 0
 	AND	u.type = 0
 GROUP BY u.currency
 ;';
