@@ -46,6 +46,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'chanleturbo_ones'
     ||  coll == 'minidragontiger_cuocs'
     ||  coll == 'xocxoc_cuocs'
+    ||  coll == 'kenopromax_cuocs'
     ) {
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^UIX_' + coll + '_uid_phien_red$').test(_idx.name))[0];
         if (!idx) {
@@ -109,8 +110,10 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
 
         var one = coll.substring(0, coll.length - 7) + '_ones';
         var cuoc = coll.substring(0, coll.length - 7) + '_cuocs';
+        var tmpcuoc = coll.substring(0, coll.length - 7) + '_tmpcuocs';
 
         if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: one})[0]) {
+            // Index for one
             var idx = db.getSiblingDB('minigame')[one].getIndexes().filter((idx)=>RegExp('^IX_' + one + '_time$').test(idx.name))[0];
             if (idx) {
                 idx.exists = true;
@@ -129,6 +132,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             delete idx.v;
             printjson(idx);
         } else if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: cuoc})[0]) {
+            // Index for cuoc
             var idx = db.getSiblingDB('minigame')[cuoc].getIndexes().filter((idx)=>RegExp('^IX_' + cuoc + '_time$').test(idx.name))[0];
             if (idx) {
                 idx.exists = true;
@@ -149,6 +153,29 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
         } else {
             print('WARNING: No associated one or cuoc available!!!');
         }
+
+        if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: tmpcuoc})[0]) {
+            // Index for tmpcuoc
+            var idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^IX_TTL_' + tmpcuoc + '_time$').test(idx.name))[0];
+            if (idx) {
+                idx.exists = true;
+            }
+            else {
+                var res = db.getSiblingDB('minigame')[tmpcuoc].createIndex(
+                    {time: 1}
+                ,   {name: 'IX_TTL_' + tmpcuoc + '_time', expireAfterSeconds: 120}
+                );
+                if (res.ok != 1) {
+                    printjson(res);
+                }
+                idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^IX_TTL_' + tmpcuoc + '_time$').test(idx.name))[0];
+                idx.CREATED = true;
+            }
+            delete idx.v;
+            if (!(idx.expireAfterSeconds = 120)) {
+                idx.WARNING = '[expireAfterSeconds] option is NOT correct!!!'
+            }
+            printjson(idx);
+        }
     }
 });
-
