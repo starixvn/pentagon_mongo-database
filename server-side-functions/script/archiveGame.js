@@ -67,10 +67,17 @@ db.getSiblingDB('script').system.js.save({
                 var ones_cnt = 0;
 
                 fromDB[coll.one].find({phien: {$in: phiens_id}}).forEach((one) => {
-                    ones.push(one);
-                    ones_cnt++;
+                    // Add currency
+                    if (users && users[one.uid]) {
+                        one.currency = users[one.uid].currency;
+                    }
 
-                    if (ones_cnt % 1000 == 0) {
+                    if (one.memberId > 0) {
+                        ones.push(one);
+                        ones_cnt++;
+                    }
+
+                    if (ones_cnt > 0 && ones_cnt % 1000 == 0) {
                         try {
                             toDB[coll_bk.one].insertMany(ones, {ordered: false});
                         } catch (e) {
@@ -79,7 +86,7 @@ db.getSiblingDB('script').system.js.save({
                         ones = [];
                     }
 
-                    if (ones_cnt % 10000 == 0) {
+                    if (ones_cnt > 0 && ones_cnt % 10000 == 0) {
                         log('I', 'ARCHIVE', group, '- Archiving ' + ones_cnt + ' ones');
                     }
                 })
@@ -99,10 +106,17 @@ db.getSiblingDB('script').system.js.save({
                 var cuocs_cnt = 0;
 
                 fromDB[coll.cuoc].find({phien: {$in: phiens_id}}).forEach((cuoc) => {
-                    cuocs.push(cuoc);
-                    cuocs_cnt++;
+                    // Add currency
+                    if (users && users[cuoc.uid]) {
+                        cuoc.currency = users[cuoc.uid].currency;
+                    }
 
-                    if (cuocs_cnt % 1000 == 0) {
+                    if (cuoc.memberId > 0) {
+                        cuocs.push(cuoc);
+                        cuocs_cnt++;
+                    }
+
+                    if (cuocs_cnt > 0 && cuocs_cnt % 1000 == 0) {
                         try {
                             toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                         } catch (e) {
@@ -111,7 +125,7 @@ db.getSiblingDB('script').system.js.save({
                         cuocs = [];
                     }
 
-                    if (cuocs_cnt % 10000 == 0) {
+                    if (cuocs_cnt > 0 && cuocs_cnt % 10000 == 0) {
                         log('I', 'ARCHIVE', group, '- Archiving ' + cuocs_cnt + ' cuocs');
                     }
                 })
@@ -129,6 +143,12 @@ db.getSiblingDB('script').system.js.save({
             log('I', 'ARCHIVE', group, 'Archived ' + phiens_id.length + ' phiens with ' + cuocs_cnt + ' cuocs & ' + ones_cnt + ' ones.');
         }
 
+        var users = {};
+        fromDB['userinfos'].find({type: false}, {_id: 0, id: 1, currency: 1}).forEach((user) => {
+            users[user.id] = {currency: user.currency};
+        });
+
+        // Running archive
         var phiens = [];
         var phiens_id = [];
 
