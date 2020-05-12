@@ -47,6 +47,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'minidragontiger_cuocs'
     ||  coll == 'xocxoc_cuocs'
     ||  coll == 'kenopromax_cuocs'
+    ||  coll == 'kenopromax_tmpcuocs'
     ) {
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^UIX_' + coll + '_uid_phien_red$').test(_idx.name))[0];
         if (!idx) {
