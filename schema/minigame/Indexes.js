@@ -1,45 +1,33 @@
 // Archive TTL indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    if (RegExp('_phiens$').test(coll) || RegExp('_ones$').test(coll) || RegExp('_cuocs$').test(coll)) {
-        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^TTL_').test(idx.name))[0];
+if (RegExp('(_phiens|_cuocs|_ones)$').test(coll)) {
+        var idx_name = 'TTL_' + coll;
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
-            idx.exists = true;
+            idx._____exists = true;
         }
         else {
             var res = db.getSiblingDB('minigame')[coll].createIndex(
                 {'__archive.eventtime': 1}
-            ,   {expireAfterSeconds: 3600*24*8, name: 'TTL_' + coll}
+            ,   {expireAfterSeconds: 3600*24*8, name: idx_name}
             );
             if (res.ok != 1) {
                 printjson(res);
             }
-            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^TTL_').test(idx.name))[0];
-            idx.CREATED = true;
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx._____CREATED = true;
         }
         delete idx.v;
         if (!(idx.expireAfterSeconds > 0)) {
-            idx.WARNING = '[expireAfterSeconds] option is NOT correct!!!'
+            idx._____WARNING = '[expireAfterSeconds] option is NOT correct!!!'
         }
         printjson(idx);
     }
 });
 
-// Unique indexes for bets
+// Indexes for bets
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    if (RegExp('_ones$').test(coll) || RegExp('_cuocs$').test(coll)) {
-        var idxs = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^UIX_').test(idx.name));
-
-        idxs.forEach((idx) => {
-            idx.exists = true;
-            delete idx.v;
-            if (!(idx.unique == true)) {
-                idx.WARNING = '[unique] option is NOT correct!!!'
-            }
-        });
-        printjson(idxs);
-    }
-
-    // uid - phien - red
+    // [UNIQUE] uid - phien - red
     if (
         coll == 'baucua_cuocs'
     ||  coll == 'chanle_ones'
@@ -49,38 +37,133 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'kenopromax_cuocs'
     ||  coll == 'kenopromax_tmpcuocs'
     ) {
-        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^UIX_' + coll + '_uid_phien_red$').test(_idx.name))[0];
+        var idx_name = 'UIX_' + coll + '_uid_phien_red';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
         if (!idx) {
             var res = db.getSiblingDB('minigame')[coll].createIndex(
                 {uid: 1, phien: 1, red: 1}
-            ,   {unique: true, name: 'UIX_' + coll + '_uid_phien_red'}
+            ,   {unique: true, name: idx_name}
             );
             if (res.ok != 1) {
                 printjson(res);
             }
-            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^UIX_' + coll + '_uid_phien_red$').test(_idx.name))[0];
-            idx.CREATED = true;
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx._____CREATED = true;
+            delete idx.v;
+            printjson(idx);
+        } else {
+            idx._____exists = true;
+            delete idx.v;
+            if (!(idx.unique == true)) {
+                idx._____WARNING = '[unique] option is NOT correct!!!'
+            }
+            printjson(idx);
+        }
+    }
+
+    // [UNIQUE] uid - phien - taixiu - red
+    if (
+        coll == 'taixiu_ones'
+    ||  coll == 'txturbo_ones'
+    ) {
+        var idx_name = 'UIX_' + coll + '_uid_phien_red';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+        if (!idx) {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {uid: 1, phien: 1, taixiu: 1, red: 1}
+            ,   {unique: true, name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx._____CREATED = true;
+            delete idx.v;
+            printjson(idx);
+        } else {
+            idx._____exists = true;
+            delete idx.v;
+            if (!(idx.unique == true)) {
+                idx._____WARNING = '[unique] option is NOT correct!!!'
+            }
+            printjson(idx);
+        }
+    }
+
+    // uid - thanhtoan - _id
+    if (
+        coll == 'chanle_cuocs'
+    ||  coll == 'chanleturbo_cuocs'
+    ) {
+        var idx_name = 'IX_' + coll + '_uid_thanhtoan__id';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+        if (!idx) {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {uid: 1, thanhtoan: 1, _id: 1}
+            ,   {name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx._____CREATED = true;
+            delete idx.v;
+            printjson(idx);
+        } else {
+            idx._____exists = true;
             delete idx.v;
             printjson(idx);
         }
     }
 
-    // uid - phien - taixiu - red
+    // uid - thanhtoan - red - _id
     if (
-        coll == 'taixiu_ones'
-    ||  coll == 'txturbo_ones'
+        coll == 'baucua_cuocs'
+    ||  coll == 'xocxoc_cuocs'
+    ||  coll == 'minidragontiger_cuocs'
     ) {
-        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^UIX_' + coll + '_uid_phien_red$').test(_idx.name))[0];
+        var idx_name = 'IX_' + coll + '_uid_thanhtoan__id';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
         if (!idx) {
             var res = db.getSiblingDB('minigame')[coll].createIndex(
-                {uid: 1, phien: 1, taixiu: 1, red: 1}
-            ,   {unique: true, name: 'UIX_' + coll + '_uid_phien_red'}
+                {uid: 1, thanhtoan: 1, red: 1, _id: 1}
+            ,   {name: idx_name}
             );
             if (res.ok != 1) {
                 printjson(res);
             }
-            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^UIX_' + coll + '_uid_phien_red$').test(_idx.name))[0];
-            idx.CREATED = true;
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx._____CREATED = true;
+            delete idx.v;
+            printjson(idx);
+        } else {
+            idx._____exists = true;
+            delete idx.v;
+            printjson(idx);
+        }
+    }
+
+    // uid - thanhtoan - red - taixiu - _id
+    if (
+        coll == 'taixiu_cuocs'
+    ||  coll == 'txturbo_cuocs'
+    ) {
+        var idx_name = 'IX_' + coll + '_uid_thanhtoan__id';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+        if (!idx) {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {uid: 1, thanhtoan: 1, red: 1, taixiu: 1, _id: 1}
+            ,   {name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx._____CREATED = true;
+            delete idx.v;
+            printjson(idx);
+        } else {
+            idx._____exists = true;
             delete idx.v;
             printjson(idx);
         }
@@ -90,21 +173,21 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
 // Time indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     if (RegExp('_phiens$').test(coll)) {
-
-        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^IX_' + coll + '_time$').test(idx.name))[0];
+        var idx_name = 'IX_' + coll + '_time';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
-            idx.exists = true;
+            idx._____exists = true;
         }
         else {
             var res = db.getSiblingDB('minigame')[coll].createIndex(
                 {time: 1}
-            ,   {name: 'IX_' + coll + '_time'}
+            ,   {name: idx_name}
             );
             if (res.ok != 1) {
                 printjson(res);
             }
-            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^IX_' + coll + '_time$').test(idx.name))[0];
-            idx.CREATED = true;
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx._____CREATED = true;
         }
         delete idx.v;
         printjson(idx);
@@ -115,39 +198,41 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
 
         if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: one})[0]) {
             // Index for one
-            var idx = db.getSiblingDB('minigame')[one].getIndexes().filter((idx)=>RegExp('^IX_' + one + '_time$').test(idx.name))[0];
+            var idx_name = 'IX_' + one + '_time';
+            var idx = db.getSiblingDB('minigame')[one].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
             if (idx) {
-                idx.exists = true;
+                idx._____exists = true;
             }
             else {
                 var res = db.getSiblingDB('minigame')[one].createIndex(
                     {time: 1}
-                ,   {name: 'IX_' + one + '_time'}
+                ,   {name: idx_name}
                 );
                 if (res.ok != 1) {
                     printjson(res);
                 }
-                idx = db.getSiblingDB('minigame')[one].getIndexes().filter((idx)=>RegExp('^IX_' + one + '_time$').test(idx.name))[0];
-                idx.CREATED = true;
+                idx = db.getSiblingDB('minigame')[one].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+                idx._____CREATED = true;
             }
             delete idx.v;
             printjson(idx);
         } else if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: cuoc})[0]) {
             // Index for cuoc
-            var idx = db.getSiblingDB('minigame')[cuoc].getIndexes().filter((idx)=>RegExp('^IX_' + cuoc + '_time$').test(idx.name))[0];
+            var idx_name = 'IX_' + cuoc + '_time';
+            var idx = db.getSiblingDB('minigame')[cuoc].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
             if (idx) {
-                idx.exists = true;
+                idx._____exists = true;
             }
             else {
                 var res = db.getSiblingDB('minigame')[cuoc].createIndex(
                     {time: 1}
-                ,   {name: 'IX_' + cuoc + '_time'}
+                ,   {name: idx_name}
                 );
                 if (res.ok != 1) {
                     printjson(res);
                 }
-                idx = db.getSiblingDB('minigame')[cuoc].getIndexes().filter((idx)=>RegExp('^IX_' + cuoc + '_time$').test(idx.name))[0];
-                idx.CREATED = true;
+                idx = db.getSiblingDB('minigame')[cuoc].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+                idx._____CREATED = true;
             }
             delete idx.v;
             printjson(idx);
@@ -157,26 +242,28 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
 
         if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: tmpcuoc})[0]) {
             // Index for tmpcuoc
-            var idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^IX_TTL_' + tmpcuoc + '_time$').test(idx.name))[0];
+            var idx_name = 'IX_TTL_' + tmpcuoc + '_time';
+            var idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
             if (idx) {
-                idx.exists = true;
+                idx._____exists = true;
             }
             else {
                 var res = db.getSiblingDB('minigame')[tmpcuoc].createIndex(
                     {time: 1}
-                ,   {name: 'IX_TTL_' + tmpcuoc + '_time', expireAfterSeconds: 120}
+                ,   {expireAfterSeconds: 120, name: idx_name}
                 );
                 if (res.ok != 1) {
                     printjson(res);
                 }
-                idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^IX_TTL_' + tmpcuoc + '_time$').test(idx.name))[0];
-                idx.CREATED = true;
+                idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+                idx._____CREATED = true;
             }
             delete idx.v;
             if (!(idx.expireAfterSeconds = 120)) {
-                idx.WARNING = '[expireAfterSeconds] option is NOT correct!!!'
+                idx._____WARNING = '[expireAfterSeconds] option is NOT correct!!!'
             }
             printjson(idx);
         }
     }
 });
+
