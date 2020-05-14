@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 1,
   "id": 370,
-  "iteration": 1589193523779,
+  "iteration": 1589433748684,
   "links": [],
   "panels": [
     {
@@ -615,11 +615,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "description": "db.serverStatus().metrics.queryExecutor\n- scanned = keysExamined\n- scanned_objects = docsExamined",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 5,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 12
       },
@@ -636,6 +637,13 @@
       },
       "lines": true,
       "linewidth": 1,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Explain",
+          "url": "https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics.queryExecutor"
+        }
+      ],
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
@@ -663,7 +671,7 @@
       "title": "Query Executor",
       "tooltip": {
         "shared": true,
-        "sort": 0,
+        "sort": 2,
         "value_type": "individual"
       },
       "type": "graph",
@@ -684,7 +692,7 @@
           "show": true
         },
         {
-          "format": "short",
+          "format": "locale",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -703,13 +711,118 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "description": "db.serverStatus().metrics.document",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "hiddenSeries": false,
+      "id": 27,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Explain",
+          "url": "https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics.document"
+        }
+      ],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "scanned/returned",
+          "dashes": true,
+          "fill": 0,
+          "linewidth": 2,
+          "spaceLength": 2,
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "idelta(mongodb_mongod_metrics_document_total{job=\"$job\"}[1m])",
+          "interval": "",
+          "legendFormat": "{{state}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Document Access",
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "cps",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "locale",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
       "decimals": 2,
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 5,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 16,
         "y": 12
       },
       "hiddenSeries": false,
@@ -1119,6 +1232,7 @@
         "allFormat": "glob",
         "allValue": null,
         "current": {
+          "selected": false,
           "tags": [],
           "text": "sabadb01",
           "value": "sabadb01"
@@ -1169,5 +1283,5 @@
   "variables": {
     "list": []
   },
-  "version": 9
+  "version": 15
 }
