@@ -4,7 +4,7 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
         var idx_name = 'IX_' + coll + '_id';
         var idx = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
-            idx._____exists = true;
+            idx.exists = true;
         }
         else {
             var res = db.getSiblingDB('minigame_arc')[coll].createIndex(
@@ -25,7 +25,7 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
         var idx_name = 'IX_' + coll + '_phien';
         var idx = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
-            idx._____exists = true;
+            idx.exists = true;
         }
         else {
             var res = db.getSiblingDB('minigame_arc')[coll].createIndex(
@@ -49,7 +49,7 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
         var idx_name = 'IX_' + coll + '_time';
         var idx = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
-            idx._____exists = true;
+            idx.exists = true;
         }
         else {
             var res = db.getSiblingDB('minigame_arc')[coll].createIndex(
@@ -73,7 +73,7 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
         var idxs = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((idx)=>RegExp('^UIX_').test(idx.name));
 
         idxs.forEach((idx) => {
-            idx._____exists = true;
+            idx.exists = true;
             delete idx.v;
             if (!(idx.unique == true)) {
                 idx.WARNING = '[unique] option is NOT correct!!!'
