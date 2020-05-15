@@ -1,6 +1,6 @@
 // Archive TTL indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-if (RegExp('(_phiens|_cuocs|_ones)$').test(coll)) {
+    if (RegExp('(_phiens|_cuocs|_ones)$').test(coll)) {
         var idx_name = 'TTL_' + coll;
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
@@ -17,10 +17,10 @@ if (RegExp('(_phiens|_cuocs|_ones)$').test(coll)) {
             idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
             idx._____CREATED = true;
         }
-        delete idx.v;
         if (!(idx.expireAfterSeconds > 0)) {
             idx._____WARNING = '[expireAfterSeconds] option is NOT correct!!!'
         }
+        delete idx.v;
         printjson(idx);
     }
 });
@@ -34,8 +34,6 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'chanleturbo_ones'
     ||  coll == 'minidragontiger_cuocs'
     ||  coll == 'xocxoc_cuocs'
-    ||  coll == 'kenopromax_cuocs'
-    ||  coll == 'kenopromax_tmpcuocs'
     ) {
         var idx_name = 'UIX_' + coll + '_uid_phien_red';
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
@@ -49,16 +47,14 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             }
             idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
             idx._____CREATED = true;
-            delete idx.v;
-            printjson(idx);
         } else {
             idx.exists = true;
-            delete idx.v;
             if (!(idx.unique == true)) {
                 idx._____WARNING = '[unique] option is NOT correct!!!'
             }
-            printjson(idx);
         }
+        delete idx.v;
+        printjson(idx);
     }
 
     // [UNIQUE] uid - phien - taixiu - red
@@ -78,16 +74,41 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             }
             idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
             idx._____CREATED = true;
-            delete idx.v;
-            printjson(idx);
         } else {
             idx.exists = true;
-            delete idx.v;
             if (!(idx.unique == true)) {
                 idx._____WARNING = '[unique] option is NOT correct!!!'
             }
-            printjson(idx);
         }
+        delete idx.v;
+        printjson(idx);
+    }
+
+    // [UNIQUE] uid - phien
+    if (
+        coll == 'kenopromax_cuocs'
+    ||  coll == 'kenopromax_tmpcuocs'
+    ) {
+        var idx_name = 'UIX_' + coll + '_uid_phien';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+        if (!idx) {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {uid: 1, phien: 1}
+            ,   {unique: true, name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx._____CREATED = true;
+        } else {
+            idx.exists = true;
+            if (!(idx.unique == true)) {
+                idx._____WARNING = '[unique] option is NOT correct!!!'
+            }
+        }
+        delete idx.v;
+        printjson(idx);
     }
 
     // uid - thanhtoan - _id
@@ -107,13 +128,11 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             }
             idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
             idx._____CREATED = true;
-            delete idx.v;
-            printjson(idx);
         } else {
             idx.exists = true;
-            delete idx.v;
-            printjson(idx);
         }
+        delete idx.v;
+        printjson(idx);
     }
 
     // uid - thanhtoan - red - _id
@@ -134,16 +153,14 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             }
             idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
             idx._____CREATED = true;
-            delete idx.v;
-            printjson(idx);
         } else {
             idx.exists = true;
-            delete idx.v;
-            printjson(idx);
         }
+        delete idx.v;
+        printjson(idx);
     }
 
-    // uid - thanhtoan - red - taixiu - _id
+    // uid - thanhtoan - _id
     if (
         coll == 'taixiu_cuocs'
     ||  coll == 'txturbo_cuocs'
@@ -152,7 +169,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
         if (!idx) {
             var res = db.getSiblingDB('minigame')[coll].createIndex(
-                {uid: 1, thanhtoan: 1, red: 1, taixiu: 1, _id: 1}
+                {uid: 1, thanhtoan: 1, _id: 1}
             ,   {name: idx_name}
             );
             if (res.ok != 1) {
@@ -160,13 +177,11 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             }
             idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
             idx._____CREATED = true;
-            delete idx.v;
-            printjson(idx);
         } else {
             idx.exists = true;
-            delete idx.v;
-            printjson(idx);
         }
+        delete idx.v;
+        printjson(idx);
     }
 });
 
@@ -258,10 +273,10 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
                 idx = db.getSiblingDB('minigame')[tmpcuoc].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
                 idx._____CREATED = true;
             }
-            delete idx.v;
             if (!(idx.expireAfterSeconds = 120)) {
                 idx._____WARNING = '[expireAfterSeconds] option is NOT correct!!!'
             }
+            delete idx.v;
             printjson(idx);
         }
     }
