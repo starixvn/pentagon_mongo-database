@@ -55,10 +55,14 @@ services:
     volumes:
       - ../.storage/mongobi01/log:/var/log/mongosqld:rw
       - ./config/mongosqld.pri.conf:/etc/mongosqld.conf:ro
+    secrets:
+      - mongosqld_ssl
 
 secrets:
   keyFile:
     file: ./secret/keyFile
+  mongosqld_ssl:
+    file: ./secret/mongosqld.pem
 
 networks:
   sabadb_network:
