@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 1,
   "id": 370,
-  "iteration": 1589433748684,
+  "iteration": 1589950918047,
   "links": [],
   "panels": [
     {
@@ -615,6 +615,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": 2,
       "description": "db.serverStatus().metrics.queryExecutor\n- scanned = keysExamined\n- scanned_objects = docsExamined",
       "fill": 1,
       "fillGradient": 0,
@@ -711,6 +712,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": 2,
       "description": "db.serverStatus().metrics.document",
       "fill": 1,
       "fillGradient": 0,
@@ -748,22 +750,13 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "scanned/returned",
-          "dashes": true,
-          "fill": 0,
-          "linewidth": 2,
-          "spaceLength": 2,
-          "yaxis": 2
-        }
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "idelta(mongodb_mongod_metrics_document_total{job=\"$job\"}[1m])",
+          "expr": "irate(mongodb_mongod_metrics_document_total{job=\"$job\"}[1m])",
           "interval": "",
           "legendFormat": "{{state}}",
           "refId": "A"
@@ -829,12 +822,12 @@
       "id": 16,
       "legend": {
         "avg": false,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": true
+        "values": false
       },
       "lines": true,
       "linewidth": 1,
@@ -1232,10 +1225,8 @@
         "allFormat": "glob",
         "allValue": null,
         "current": {
-          "selected": false,
-          "tags": [],
-          "text": "sabadb01",
-          "value": "sabadb01"
+          "text": "MongoDB_L1_Main01",
+          "value": "MongoDB_L1_Main01"
         },
         "datasource": "Prometheus",
         "definition": "label_values(job)",
@@ -1248,7 +1239,7 @@
         "options": [],
         "query": "label_values(job)",
         "refresh": 1,
-        "regex": "/^saba/",
+        "regex": "/^MongoDB_/",
         "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
@@ -1283,5 +1274,5 @@
   "variables": {
     "list": []
   },
-  "version": 15
+  "version": 20
 }

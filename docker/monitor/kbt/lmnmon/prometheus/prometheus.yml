@@ -8,22 +8,38 @@ global:
 rule_files:
 
 scrape_configs:
-  - job_name: 'sabadb01'
+  - job_name: 'MongoDB_L1_Main01'
     static_configs:
       - targets: ['10.99.99.54:29101']
 
-  - job_name: 'sabadb02'
+  - job_name: 'MongoDB_L1_Main02'
     static_configs:
       - targets: ['10.99.99.53:29102']
 
-  - job_name: 'sabaarcdb01'
+  - job_name: 'MongoDB_L1_Arc01'
     static_configs:
       - targets: ['10.99.99.53:29151']
 
-  - job_name: 'L1DB1'
+  - job_name: 'MongoDB_L2_Main01'
+    static_configs:
+      - targets: ['10.99.99.53:39101']
+
+  - job_name: 'MongoDB_L2_Main02'
+    static_configs:
+      - targets: ['10.99.99.54:39102']
+
+  - job_name: 'MongoDB_L2_Arc01'
+    static_configs:
+      - targets: ['10.99.99.54:39151']
+
+  - job_name: 'Node_sbdb01'
     static_configs:
       - targets: ['10.99.99.53:9100']
 
-  - job_name: 'L1DB2'
+  - job_name: 'Node_sbdb02'
     static_configs:
       - targets: ['10.99.99.54:9100']
+
+  - job_name: 'Node_sbapp05'
+    static_configs:
+      - targets: ['10.4.189.65:9100']
