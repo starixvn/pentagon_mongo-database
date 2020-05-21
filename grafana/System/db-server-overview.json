@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 372,
-  "iteration": 1589185970572,
+  "iteration": 1589950833232,
   "links": [],
   "panels": [
     {
@@ -849,6 +849,8 @@
       "legend": {
         "avg": false,
         "current": false,
+        "hideEmpty": true,
+        "hideZero": true,
         "max": false,
         "min": false,
         "show": true,
@@ -1132,8 +1134,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "L1DB2",
-          "value": "L1DB2"
+          "text": "Node_sbdb01",
+          "value": "Node_sbdb01"
         },
         "datasource": "Prometheus",
         "definition": "label_values(job)",
@@ -1146,7 +1148,7 @@
         "options": [],
         "query": "label_values(job)",
         "refresh": 1,
-        "regex": "/^L/",
+        "regex": "/^Node_/",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
@@ -1181,5 +1183,5 @@
   "variables": {
     "list": []
   },
-  "version": 3
+  "version": 6
 }

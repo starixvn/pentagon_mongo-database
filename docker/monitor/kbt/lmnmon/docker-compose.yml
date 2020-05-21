@@ -1,22 +1,5 @@
 version: '3.3'
 services:
-  grafana:
-    build:
-      context: .
-      dockerfile: Dockerfile_grafana
-    container_name: Grafana
-    hostname: Grafana
-    restart: always
-    networks:
-      monitor_network:
-        ipv4_address: 172.132.0.11
-    ports:
-      - '10.99.99.53:3000:3000'
-    volumes:
-      - ../.storage/grafana/data:/var/lib/grafana:rw
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
-    user: root
-
   prometheus:
     build:
       context: .
@@ -26,9 +9,9 @@ services:
     restart: always
     networks:
       monitor_network:
-        ipv4_address: 172.132.0.12
+        ipv4_address: 173.1.0.10
     ports:
-      - '10.99.99.53:9090:9090'
+      - '10.2.189.65:9090:9090'
     volumes:
       - ../.storage/prometheus/data:/prometheus:rw
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
@@ -38,4 +21,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.132.0.0/16
+        - subnet: 173.1.0.0/16
