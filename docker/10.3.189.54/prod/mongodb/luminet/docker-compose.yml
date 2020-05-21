@@ -38,7 +38,7 @@ services:
       - '10.99.99.54:29101:9216'
     environment:
       MONGODB_URI: 'mongodb://mongodb_exporter:@172.39.0.101:27101/'
-    command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
 
   saba_bi01:
     build:
