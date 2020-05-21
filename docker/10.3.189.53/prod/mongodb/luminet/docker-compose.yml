@@ -70,7 +70,7 @@ services:
       - ./config/mongod.arc.conf:/etc/mongod.conf:ro
     secrets:
       - keyFile
-    command: --config /etc/mongod.conf --auth
+    command: --config /etc/mongod.conf --replSet L1_SabaArc --auth
 
   saba_dbexporter02:
     build:
