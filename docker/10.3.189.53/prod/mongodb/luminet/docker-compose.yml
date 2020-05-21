@@ -86,7 +86,7 @@ services:
       - '10.99.99.53:29102:9216'
     environment:
       MONGODB_URI: 'mongodb://mongodb_exporter:@172.39.0.102:27102/'
-    command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
 
   saba_arc_dbexporter01:
     build:
@@ -102,7 +102,7 @@ services:
       - '10.99.99.53:29151:9216'
     environment:
       MONGODB_URI: 'mongodb://@172.39.0.151:27151/'
-    command: --collect.database --collect.collection --collect.topmetrics --collect.indexusage --collect.connpoolstats
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
 
   saba_bi02:
     build:
@@ -119,10 +119,32 @@ services:
     volumes:
       - ../.storage/mongobi02/log:/var/log/mongosqld:rw
       - ./config/mongosqld.sec.conf:/etc/mongosqld.conf:ro
+    secrets:
+      - mongosqld_ssl
+
+  saba_arc_bi01:
+    build:
+      context: .
+      dockerfile: Dockerfile_mongobi
+    container_name: SabaArcBI01
+    hostname: saba_arc_bi01
+    restart: always
+    networks:
+      sabadb_network:
+        ipv4_address: 172.39.0.31
+    ports:
+      - '10.99.99.53:28151:28151'
+    volumes:
+      - ../.storage/mongoarcbi01/log:/var/log/mongosqld:rw
+      - ./config/mongosqld.arc.conf:/etc/mongosqld.conf:ro
+    secrets:
+      - mongosqld_ssl
 
 secrets:
   keyFile:
     file: ./secret/keyFile
+  mongosqld_ssl:
+    file: ./secret/mongosqld.pem
 
 networks:
   sabadb_network:
