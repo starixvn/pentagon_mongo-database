@@ -32,14 +32,16 @@ db.getSiblingDB('script').system.js.save({
         ,   cuoc: group + '_cuocs_bk'
         };
 
-        // Group must have _phiens collection
-        if (fromDB.getCollectionInfos({name: coll.phien}).length != 1)
-            throw Error("Cannot run archive because [" + fromDB._name + "." + coll.phien + "] does NOT exist");
-
         // Function for logging
         var log = (type, label, title, str) => {
             d = new Date();
             print(d.toISOString() + ' ' + type.toUpperCase() + '  ' + label.toUpperCase() + ' [' + title + '] ' + str);
+        }
+
+        // Group must have _phiens collection
+        if (fromDB.getCollectionInfos({name: coll.phien}).length != 1) {
+            log('E', 'ARCHIVE', group, 'Cannot run archive because [' + fromDB._name + '.' + coll.phien +'] does NOT exist');
+            return;
         }
 
         // Function for archive by phiens
