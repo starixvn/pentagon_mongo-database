@@ -17,6 +17,7 @@ archiveGame(db_active, db_arc, 'chanle');
 archiveGame(db_active, db_arc, 'chanleturbo');
 archiveGame(db_active, db_arc, 'minidragontiger');
 archiveGame(db_active, db_arc, 'kenopromax');
+archiveGame(db_active, db_arc, 'minisedie');
 
 // Archive Log
 db_active = db_active.getSiblingDB('log');
