@@ -44,6 +44,6 @@ scrape_configs:
     static_configs:
       - targets: ['10.4.189.65:9100']
 
-  - job_name: 'Node_sbapp_bk01'
+  - job_name: 'Node_sb_bk01'
     static_configs:
-      - targets: ['10.40.40.186:9100']
+      - targets: ['10.99.99.187:9100']
