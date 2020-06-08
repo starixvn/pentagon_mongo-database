@@ -177,6 +177,7 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
     if (
         coll == 'kenopromax_cuocs_bk'
     ||  coll == 'minisedie_cuocs_bk'
+    ||  coll == 'baccarat_cuocs_bk'
     ) {
         var idx_name = 'UIX_' + coll + '_uid_phien';
         var idx = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];

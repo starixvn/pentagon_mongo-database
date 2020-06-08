@@ -89,6 +89,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
         coll == 'kenopromax_cuocs'
     ||  coll == 'kenopromax_tmpcuocs'
     ||  coll == 'minisedie_cuocs'
+    ||  coll == 'baccarat_cuocs'
+    ||  coll == 'baccarat_tmpcuocs'
     ) {
         var idx_name = 'UIX_' + coll + '_uid_phien';
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
@@ -167,6 +169,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'txturbo_cuocs'
     ||  coll == 'kenopromax_cuocs'
     ||  coll == 'minisedie_cuocs'
+    ||  coll == 'baccarat_cuocs'
     ) {
         var idx_name = 'IX_' + coll + '_uid_thanhtoan__id';
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
