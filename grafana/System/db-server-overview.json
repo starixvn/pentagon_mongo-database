@@ -16,11 +16,11 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 372,
-  "iteration": 1589950833232,
+  "iteration": 1591001206114,
   "links": [],
   "panels": [
     {
-      "content": "<div style=\"height:100%; width:100%; display:grid !important;\">\n  <div class=\"text-center dashboard-header\" style=\"margin:auto !important; width:100%; font-size: 2vw;\">\n    <span><b>${job}</b></span>\n  </div>\n</div>",
+      "content": "<div style=\"height:100%; width:100%; display:grid !important;\">\n  <div class=\"text-center dashboard-header\" style=\"margin:auto !important; width:100%; font-size: 1.5vw;\">\n    <span><b>${job}</b></span>\n  </div>\n</div>",
       "datasource": null,
       "gridPos": {
         "h": 4,
@@ -320,7 +320,7 @@
       "pluginVersion": "6.7.2",
       "targets": [
         {
-          "expr": "100 - (node_filesystem_free_bytes{job=\"$job\",fstype!=\"tmpfs\",fstype!=\"fuse.lxcfs\",mountpoint!=\"/boot\"} / node_filesystem_size_bytes{job=\"$job\",fstype!=\"tmpfs\",fstype!=\"fuse.lxcfs\",mountpoint!=\"/boot\"}) * 100",
+          "expr": "100 - (node_filesystem_free_bytes{job=\"$job\",fstype!=\"tmpfs\",fstype!=\"fuse.lxcfs\",fstype!=\"vfat\",mountpoint!=\"/boot\"} / node_filesystem_size_bytes{job=\"$job\",fstype!=\"tmpfs\",fstype!=\"fuse.lxcfs\",fstype!=\"vfat\",mountpoint!=\"/boot\"}) * 100",
           "instant": true,
           "interval": "",
           "legendFormat": "{{mountpoint}}",
@@ -372,7 +372,7 @@
       "pluginVersion": "6.7.2",
       "targets": [
         {
-          "expr": "node_filesystem_size_bytes{job=\"$job\",fstype!=\"tmpfs\",fstype!=\"fuse.lxcfs\",mountpoint!=\"/boot\"}",
+          "expr": "node_filesystem_size_bytes{job=\"$job\",fstype!=\"tmpfs\",fstype!=\"fuse.lxcfs\",fstype!=\"vfat\",mountpoint!=\"/boot\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "{{mountpoint}}",
@@ -637,7 +637,7 @@
       "datasource": "Prometheus",
       "decimals": 1,
       "description": "",
-      "fill": 0,
+      "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 6,
@@ -669,11 +669,8 @@
       "seriesOverrides": [
         {
           "alias": "available_memory",
+          "fill": 0,
           "fillBelowTo": "free_memory"
-        },
-        {
-          "alias": "free_memory",
-          "fill": 1
         }
       ],
       "spaceLength": 10,
@@ -945,6 +942,8 @@
       "legend": {
         "avg": false,
         "current": false,
+        "hideEmpty": true,
+        "hideZero": true,
         "max": false,
         "min": false,
         "show": true,
@@ -1183,5 +1182,5 @@
   "variables": {
     "list": []
   },
-  "version": 6
+  "version": 10
 }

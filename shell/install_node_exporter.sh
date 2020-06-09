@@ -2,9 +2,9 @@
 
 addgroup node_exporter
 adduser node_exporter --disabled-password --no-create-home --ingroup node_exporter --quiet --gecos ",,,"
-wget https://github.com/prometheus/node_exporter/releases/download/v1.0.0-rc.0/node_exporter-1.0.0-rc.0.linux-amd64.tar.gz
-tar xvfz node_exporter-1.0.0-rc.0.linux-amd64.tar.gz
-cp node_exporter-1.0.0-rc.0.linux-amd64/node_exporter /usr/local/bin/node_exporter
+wget https://github.com/prometheus/node_exporter/releases/download/v1.0.0/node_exporter-1.0.0.linux-amd64.tar.gz
+tar xvfz node_exporter-1.0.0.linux-amd64.tar.gz
+cp node_exporter-1.0.0.linux-amd64/node_exporter /usr/local/bin/node_exporter
 rm node_exporter-* -rf
 chown node_exporter:node_exporter /usr/local/bin/node_exporter
 

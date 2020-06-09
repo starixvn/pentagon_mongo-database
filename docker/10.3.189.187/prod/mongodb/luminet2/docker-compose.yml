@@ -1,0 +1,64 @@
+version: '3.3'
+services:
+  l2_saba_bk_db01:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: L2_SabaBKDB01
+    hostname: l2_saba_bk_db01
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.37.111
+    ports:
+      - '0.0.0.0:37111:37111'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ./.storage/l2_mongobkdb01/db:/data/db:rw
+      - ./.storage/l2_mongobkdb01/backup:/data/backup:rw
+      - ./.storage/l2_mongobkdb01/log:/var/log/mongodb:rw
+      - ./config/mongod.bk.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet L2_SabaMain --auth
+    security_opt:
+      - 'seccomp=unconfined'
+
+  l2_saba_lag_db01:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: L2_SabaLagDB01
+    hostname: l2_saba_lag_db01
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.37.112
+    ports:
+      - '0.0.0.0:37112:37112'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ''
+      MONGO_INITDB_ROOT_PASSWORD: ''
+    volumes:
+      - ./.storage/l2_mongolagdb01/db:/data/db:rw
+      - ./.storage/l2_mongolagdb01/backup:/data/backup:rw
+      - ./.storage/l2_mongolagdb01/log:/var/log/mongodb:rw
+      - ./config/mongod.lag.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet L2_SabaMain --auth
+    security_opt:
+      - 'seccomp=unconfined'
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  l2_sabadb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.39.37.0/24
