@@ -20,6 +20,9 @@ archiveGame(db_active, db_arc, 'kenopromax');
 archiveGame(db_active, db_arc, 'minisedie');
 archiveGame(db_active, db_arc, 'baccarat');
 
+// Archive user
+archiveTable(db_active, db_arc, 'usersessions', 'recheckInTime');
+
 // Archive Log
 db_active = db_active.getSiblingDB('log');
 db_arc = db_arc.getSiblingDB('log_arc');
