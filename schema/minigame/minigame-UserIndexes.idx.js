@@ -108,25 +108,74 @@
     }
 }
 
-// usersessions - ssoToken
+// usersessions
 {
     var coll = 'usersessions';
-    var idx_name = 'IX_usersessions_ssoToken';
-    var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
-    if (idx) {
-        idx.exists = true;
-    } else {
-        var res = db.getSiblingDB('minigame')[coll].createIndex(
-            {ssoToken: 1}
-        ,   {name: idx_name}
-        );
-        if (res.ok != 1) {
-            printjson(res);
-        }
-        idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
-        idx.__________________________________________________CREATED = true;
-    }
-    delete idx.v;
-    printjson(idx);
-}
 
+    // ssoToken
+    {
+        var idx_name = 'IX_usersessions_ssoToken';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+        if (idx) {
+            idx.exists = true;
+        } else {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {ssoToken: 1}
+            ,   {name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx.__________________________________________________CREATED = true;
+        }
+        delete idx.v;
+        printjson(idx);
+    }
+
+    // recheckInTime
+    {
+        var idx_name = 'IX_usersessions_recheckInTime';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+        if (idx) {
+            idx.exists = true;
+        } else {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {recheckInTime: 1}
+            ,   {name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx.__________________________________________________CREATED = true;
+        }
+        delete idx.v;
+        printjson(idx);
+    }
+
+    // Archive TTL
+    {
+        var idx_name = 'TTL_usersessions';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+        if (idx) {
+            idx.exists = true;
+        }
+        else {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {'__archive.eventtime': 1}
+            ,   {expireAfterSeconds: 3600*24*8, name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx.__________________________________________________CREATED = true;
+        }
+        if (!(idx.expireAfterSeconds > 0)) {
+            idx.__________________________________________________WARNING = '[expireAfterSeconds] option is NOT correct!!!'
+        }
+        delete idx.v;
+        printjson(idx);
+    }
+}
