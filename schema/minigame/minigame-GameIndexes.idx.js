@@ -91,6 +91,15 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'minisedie_cuocs'
     ||  coll == 'baccarat_cuocs'
     ||  coll == 'baccarat_tmpcuocs'
+    ||  coll == 'kenoeast_ones'
+    ||  coll == 'kenowest_ones'
+    ||  coll == 'kenosouth_ones'
+    ||  coll == 'kenonorth_ones'
+    ||  coll == 'kenomax_ones'
+    ||  coll == 'kenomax2_ones'
+    ||  coll == 'kenomini_ones'
+    ||  coll == 'kenomini2_ones'
+    ||  coll == 'kenoproviet_ones'
     ) {
         var idx_name = 'UIX_' + coll + '_uid_phien';
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
@@ -176,6 +185,37 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
         if (!idx) {
             var res = db.getSiblingDB('minigame')[coll].createIndex(
                 {uid: 1, thanhtoan: 1, _id: 1}
+            ,   {name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+            idx.__________________________________________________CREATED = true;
+        } else {
+            idx.exists = true;
+        }
+        delete idx.v;
+        printjson(idx);
+    }
+
+    // uid - _id
+    if (
+        coll == 'kenoeast_cuocs'
+    ||  coll == 'kenowest_cuocs'
+    ||  coll == 'kenosouth_cuocs'
+    ||  coll == 'kenonorth_cuocs'
+    ||  coll == 'kenomax_cuocs'
+    ||  coll == 'kenomax2_cuocs'
+    ||  coll == 'kenomini_cuocs'
+    ||  coll == 'kenomini2_cuocs'
+    ||  coll == 'kenoproviet_cuocs'
+    ) {
+        var idx_name = 'IX_' + coll + '_uid__id';
+        var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
+        if (!idx) {
+            var res = db.getSiblingDB('minigame')[coll].createIndex(
+                {uid: 1, _id: 1}
             ,   {name: idx_name}
             );
             if (res.ok != 1) {

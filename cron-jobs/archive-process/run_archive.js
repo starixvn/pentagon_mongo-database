@@ -19,6 +19,15 @@ archiveGame(db_active, db_arc, 'minidragontiger');
 archiveGame(db_active, db_arc, 'kenopromax');
 archiveGame(db_active, db_arc, 'minisedie');
 archiveGame(db_active, db_arc, 'baccarat');
+archiveGame(db_active, db_arc, 'kenoeast');
+archiveGame(db_active, db_arc, 'kenowest');
+archiveGame(db_active, db_arc, 'kenosouth');
+archiveGame(db_active, db_arc, 'kenonorth');
+archiveGame(db_active, db_arc, 'kenomax');
+archiveGame(db_active, db_arc, 'kenomax2');
+archiveGame(db_active, db_arc, 'kenomini');
+archiveGame(db_active, db_arc, 'kenomini2');
+archiveGame(db_active, db_arc, 'kenoproviet');
 
 // Archive user
 archiveTable(db_active, db_arc, 'usersessions', 'recheckInTime');
