@@ -1,0 +1,92 @@
+version: '3.3'
+services:
+  l2_saba_db02:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongod
+    container_name: L2_SabaDB02
+    hostname: l2_saba_db02
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.84.66
+    ports:
+      - '0.0.0.0:37102:37102'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l2_mongodb02/db:/data/db:rw
+      - ./.storage/l2_mongodb02/backup:/data/backup:rw
+      - ./.storage/l2_mongodb02/log:/var/log/mongodb:rw
+      - ./config/mongod.sec.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet L2_SabaMain --auth
+
+  l2_saba_arc_db01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongod
+    container_name: L2_SabaArcDB01
+    hostname: l2_saba_arc_db01
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.84.115
+    ports:
+      - '0.0.0.0:37151:37151'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l2_mongoarcdb01/db:/data/db:rw
+      - ./.storage/l2_mongoarcdb01/backup:/data/backup:rw
+      - ./.storage/l2_mongoarcdb01/log:/var/log/mongodb:rw
+      - ./config/mongod.arc.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet L2_SabaArc --auth
+
+  l2_saba_dbexporter02:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_exporter
+    container_name: L2_SabaDBExporter02
+    hostname: l2_saba_dbexporter02
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.92.66
+    ports:
+      - '10.99.99.54:39102:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:%28x%23pW8M%60%2A%2A6H60Y%3F4jKypTu%3DjV%21%24A%25d%60@l2_saba_db02:37102/'
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
+
+  l2_saba_arc_dbexporter01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_exporter
+    container_name: L2_SabaArcDBExporter01
+    hostname: l2_saba_arc_dbexporter01
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.92.115
+    ports:
+      - '10.99.99.54:39151:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:%28x%23pW8M%60%2A%2A6H60Y%3F4jKypTu%3DjV%21%24A%25d%60@l2_saba_arc_db01:37151/'
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  l2_sabadb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.39.64.0/19

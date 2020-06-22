@@ -1,0 +1,90 @@
+version: '3.3'
+services:
+  l3_saba_db02:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongod
+    container_name: L3_SabaDB02
+    hostname: l3_saba_db02
+    restart: always
+    networks:
+      l3_sabadb_network:
+        ipv4_address: 172.39.116.66
+    ports:
+      - '0.0.0.0:47102:47102'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l3_mongodb02/db:/data/db:rw
+      - ./.storage/l3_mongodb02/log:/data/db/.log:rw
+      - ./config/mongod.sec.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet L3_SabaMain --auth
+
+  l3_saba_arc_db01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongod
+    container_name: L3_SabaArcDB01
+    hostname: l3_saba_arc_db01
+    restart: always
+    networks:
+      l3_sabadb_network:
+        ipv4_address: 172.39.116.115
+    ports:
+      - '0.0.0.0:47151:47151'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l3_mongoarcdb01/db:/data/db:rw
+      - ./.storage/l3_mongoarcdb01/log:/data/db/.log:rw
+      - ./config/mongod.arc.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet L3_SabaArc --auth
+
+  l3_saba_dbexporter02:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_exporter
+    container_name: L3_SabaDBExporter02
+    hostname: l3_saba_dbexporter02
+    restart: always
+    networks:
+      l3_sabadb_network:
+        ipv4_address: 172.39.124.66
+    ports:
+      - '10.99.99.54:49102:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:F%2A%21%3Dc%2AXD%3C%25Y%3CLxIqOebtTFQT7%7B4B%28ZET@172.39.116.66:47102/'
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
+
+  l3_saba_arc_dbexporter01:
+    build:
+      context: .
+      dockerfile: Dockerfile_exporter
+    container_name: L3_SabaArcDBExporter01
+    hostname: l3_saba_arc_dbexporter01
+    restart: always
+    networks:
+      l3_sabadb_network:
+        ipv4_address: 172.39.124.115
+    ports:
+      - '10.99.99.54:49151:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:F%2A%21%3Dc%2AXD%3C%25Y%3CLxIqOebtTFQT7%7B4B%28ZET@172.39.116.115:47151/'
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  l3_sabadb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.39.96.0/19

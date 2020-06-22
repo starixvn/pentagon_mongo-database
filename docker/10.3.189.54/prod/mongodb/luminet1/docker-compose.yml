@@ -1,0 +1,52 @@
+version: '3.3'
+services:
+  l1_saba_db01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongod
+    container_name: L1_SabaDB01
+    hostname: l1_saba_db01
+    restart: always
+    networks:
+      l1_sabadb_network:
+        ipv4_address: 172.39.52.65
+    ports:
+      - '0.0.0.0:27101:27101'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l1_mongodb01/db:/data/db:rw
+      - ./.storage/l1_mongodb01/backup:/data/backup:rw
+      - ./.storage/l1_mongodb01/log:/data/db/.log:rw
+      - ./config/mongod.pri.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet SabaMain --auth
+
+  l1_saba_dbexporter01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_exporter
+    container_name: L1_SabaDBExporter01
+    hostname: l1_saba_dbexporter01
+    restart: always
+    networks:
+      l1_sabadb_network:
+        ipv4_address: 172.39.60.65
+    ports:
+      - '10.99.99.54:29101:9216'
+    environment:
+      MONGODB_URI: 'mongodb://mongodb_exporter:w%60%2BiHdV6RcM%7DETG0DoV%60kYuewwKx%29%23p1@l1_saba_db01:27101/'
+    command: --collect.database --collect.topmetrics --collect.connpoolstats
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  l1_sabadb_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.39.32.0/19

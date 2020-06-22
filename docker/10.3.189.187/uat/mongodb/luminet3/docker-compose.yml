@@ -1,0 +1,35 @@
+version: '3.3'
+services:
+  l3_saba_uat_db01:
+    build:
+      context: .
+      dockerfile: Dockerfile_mongod
+    container_name: L3_SabaUATDB01
+    hostname: l3_saba_uat_db01
+    restart: always
+    networks:
+      l3_sabauatdb_network:
+        ipv4_address: 172.39.116.129
+    ports:
+      - '0.0.0.0:47201:47201'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l3_mongouatdb01/db:/data/db:rw
+      - ./.storage/l3_mongouatdb01/log:/data/db/.log:rw
+      - ./config/mongod.pri.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet SabaL3UAT --auth
+    security_opt:
+      - 'seccomp=unconfined'
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  l3_sabauatdb_network:
+    external:
+      name: luminet3_l3_sabadb_network
