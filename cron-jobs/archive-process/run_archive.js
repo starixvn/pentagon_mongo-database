@@ -35,7 +35,7 @@ archiveLog(db_active, db_arc, 'failed_requests');
 db_active = db_active.getSiblingDB('member');
 db_arc = db_arc.getSiblingDB('member_arc');
 // Run archive
-archiveLog(db_active, db_arc, 'member_auths');
+archiveTable(db_active, db_arc, 'member_auths', 'time');
 
 print("=========================================================================================\n\n");
 db_active._session.endSession();
