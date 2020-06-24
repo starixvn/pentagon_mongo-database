@@ -1,14 +1,12 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'archiveLog'
-,   value: (fromDB, toDB, group, cutOffDate) => {
+,   value: (fromDB, toDB, group) => {
         if (fromDB == null || typeof(fromDB) == "undefined")
             throw Error("[fromDB] must be defined");
         if (toDB == null || typeof(toDB) == "undefined")
             throw Error("[toDB] must be defined");
         if (group == null || typeof(group) == "undefined")
             throw Error("[group] must be defined");
-        if (cutOffDate == null || typeof(cutOffDate) == "undefined")
-            cutOffDate = new Date((Math.floor(Date.now() / 3600000) - 24) * 3600000);
 
         // Parameters' type verification
         if (!(fromDB instanceof DB))
@@ -17,8 +15,6 @@ db.getSiblingDB('script').system.js.save({
             throw Error("[toDB] must be a database");
         if (!(typeof group == "string"))
             throw Error("[group] must be a string");
-        if (!(cutOffDate instanceof Date))
-            throw Error("[cutOffDate] must be a date");
 
         // Initialize group collections' name
         var coll = {
@@ -59,8 +55,6 @@ db.getSiblingDB('script').system.js.save({
 
         var docs = [];
         var docs_cnt = 0;
-
-        log('I', 'ARCHIVE', 'CutOffTime', cutOffDate.toISOString());
 
         fromDB[coll.log].find({'__archive.eventtime': {$exists: false}}).forEach( (doc) => {
             docs.push(doc);
