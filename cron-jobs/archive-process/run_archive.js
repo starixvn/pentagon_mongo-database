@@ -26,11 +26,16 @@ archiveTable(db_active, db_arc, 'usersessions', 'recheckInTime');
 // Archive Log
 db_active = db_active.getSiblingDB('log');
 db_arc = db_arc.getSiblingDB('log_arc');
-
 // Run archive
 archiveLog(db_active, db_arc, 'bets');
 archiveLog(db_active, db_arc, 'end_games');
 archiveLog(db_active, db_arc, 'failed_requests');
+
+// Archive Member
+db_active = db_active.getSiblingDB('member');
+db_arc = db_arc.getSiblingDB('member_arc');
+// Run archive
+archiveLog(db_active, db_arc, 'member_auths');
 
 print("=========================================================================================\n\n");
 db_active._session.endSession();

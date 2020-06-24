@@ -43,4 +43,29 @@
         delete idx.v;
         printjson(idx);
     }
+
+    // TTL index for archive
+    {
+        var idx_name = 'TTL_' + coll;
+        var idx = db.getSiblingDB('member')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+        if (idx) {
+            idx.exists = true;
+        }
+        else {
+            var res = db.getSiblingDB('member')[coll].createIndex(
+                {'__archive.eventtime': 1}
+            ,   {expireAfterSeconds: 3600*24*8, name: idx_name}
+            );
+            if (res.ok != 1) {
+                printjson(res);
+            }
+            idx = db.getSiblingDB('member')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx.__________________________________________________CREATED = true;
+        }
+        if (!(idx.expireAfterSeconds > 0)) {
+            idx.__________________________________________________WARNING = '[expireAfterSeconds] option is NOT correct!!!'
+        }
+        delete idx.v;
+        printjson(idx);
+    }
 }
