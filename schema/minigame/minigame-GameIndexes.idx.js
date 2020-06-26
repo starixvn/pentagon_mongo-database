@@ -1,6 +1,6 @@
 // Archive TTL indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    if (RegExp('(_phiens|_cuocs|_ones)$').test(coll)) {
+    if (RegExp('(_phiens|_cuocs|_ones|_phiens_log)$').test(coll)) {
         var idx_name = 'TTL_' + coll;
         var idx = db.getSiblingDB('minigame')[coll].getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         if (idx) {
