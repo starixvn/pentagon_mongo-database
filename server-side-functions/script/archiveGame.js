@@ -23,11 +23,13 @@ db.getSiblingDB('script').system.js.save({
         // Initialize group collections' name
         var coll = {
             phien: group + '_phiens'
+        ,   phien_log: group + '_phiens_log'
         ,   one: group + '_ones'
         ,   cuoc: group + '_cuocs'
         };
         var coll_bk = {
             phien: group + '_phiens_bk'
+        ,   phien_log: group + '_phiens_log_bk'
         ,   one: group + '_ones_bk'
         ,   cuoc: group + '_cuocs_bk'
         };
@@ -53,8 +55,15 @@ db.getSiblingDB('script').system.js.save({
             };
 
             // Prepare update archive flag pipe for this batch
+            var bulkUpdatePipe_id = [];
             var bulkUpdatePipe = [];
             phiens.forEach((phien) => {
+                bulkUpdatePipe_id.push({
+                    updateMany: {
+                        filter: {id: phien.id}
+                    ,   update: {$set: {'__archive.eventtime': phien.time}}
+                    }
+                });
                 bulkUpdatePipe.push({
                     updateMany: {
                         filter: {phien: phien.id}
@@ -62,6 +71,38 @@ db.getSiblingDB('script').system.js.save({
                     }
                 });
             });
+
+            // Archive related phien logs if exist
+            if (fromDB.getCollectionInfos({name: coll.phien_log}).length == 1) {
+                var phien_logs = [];
+                var phien_logs_cnt = 0;
+
+                fromDB[coll.phien_log].find({id: {$in: phiens_id}}).forEach((phien_log) => {
+                    phien_logs.push(phien_log);
+                    phien_logs_cnt++;
+
+                    if (phien_logs_cnt > 0 && phien_logs_cnt % 1000 == 0) {
+                        try {
+                            toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
+                        } catch (e) {
+                            log('E', e.name, group, '- phien_logs.insertMany: ' + e.message);
+                        };
+                        phien_logs = [];
+                    }
+
+                    if (phien_logs_cnt > 0 && phien_logs_cnt % 10000 == 0) {
+                        log('I', 'ARCHIVE', group, '- Archiving ' + phien_logs_cnt + ' phien logs');
+                    }
+                })
+                try {
+                    toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
+                } catch (e) {
+                    log('E', e.name, group, '- phien_logs.insertMany: ' + e.message);
+                };
+                log('I', 'ARCHIVE', group, '- Archived ' + phien_logs_cnt + ' phien logs');
+
+                fromDB[coll.phien_log].bulkWrite(bulkUpdatePipe_id, {ordered : false});
+            }
 
             // Archive related ones if exist
             if (fromDB.getCollectionInfos({name: coll.one}).length == 1) {
