@@ -155,6 +155,15 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
     if (
         coll == 'taixiu_cuocs_bk'
     ||  coll == 'txturbo_cuocs_bk'
+    ||  coll == 'kenoeast_cuocs_bk'
+    ||  coll == 'kenowest_cuocs_bk'
+    ||  coll == 'kenosouth_cuocs_bk'
+    ||  coll == 'kenonorth_cuocs_bk'
+    ||  coll == 'kenomax_cuocs_bk'
+    ||  coll == 'kenomax2_cuocs_bk'
+    ||  coll == 'kenomini_cuocs_bk'
+    ||  coll == 'kenomini2_cuocs_bk'
+    ||  coll == 'kenoproviet_cuocs_bk'
     ) {
         var idx_name = 'IX_' + coll + '_uid_phien';
         var idx = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
@@ -178,6 +187,15 @@ db.getSiblingDB('minigame_arc').getCollectionNames().forEach((coll) => {
         coll == 'kenopromax_cuocs_bk'
     ||  coll == 'minisedie_cuocs_bk'
     ||  coll == 'baccarat_cuocs_bk'
+    ||  coll == 'kenoeast_ones_bk'
+    ||  coll == 'kenowest_ones_bk'
+    ||  coll == 'kenosouth_ones_bk'
+    ||  coll == 'kenonorth_ones_bk'
+    ||  coll == 'kenomax_ones_bk'
+    ||  coll == 'kenomax2_ones_bk'
+    ||  coll == 'kenomini_ones_bk'
+    ||  coll == 'kenomini2_ones_bk'
+    ||  coll == 'kenoproviet_ones_bk'
     ) {
         var idx_name = 'UIX_' + coll + '_uid_phien';
         var idx = db.getSiblingDB('minigame_arc')[coll].getIndexes().filter((_idx)=>RegExp('^' + idx_name + '$').test(_idx.name))[0];
