@@ -12,7 +12,7 @@ db.getSiblingDB('script').system.js.save({
                 type = label ? label : 'V';
 
             var d = new Date();
-            print(d.toISOString() + '     ' + type.ltrim().substr(0,1).toUpperCase() + '  ' + label.toUpperCase() + ' [' + title + '] ' + str);
+            print(d.toISOString().pad(29, 1) + type.ltrim().substr(0,1).toUpperCase().pad(3, 1) + label.toUpperCase().pad(8, 1) + ' [' + title + '] ' + str);
         } catch (e) {}
     }
 }); db.getSiblingDB('script').loadServerScripts();
