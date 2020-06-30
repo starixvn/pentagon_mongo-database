@@ -1,0 +1,44 @@
+db.getSiblingDB('script').system.js.save({
+    _id: 'reIndex'
+,   value: (coll, filter) => {
+        if (coll == null || typeof(coll) == "undefined")
+            throw Error("[coll] must be defined");
+
+        // Parameters' type verification
+        if (!(coll instanceof DBCollection))
+            throw Error("[coll] must be a collection");
+
+        // Get list of indexes
+        var indexes = coll.getIndexes();
+        if (typeof filter == 'string') {
+            indexes = indexes.filter((doc) => doc.name == filter);
+        } else if (filter instanceof RegExp) {
+            indexes = indexes.filter((doc) => filter.test(doc.name));
+        }
+
+        // Re-create indexes
+        indexes.forEach((idx) => {
+            var key = idx.key;
+            delete idx.key;
+            delete idx.v;
+            delete idx.ns;
+
+            if (key._id) {
+                return;
+            }
+
+            var res;
+            res = coll.dropIndex(idx.name);
+            if (!(res.ok)) {
+                log('dropIndex ' + tojson(res), coll._shortName, 'REINDEX', 'E');
+                return;
+            }
+            res = coll.createIndex(key, idx);
+            if (!(res.ok)) {
+                log('createIndex ' + tojson(res), coll._shortName, 'REINDEX', 'E');
+                return;
+            }
+            log('Index ' + idx.name + ' re-created: ' + tojsononeline(key), coll._shortName, 'REINDEX', 'I');
+        });
+    }
+}); db.getSiblingDB('script').loadServerScripts();
