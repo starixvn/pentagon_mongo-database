@@ -1,24 +1,38 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'archiveGame'
 ,   value: (fromDB, toDB, group, cutOffDate) => {
-        if (fromDB == null || typeof(fromDB) == "undefined")
-            throw Error("[fromDB] must be defined");
-        if (toDB == null || typeof(toDB) == "undefined")
-            throw Error("[toDB] must be defined");
-        if (group == null || typeof(group) == "undefined")
-            throw Error("[group] must be defined");
+        if (fromDB == null || typeof(fromDB) == "undefined") {
+            log('[fromDB] must be defined', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (toDB == null || typeof(toDB) == "undefined") {
+            log('[toDB] must be defined', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (group == null || typeof(group) == "undefined") {
+            log('[group] must be defined', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
         if (cutOffDate == null || typeof(cutOffDate) == "undefined")
             cutOffDate = new Date((Math.floor(Date.now() / 3600000) - 24) * 3600000);
 
         // Parameters' type verification
-        if (!(fromDB instanceof DB))
-            throw Error("[fromDB] must be a database");
-        if (!(toDB instanceof DB))
-            throw Error("[toDB] must be a database");
-        if (!(typeof group == "string"))
-            throw Error("[group] must be a string");
-        if (!(cutOffDate instanceof Date))
-            throw Error("[cutOffDate] must be a date");
+        if (!(fromDB instanceof DB)) {
+            log('[fromDB] must be a database', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (!(toDB instanceof DB)) {
+            log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (!(typeof group == "string")) {
+            log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (!(cutOffDate instanceof Date)) {
+            log('[cutOffDate] must be a date', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
 
         // Initialize group collections' name
         var coll = {
@@ -34,15 +48,9 @@ db.getSiblingDB('script').system.js.save({
         ,   cuoc: group + '_cuocs_bk'
         };
 
-        // Function for logging
-        var log = (type, label, title, str) => {
-            d = new Date();
-            print(d.toISOString() + ' ' + type.toUpperCase() + '  ' + label.toUpperCase() + ' [' + title + '] ' + str);
-        }
-
         // Group must have _phiens collection
         if (fromDB.getCollectionInfos({name: coll.phien}).length != 1) {
-            log('E', 'ARCHIVE', group, 'Cannot run archive because [' + fromDB._name + '.' + coll.phien +'] does NOT exist');
+            log('Cannot run archive because [' + fromDB._name + '.' + coll.phien +'] does NOT exist', group, 'ARCHIVE', 'E');
             return;
         }
 
@@ -51,7 +59,7 @@ db.getSiblingDB('script').system.js.save({
             try {
                 toDB[coll_bk.phien].insertMany(phiens, {ordered: false});
             } catch (e) {
-                log('E', e.name, group, '- phiens.insertMany: ' + e.message);
+                log('- phiens.insertMany: ' + e.message, group, e.name, 'E');
             };
 
             // Prepare update archive flag pipe for this batch
@@ -85,21 +93,21 @@ db.getSiblingDB('script').system.js.save({
                         try {
                             toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
                         } catch (e) {
-                            log('E', e.name, group, '- phien_logs.insertMany: ' + e.message);
+                            log('- phien_logs.insertMany: ' + e.message, group, e.name, 'E');
                         };
                         phien_logs = [];
                     }
 
                     if (phien_logs_cnt > 0 && phien_logs_cnt % 10000 == 0) {
-                        log('I', 'ARCHIVE', group, '- Archiving ' + phien_logs_cnt + ' phien logs');
+                        log('- Archiving ' + phien_logs_cnt + ' phien logs', group, 'ARCHIVE', 'I');
                     }
                 })
                 try {
                     toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
                 } catch (e) {
-                    log('E', e.name, group, '- phien_logs.insertMany: ' + e.message);
+                    log('- phien_logs.insertMany: ' + e.message, group, e.name, 'E');
                 };
-                log('I', 'ARCHIVE', group, '- Archived ' + phien_logs_cnt + ' phien logs');
+                log('- Archived ' + phien_logs_cnt + ' phien logs', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.phien_log].bulkWrite(bulkUpdatePipe_id, {ordered : false});
             }
@@ -124,21 +132,21 @@ db.getSiblingDB('script').system.js.save({
                         try {
                             toDB[coll_bk.one].insertMany(ones, {ordered: false});
                         } catch (e) {
-                            log('E', e.name, group, '- ones.insertMany: ' + e.message);
+                            log('- ones.insertMany: ' + e.message, group, e.name, 'E');
                         };
                         ones = [];
                     }
 
                     if (ones_cnt > 0 && ones_cnt % 10000 == 0) {
-                        log('I', 'ARCHIVE', group, '- Archiving ' + ones_cnt + ' ones');
+                        log('- Archiving ' + ones_cnt + ' ones', group, 'ARCHIVE', 'I');
                     }
                 })
                 try {
                     toDB[coll_bk.one].insertMany(ones, {ordered: false});
                 } catch (e) {
-                    log('E', e.name, group, '- ones.insertMany: ' + e.message);
+                    log('- ones.insertMany: ' + e.message, group, e.name, 'E');
                 };
-                log('I', 'ARCHIVE', group, '- Archived ' + ones_cnt + ' ones');
+                log('- Archived ' + ones_cnt + ' ones', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.one].bulkWrite(bulkUpdatePipe, {ordered : false});
             }
@@ -163,27 +171,27 @@ db.getSiblingDB('script').system.js.save({
                         try {
                             toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                         } catch (e) {
-                            log('E', e.name, group, '- cuocs.insertMany: ' + e.message);
+                            log('- cuocs.insertMany: ' + e.message, group, e.name, 'E');
                         };
                         cuocs = [];
                     }
 
                     if (cuocs_cnt > 0 && cuocs_cnt % 10000 == 0) {
-                        log('I', 'ARCHIVE', group, '- Archiving ' + cuocs_cnt + ' cuocs');
+                        log('- Archiving ' + cuocs_cnt + ' cuocs', group, 'ARCHIVE', 'I');
                     }
                 })
                 try {
                     toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                 } catch (e) {
-                    log('E', e.name, group, '- cuocs.insertMany: ' + e.message);
+                    log('- cuocs.insertMany: ' + e.message, group, e.name, 'E');
                 };
-                log('I', 'ARCHIVE', group, '- Archived ' + cuocs_cnt + ' cuocs');
+                log('- Archived ' + cuocs_cnt + ' cuocs', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.cuoc].bulkWrite(bulkUpdatePipe, {ordered : false});
             }
 
             fromDB[coll.phien].updateMany({id: {$in: phiens_id}}, [{$set: {'__archive.eventtime': "$time"}}]);
-            log('I', 'ARCHIVE', group, 'Archived ' + phiens_id.length + ' phiens with ' + cuocs_cnt + ' cuocs & ' + ones_cnt + ' ones.');
+            log('Archived ' + phiens_id.length + ' phiens with ' + cuocs_cnt + ' cuocs & ' + ones_cnt + ' ones.', group, 'ARCHIVE', 'I');
         }
 
         var users = {};
@@ -195,7 +203,7 @@ db.getSiblingDB('script').system.js.save({
         var phiens = [];
         var phiens_id = [];
 
-        log('I', 'ARCHIVE', 'CutOffTime', cutOffDate.toISOString());
+        log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
 
         fromDB[coll.phien].find({time: {$lt: cutOffDate}, '__archive.eventtime': {$exists: false}}).forEach((phien) => {
             phiens.push(phien);
