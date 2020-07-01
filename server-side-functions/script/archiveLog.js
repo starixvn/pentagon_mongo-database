@@ -1,20 +1,32 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'archiveLog'
 ,   value: (fromDB, toDB, group) => {
-        if (fromDB == null || typeof(fromDB) == "undefined")
-            throw Error("[fromDB] must be defined");
-        if (toDB == null || typeof(toDB) == "undefined")
-            throw Error("[toDB] must be defined");
-        if (group == null || typeof(group) == "undefined")
-            throw Error("[group] must be defined");
+        if (fromDB == null || typeof(fromDB) == "undefined") {
+            log('[fromDB] must be defined', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (toDB == null || typeof(toDB) == "undefined") {
+            log('[toDB] must be defined', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (group == null || typeof(group) == "undefined") {
+            log('[group] must be defined', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
 
         // Parameters' type verification
-        if (!(fromDB instanceof DB))
-            throw Error("[fromDB] must be a database");
-        if (!(toDB instanceof DB))
-            throw Error("[toDB] must be a database");
-        if (!(typeof group == "string"))
-            throw Error("[group] must be a string");
+        if (!(fromDB instanceof DB)) {
+            log('[fromDB] must be a database', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (!(toDB instanceof DB)) {
+            log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
+        if (!(typeof group == "string")) {
+            log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
+            return;
+        }
 
         // Initialize group collections' name
         var coll = {
@@ -25,20 +37,16 @@ db.getSiblingDB('script').system.js.save({
         };
 
         // Group must have collection
-        if (fromDB.getCollectionInfos({name: coll.log}).length != 1)
-            throw Error("Cannot run archive because [" + fromDB._name + "." + coll.log + "] does NOT exist");
-
-        // Function for logging
-        var log = (type, label, title, str) => {
-            d = new Date();
-            print(d.toISOString() + ' ' + type.toUpperCase() + '  ' + label.toUpperCase() + ' [' + title + '] ' + str);
+        if (fromDB.getCollectionInfos({name: coll.log}).length != 1) {
+            log('Cannot run archive because [' + fromDB._name + '.' + coll.log + '] does NOT exist', group, 'ARCHIVE', 'E');
+            return;
         }
 
         var archiveByBatch = (docs) => {
             try {
                 toDB[coll_bk.log].insertMany(docs, {ordered: false});
             } catch (e) {
-                log('E', e.name, group, '- log.insertMany: ' + e.message);
+                log('- log.insertMany: ' + e.message, group, e.name, 'E');
             }
             bulkUpdatePipe = [];
             docs.forEach( (_doc) => {
@@ -66,10 +74,10 @@ db.getSiblingDB('script').system.js.save({
             }
 
             if (docs_cnt % 10000 === 0) {
-                log('I', 'ARCHIVE', group, '- Archiving ' + docs_cnt + ' logs');
+                log('- Archiving ' + docs_cnt + ' logs', group, 'ARCHIVE', 'I');
             }
         });
         archiveByBatch(docs);
-        log('I', 'ARCHIVE', group, 'Archived ' + docs_cnt + ' logs');
+        log('Archived ' + docs_cnt + ' logs', group, 'ARCHIVE', 'I');
     }
 }); db.getSiblingDB('script').loadServerScripts();
