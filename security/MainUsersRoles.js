@@ -51,6 +51,11 @@ db.getSiblingDB('admin').createUser({
 ,   pwd: passwordPrompt()
 ,   roles: []
 });
+db.getSiblingDB('admin').createUser({
+    user: 'lmn_summary'
+,   pwd: passwordPrompt()
+,   roles: []
+});
 
 
 db.getSiblingDB('admin').grantRolesToUser('billy.bui', [
@@ -63,17 +68,20 @@ db.getSiblingDB('admin').grantRolesToUser('lmn_archive', [
     {role: 'readWrite', db: 'minigame'}
 ,   {role: 'readWrite', db: 'member'}
 ,   {role: 'readWrite', db: 'log'}
+,   {role: 'readWrite', db: 'summary'}
 ,   {role: 'read', db: 'script'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('lmn_backend', [
     {role: 'readWrite', db: 'minigame'}
 ,   {role: 'readWrite', db: 'member'}
 ,   {role: 'readWrite', db: 'log'}
+,   {role: 'read', db: 'summary'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('lmn_readonly', [
     {role: 'read', db: 'minigame'}
 ,   {role: 'read', db: 'member'}
 ,   {role: 'read', db: 'log'}
+,   {role: 'read', db: 'summary'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('mongodb_exporter', [
     {role: 'clusterMonitor', db: 'admin'}
@@ -83,6 +91,12 @@ db.getSiblingDB('admin').grantRolesToUser('mongosqld', [
     {role: 'read', db: 'minigame'}
 ,   {role: 'read', db: 'member'}
 ,   {role: 'read', db: 'log'}
+,   {role: 'read', db: 'summary'}
 ,   {role: 'readWrite', db: 'schema'}
+]);
+db.getSiblingDB('admin').grantRolesToUser('lmn_summary', [
+    {role: 'read', db: 'minigame'}
+,   {role: 'read', db: 'script'}
+,   {role: 'readWrite', db: 'summary'}
 ]);
 

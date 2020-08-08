@@ -1,0 +1,346 @@
+createIndex(db.getSiblingDB('summary').game_summary_config, {gameId: 1}, {unique: true, name: 'UIX_game_summary_config_gameId'});
+
+db.getSiblingDB('summary').game_summary_config.insertMany([
+    {   gameId: 1,
+        owGameTypeId: 1612,
+        name: {
+            en: 'Big Small',
+            vi: 'Tài Xỉu'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'taixiu',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$bet'],
+            payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        }
+    },
+
+    {   gameId: 2,
+        owGameTypeId: 1613,
+        name: {
+            en: 'Se Die',
+            vi: 'Xóc Đĩa'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'xocxoc',
+            round: '_phiens',
+            postfix: '_cuocs'
+        },
+        fields: {
+            stake: ['$chan', '$le', '$red3', '$red4', '$white3', '$white4'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 3,
+        owGameTypeId: 1614,
+        name: {
+            en: 'Fish Prawn Crab',
+            vi: 'Bầu Cua'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'baucua',
+            round: '_phiens',
+            postfix: '_cuocs'
+        },
+        fields: {
+            stake: ['$0', '$1', '$2', '$3', '$4', '$5'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 4,
+        owGameTypeId: 1615,
+        name: {
+            en: 'Turbo Big Small',
+            vi: 'Tài Xỉu Siêu Tốc'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'txturbo',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$bet'],
+            payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        }
+    },
+
+    {   gameId: 5,
+        owGameTypeId: 1616,
+        name: {
+            en: 'Odd Even',
+            vi: 'Chẵn Lẻ'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'chanle',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$bet'],
+            payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        }
+    },
+
+    {   gameId: 6,
+        owGameTypeId: 1617,
+        name: {
+            en: 'Turbo Odd Even',
+            vi: 'Chẵn Lẻ Siêu Tốc'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'chanleturbo',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$bet'],
+            payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        }
+    },
+
+    {   gameId: 7,
+        owGameTypeId: 1618,
+        name: {
+            en: 'Dragon Tiger',
+            vi: 'Rồng Hổ'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'minidragontiger',
+            round: '_phiens',
+            postfix: '_cuocs'
+        },
+        fields: {
+            stake: ['$dragon', '$tie', '$tiger'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 8,
+        owGameTypeId: 1619,
+        name: {
+            en: 'Keno Pro Max',
+            vi: 'Keno Pro Max'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenopromax',
+            round: '_phiens',
+            postfix: '_cuocs'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 9,
+        owGameTypeId: 1620,
+        name: {
+            en: 'Mini Se Die',
+            vi: 'Xóc Đĩa Mini'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'minisedie',
+            round: '_phiens',
+            postfix: '_cuocs'
+        },
+        fields: {
+            stake: ['$even', '$odd', '$red3', '$red4', '$white3', '$white4'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 10,
+        owGameTypeId: 1621,
+        name: {
+            en: 'Baccarat',
+            vi: 'Cào Baccarat'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'baccarat',
+            round: '_phiens',
+            postfix: '_cuocs'
+        },
+        fields: {
+            stake: ['$banker', '$bankerPair', '$player', '$playerPair', '$tie', '$big', '$small'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 11,
+        owGameTypeId: 1622,
+        name: {
+            en: 'Keno Pro Viet',
+            vi: 'Keno Pro Viet'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenoproviet',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 12,
+        owGameTypeId: 1623,
+        name: {
+            en: 'Keno Max',
+            vi: 'Keno Max'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenomax',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 13,
+        owGameTypeId: 1624,
+        name: {
+            en: 'Keno Max 2',
+            vi: 'Keno Max 2'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenomax2',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 14,
+        owGameTypeId: 1625,
+        name: {
+            en: 'Keno Mini',
+            vi: 'Keno Mini'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenomini',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 15,
+        owGameTypeId: 1626,
+        name: {
+            en: 'Keno Mini 2',
+            vi: 'Keno Mini 2'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenomini2',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 16,
+        owGameTypeId: 1627,
+        name: {
+            en: 'Keno East',
+            vi: 'Keno Đông'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenoeast',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 17,
+        owGameTypeId: 1628,
+        name: {
+            en: 'Keno West',
+            vi: 'Keno Tây'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenowest',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 18,
+        owGameTypeId: 1629,
+        name: {
+            en: 'Keno South',
+            vi: 'Keno Nam'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenosouth',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    },
+
+    {   gameId: 19,
+        owGameTypeId: 1630,
+        name: {
+            en: 'Keno North',
+            vi: 'Keno Bắc'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'kenonorth',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
+            payout: ['$betwin']
+        }
+    }
+
+], {ordered: false});
