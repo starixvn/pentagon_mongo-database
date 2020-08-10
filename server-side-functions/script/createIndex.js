@@ -17,10 +17,10 @@ db.getSiblingDB('script').system.js.save({
             throw Error("[idx_opts] must be an object");
 
         // Create index
-        var idx;
+        let idx;
         idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_opts.name + '$').test(idx.name))[0];
         if (!idx) {
-            var idx_name = '';
+            let idx_name = '';
             Object.keys(idx_keys).forEach((key) => {
                 idx_name += '_' + key + '_' + JSON.stringify(idx_keys[key]);
             });
@@ -28,7 +28,7 @@ db.getSiblingDB('script').system.js.save({
             idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
         }
         if (!idx) {
-            var res = coll.createIndex(idx_keys, idx_opts);
+            let res = coll.createIndex(idx_keys, idx_opts);
             if (res.ok != 1) {
                 printjson(res);
                 return;

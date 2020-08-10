@@ -6,7 +6,7 @@ db.getSiblingDB('script').system.js.save({
             return;
         }
 
-        var dayLen = 24 * 3600 * 1000;
+        let dayLen = 24 * 3600 * 1000;
         if (summaryDay == null || typeof(summaryDay) == "undefined")
             summaryDay = new Date(Date.now() - dayLen);
 
@@ -32,14 +32,14 @@ db.getSiblingDB('script').system.js.save({
         }
 
         // Initialize time frame for data summary
-        var timeFrom = new Date(Math.floor(summaryDay.valueOf() / dayLen) * dayLen);
-        var timeTo = new Date(timeFrom.valueOf() + dayLen);
+        let timeFrom = new Date(Math.floor(summaryDay.valueOf() / dayLen) * dayLen);
+        let timeTo = new Date(timeFrom.valueOf() + dayLen);
 
         // Run summary from config
         log('Data summary started.', timeFrom.toISOString().substr(0,10), 'SUMMARY', 'I');
 
         db.getSiblingDB('summary').game_summary_config.find().forEach((game) => {
-            var agg = [];
+            let agg = [];
 
             agg[ 0] = {$match: {$and: [{time: {$gte: timeFrom}}, {time: {$lt: timeTo}}]}};
             agg[ 1] = {$project: {_id: 0, id: 1}};
@@ -67,10 +67,10 @@ db.getSiblingDB('script').system.js.save({
                 'value.stake': '$stake', 'value.payout': '$payout', 'value.tickets': '$tickets'
             }};
 
-            var time = new Date();
-            var summaries = db.getSiblingDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).toArray();
+            let time = new Date();
+            let summaries = db.getSiblingDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).toArray();
             summaries.forEach((doc) => {
-                var res = db.getSiblingDB('summary').daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
+                let res = db.getSiblingDB('summary').daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
                 if (res.upsertedId)
                     log('- Inserted new summary record for ' + doc.key.currency, game.name.en, 'SUMMARY', 'I');
                 else if (res.modifiedCount > 0)

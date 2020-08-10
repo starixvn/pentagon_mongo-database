@@ -34,14 +34,16 @@ db.getSiblingDB('script').system.js.save({
             return;
         }
 
+        let e;
+
         // Initialize group collections' name
-        var coll = {
+        let coll = {
             phien: group + '_phiens'
         ,   phien_log: group + '_phiens_log'
         ,   one: group + '_ones'
         ,   cuoc: group + '_cuocs'
         };
-        var coll_bk = {
+        let coll_bk = {
             phien: group + '_phiens_bk'
         ,   phien_log: group + '_phiens_log_bk'
         ,   one: group + '_ones_bk'
@@ -55,7 +57,7 @@ db.getSiblingDB('script').system.js.save({
         }
 
         // Function for archive by phiens
-        var archiveByPhiens = (phiens, phiens_id) => {
+        let archiveByPhiens = (phiens, phiens_id) => {
             try {
                 toDB[coll_bk.phien].insertMany(phiens, {ordered: false});
             } catch (e) {
@@ -63,8 +65,8 @@ db.getSiblingDB('script').system.js.save({
             };
 
             // Prepare update archive flag pipe for this batch
-            var bulkUpdatePipe_id = [];
-            var bulkUpdatePipe = [];
+            let bulkUpdatePipe_id = [];
+            let bulkUpdatePipe = [];
             phiens.forEach((phien) => {
                 bulkUpdatePipe_id.push({
                     updateMany: {
@@ -82,8 +84,8 @@ db.getSiblingDB('script').system.js.save({
 
             // Archive related phien logs if exist
             if (fromDB.getCollectionInfos({name: coll.phien_log}).length == 1) {
-                var phien_logs = [];
-                var phien_logs_cnt = 0;
+                let phien_logs = [];
+                let phien_logs_cnt = 0;
 
                 fromDB[coll.phien_log].find({id: {$in: phiens_id}}).forEach((phien_log) => {
                     phien_logs.push(phien_log);
@@ -114,8 +116,8 @@ db.getSiblingDB('script').system.js.save({
 
             // Archive related ones if exist
             if (fromDB.getCollectionInfos({name: coll.one}).length == 1) {
-                var ones = [];
-                var ones_cnt = 0;
+                let ones = [];
+                let ones_cnt = 0;
 
                 fromDB[coll.one].find({phien: {$in: phiens_id}}).forEach((one) => {
                     // Add currency
@@ -153,8 +155,8 @@ db.getSiblingDB('script').system.js.save({
 
             // Archive related cuocs if exist
             if (fromDB.getCollectionInfos({name: coll.cuoc}).length == 1) {
-                var cuocs = [];
-                var cuocs_cnt = 0;
+                let cuocs = [];
+                let cuocs_cnt = 0;
 
                 fromDB[coll.cuoc].find({phien: {$in: phiens_id}}).forEach((cuoc) => {
                     // Add currency
@@ -194,14 +196,14 @@ db.getSiblingDB('script').system.js.save({
             log('Archived ' + phiens_id.length + ' phiens with ' + cuocs_cnt + ' cuocs & ' + ones_cnt + ' ones.', group, 'ARCHIVE', 'I');
         }
 
-        var users = {};
+        let users = {};
         fromDB['userinfos'].find({type: false}, {_id: 0, id: 1, currency: 1}).forEach((user) => {
             users[user.id] = {currency: user.currency};
         });
 
         // Running archive
-        var phiens = [];
-        var phiens_id = [];
+        let phiens = [];
+        let phiens_id = [];
 
         log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
 
