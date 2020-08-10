@@ -40,6 +40,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'kenomini_ones'
     ||  coll == 'kenomini2_ones'
     ||  coll == 'kenoproviet_ones'
+    ||  coll == 'roulette_ones'
+    ||  coll == 'roulette_tmpones'
     ) {
         var idx_keys = {uid: 1, phien: 1};
         var idx_opts = {unique: true, name: 'UIX_' + coll + '_uid_phien'};
@@ -83,6 +85,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'kenomini_cuocs'
     ||  coll == 'kenomini2_cuocs'
     ||  coll == 'kenoproviet_cuocs'
+    ||  coll == 'roulette_cuocs'
     ) {
         var idx_keys = {uid: 1, _id: 1};
         var idx_opts = {name: 'IX_' + coll + '_uid__id'};
@@ -100,6 +103,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
         var one = coll.substring(0, coll.length - 7) + '_ones';
         var cuoc = coll.substring(0, coll.length - 7) + '_cuocs';
         var tmpcuoc = coll.substring(0, coll.length - 7) + '_tmpcuocs';
+        var tmpone = coll.substring(0, coll.length - 7) + '_tmpones';
 
         if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: one})[0]) {
             // Index for one
@@ -117,6 +121,11 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
             // Index for tmpcuoc
             idx_opts = {expireAfterSeconds: 120, name: 'IX_TTL_' + tmpcuoc + '_time'};
             createIndex(db.getSiblingDB('minigame')[tmpcuoc], idx_keys, idx_opts);
+        }
+        if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: tmpone})[0]) {
+            // Index for tmpone
+            idx_opts = {expireAfterSeconds: 120, name: 'IX_TTL_' + tmpone + '_time'};
+            createIndex(db.getSiblingDB('minigame')[tmpone], idx_keys, idx_opts);
         }
     }
 });
