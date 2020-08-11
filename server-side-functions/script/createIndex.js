@@ -49,4 +49,5 @@ db.getSiblingDB('script').system.js.save({
         delete idx.v;
         printjson(idx);
     }
+,   version: 1.1
 }); db.getSiblingDB('script').loadServerScripts();
