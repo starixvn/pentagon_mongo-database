@@ -41,4 +41,5 @@ db.getSiblingDB('script').system.js.save({
             log('Index ' + idx.name + ' re-created: ' + tojsononeline(key), coll._shortName, 'REINDEX', 'I');
         });
     }
+,   version: 1.1
 }); db.getSiblingDB('script').loadServerScripts();
