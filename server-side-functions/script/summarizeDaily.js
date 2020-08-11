@@ -80,4 +80,5 @@ db.getSiblingDB('script').system.js.save({
         });
         log('Data summary finished.', timeFrom.toISOString().substr(0,10), 'SUMMARY', 'I');
     }
+,   version: 1.1
 }); db.getSiblingDB('script').loadServerScripts();
