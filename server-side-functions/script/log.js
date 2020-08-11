@@ -17,4 +17,5 @@ db.getSiblingDB('script').system.js.save({
             print(d.toISOString().pad(29, 1) + type.ltrim().substr(0,1).toUpperCase().pad(3, 1) + label.toUpperCase().pad(8, 1) + ' [' + title + '] ' + str);
         } catch (e) {}
     }
+,   version: 1.4
 }); db.getSiblingDB('script').loadServerScripts();
