@@ -219,4 +219,5 @@ db.getSiblingDB('script').system.js.save({
         });
         archiveByPhiens(phiens, phiens_id);
     }
+,   version: 2.7
 }); db.getSiblingDB('script').loadServerScripts();
