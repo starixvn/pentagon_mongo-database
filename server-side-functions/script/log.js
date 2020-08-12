@@ -18,4 +18,5 @@ db.getSiblingDB('script').system.js.save({
         } catch (e) {}
     }
 ,   version: 1.4
+,   process: 'Global Functions'
 }); db.getSiblingDB('script').loadServerScripts();

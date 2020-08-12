@@ -83,4 +83,5 @@ db.getSiblingDB('script').system.js.save({
         log('Archived ' + docs_cnt + ' logs', group, 'ARCHIVE', 'I');
     }
 ,   version: 2.7
+,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();

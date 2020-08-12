@@ -50,4 +50,5 @@ db.getSiblingDB('script').system.js.save({
         printjson(idx);
     }
 ,   version: 1.1
+,   process: 'Database Maintenance'
 }); db.getSiblingDB('script').loadServerScripts();

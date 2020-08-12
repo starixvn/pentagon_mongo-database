@@ -220,4 +220,5 @@ db.getSiblingDB('script').system.js.save({
         archiveByPhiens(phiens, phiens_id);
     }
 ,   version: 2.7
+,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();
