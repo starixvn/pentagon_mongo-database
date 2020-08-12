@@ -115,9 +115,9 @@ db.getSiblingDB('script').system.js.save({
             }
 
             // Archive related ones if exist
+            let ones = [];
+            let ones_cnt = 0;
             if (fromDB.getCollectionInfos({name: coll.one}).length == 1) {
-                let ones = [];
-                let ones_cnt = 0;
 
                 fromDB[coll.one].find({phien: {$in: phiens_id}}).forEach((one) => {
                     // Add currency
@@ -154,10 +154,9 @@ db.getSiblingDB('script').system.js.save({
             }
 
             // Archive related cuocs if exist
+            let cuocs = [];
+            let cuocs_cnt = 0;
             if (fromDB.getCollectionInfos({name: coll.cuoc}).length == 1) {
-                let cuocs = [];
-                let cuocs_cnt = 0;
-
                 fromDB[coll.cuoc].find({phien: {$in: phiens_id}}).forEach((cuoc) => {
                     // Add currency
                     if (users && users[cuoc.uid]) {
@@ -219,6 +218,6 @@ db.getSiblingDB('script').system.js.save({
         });
         archiveByPhiens(phiens, phiens_id);
     }
-,   version: 2.7
+,   version: 2.8
 ,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();
