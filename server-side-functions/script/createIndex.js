@@ -1,6 +1,6 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'createIndex'
-,   value: (coll, idx_keys, idx_opts) => {
+,   value: (coll, idx_keys, idx_opts, show_exist = false) => {
         if (coll == null || typeof(coll) == "undefined")
             throw Error("[coll] must be defined");
         if (idx_keys == null || typeof(idx_keys) == "undefined")
@@ -34,21 +34,23 @@ db.getSiblingDB('script').system.js.save({
                 return;
             }
             idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_opts.name + '$').test(idx.name))[0];
-            idx.__________________________________________________CREATED = true;
+            idx.____________________________________________________CREATED = true;
         } else {
-            idx._________________________exists = true;
+            idx._____________exists = true;
         }
         if (JSON.stringify(idx.key) != JSON.stringify(idx_keys)) {
-            idx.__________________________________________________WARNING = '[keys] is NOT correct!!!';
+            idx.__________________________WARNING = '[keys] is NOT correct!!!';
         }
         Object.keys(idx_opts).forEach((opt) => {
             if (JSON.stringify(idx[opt]) != JSON.stringify(idx_opts[opt])) {
-                idx.__________________________________________________WARNING = '[' + opt + '] option is NOT correct!!!';
+                idx.__________________________WARNING = '[' + opt + '] option is NOT correct!!!';
             }
         });
         delete idx.v;
-        printjson(idx);
+        if (show_exist || !idx._____________exists || idx.__________________________WARNING) {
+            printjson(idx);
+        }
     }
-,   version: 1.1
+,   version: 1.2
 ,   process: 'Database Maintenance'
 }); db.getSiblingDB('script').loadServerScripts();
