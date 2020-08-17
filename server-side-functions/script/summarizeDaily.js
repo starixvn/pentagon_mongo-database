@@ -41,17 +41,17 @@ db.getSiblingDB('script').system.js.save({
         db.getSiblingDB('summary').game_summary_config.find().forEach((game) => {
             let agg = [];
 
-            agg[ 0] = {$match: {$and: [{time: {$gte: timeFrom}}, {time: {$lt: timeTo}}]}};
+            agg[ 0] = {$match: {$expr: {$and: [{$gte: [game.fields.time, timeFrom]}, {$lt: [game.fields.time, timeTo]}]}}};
             agg[ 1] = {$project: {_id: 0, id: 1}};
             agg[ 2] = {$lookup: {
                 from: game.coll.group + game.coll.postfix,
                 localField: 'id',
-                foreignField: 'phien',
+                foreignField: game.fields.map,
                 as: 'bets'
             }};
             agg[ 3] = {$unwind: '$bets'};
             agg[ 4] = {$replaceWith: '$bets'};
-            agg[ 5] = {$match: {$expr: {$and: [{$gt: ['$memberId', 0]}, {$eq: ['$thanhtoan', true]}]}}};
+            agg[ 5] = {$match: {$expr: {$and: [{$gt: ['$memberId', 0]}, {$eq: [game.fields.settled, true]}]}}};
             agg[ 6] = {$project: {_id: 0, stake: {$sum: game.fields.stake}, payout: {$sum: game.fields.payout}, uid: 1}};
             agg[ 7] = {$lookup: {
                 from: 'userinfos',
@@ -80,6 +80,6 @@ db.getSiblingDB('script').system.js.save({
         });
         log('Data summary finished.', timeFrom.toISOString().substr(0,10), 'SUMMARY', 'I');
     }
-,   version: 1.1
+,   version: 1.2
 ,   process: 'Daily Summary'
 }); db.getSiblingDB('script').loadServerScripts();

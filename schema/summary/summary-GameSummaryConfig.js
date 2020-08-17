@@ -1,5 +1,16 @@
-createIndex(db.getSiblingDB('summary').game_summary_config, {gameId: 1}, {unique: true, name: 'UIX_game_summary_config_gameId'});
+// game_summary_config
+{
+    let coll = 'game_summary_config';
 
+    // gameId
+    {
+        let idx_keys = {gameId: 1};
+        let idx_opts = {unique: true, name: 'UIX_' + coll + '_gameId'};
+        createIndex(db.getSiblingDB('summary')[coll], idx_keys, idx_opts);
+    }
+}
+
+db.getSiblingDB('summary').game_summary_config.remove({});
 db.getSiblingDB('summary').game_summary_config.insertMany([
     {   gameId: 1,
         owGameTypeId: 1612,
@@ -14,6 +25,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
         }
@@ -32,6 +46,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_cuocs'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$chan', '$le', '$red3', '$red4', '$white3', '$white4'],
             payout: ['$betwin']
         }
@@ -50,6 +67,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_cuocs'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$0', '$1', '$2', '$3', '$4', '$5'],
             payout: ['$betwin']
         }
@@ -68,6 +88,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
         }
@@ -86,6 +109,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
         }
@@ -104,6 +130,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
         }
@@ -122,6 +151,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_cuocs'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$dragon', '$tie', '$tiger'],
             payout: ['$betwin']
         }
@@ -140,6 +172,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_cuocs'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -158,6 +193,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_cuocs'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$even', '$odd', '$red3', '$red4', '$white3', '$white4'],
             payout: ['$betwin']
         }
@@ -176,6 +214,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_cuocs'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$banker', '$bankerPair', '$player', '$playerPair', '$tie', '$big', '$small'],
             payout: ['$betwin']
         }
@@ -194,6 +235,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -212,6 +256,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -230,6 +277,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -248,6 +298,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -266,6 +319,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -284,6 +340,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -302,6 +361,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -320,6 +382,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
@@ -338,9 +403,56 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             postfix: '_ones'
         },
         fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
         }
-    }
+    },
 
-], {ordered: false});
+    {   gameId: 20,
+        owGameTypeId: 1631,
+        name: {
+            en: 'Bola Tangkas',
+            vi: 'Bola Tangkas'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'bolatangkas',
+            round: '_rounds',
+            postfix: '_rounds'
+        },
+        fields: {
+            map: 'id',
+            time: '$startTime',
+            settled: '$settled',
+            stake: ['$totalBet'],
+            payout: ['$win']
+        }
+    },
+
+    {   gameId: 21,
+        owGameTypeId: 1632,
+        name: {
+            en: 'Roulette',
+            vi: 'Roulette'
+        },
+        coll: {
+            db: 'minigame',
+            group: 'roulette',
+            round: '_phiens',
+            postfix: '_ones'
+        },
+        fields: {
+            map: 'phien',
+            time: '$time',
+            settled: '$thanhtoan',
+            stake: ['$totalAmount'],
+            payout: ['$betwin']
+        }
+    }
+]
+,   {ordered: false}
+);
+
