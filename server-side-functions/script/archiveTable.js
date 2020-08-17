@@ -42,11 +42,13 @@ db.getSiblingDB('script').system.js.save({
             return;
         }
 
+        let e;
+
         // Initialize group collections' name
-        var coll = {
+        let coll = {
             name: group
         };
-        var coll_bk = {
+        let coll_bk = {
             name: group + '_bk'
         };
 
@@ -56,7 +58,7 @@ db.getSiblingDB('script').system.js.save({
             return;
         }
 
-        var archiveByBatch = (docs) => {
+        let archiveByBatch = (docs) => {
             try {
                 toDB[coll_bk.name].insertMany(docs, {ordered: false});
             } catch (e) {
@@ -64,7 +66,7 @@ db.getSiblingDB('script').system.js.save({
             }
             bulkUpdatePipe = [];
             docs.forEach( (_doc) => {
-                var eventtime = new Date();
+                let eventtime = new Date();
                 try {
                     eventtime = (_doc[column] instanceof Date) ? _doc[column] : (typeof _doc[column] == 'string') ? ISODate(date) : new Date();
                 } catch (e) {}
@@ -80,11 +82,11 @@ db.getSiblingDB('script').system.js.save({
             fromDB[coll.name].bulkWrite(bulkUpdatePipe, {ordered : false});
         }
 
-        var docs = [];
-        var docs_cnt = 0;
+        let docs = [];
+        let docs_cnt = 0;
 
         log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
-        var filter = {};
+        let filter = {};
         filter[column] = {$lt: cutOffDate};
         filter['__archive.eventtime'] = {$exists: false};
 
@@ -104,4 +106,6 @@ db.getSiblingDB('script').system.js.save({
         archiveByBatch(docs);
         log('Archived ' + docs_cnt + ' docs', group, 'ARCHIVE', 'I');
     }
+,   version: 2.8
+,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();

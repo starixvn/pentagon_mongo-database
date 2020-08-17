@@ -28,11 +28,13 @@ db.getSiblingDB('script').system.js.save({
             return;
         }
 
+        let e;
+
         // Initialize group collections' name
-        var coll = {
+        let coll = {
             log: group
         };
-        var coll_bk = {
+        let coll_bk = {
             log: group + '_bk'
         };
 
@@ -42,7 +44,7 @@ db.getSiblingDB('script').system.js.save({
             return;
         }
 
-        var archiveByBatch = (docs) => {
+        let archiveByBatch = (docs) => {
             try {
                 toDB[coll_bk.log].insertMany(docs, {ordered: false});
             } catch (e) {
@@ -61,8 +63,8 @@ db.getSiblingDB('script').system.js.save({
             fromDB[coll.log].bulkWrite(bulkUpdatePipe, {ordered : false});
         }
 
-        var docs = [];
-        var docs_cnt = 0;
+        let docs = [];
+        let docs_cnt = 0;
 
         fromDB[coll.log].find({'__archive.eventtime': {$exists: false}}).forEach( (doc) => {
             docs.push(doc);
@@ -80,4 +82,6 @@ db.getSiblingDB('script').system.js.save({
         archiveByBatch(docs);
         log('Archived ' + docs_cnt + ' logs', group, 'ARCHIVE', 'I');
     }
+,   version: 2.8
+,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();

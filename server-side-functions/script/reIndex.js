@@ -9,7 +9,7 @@ db.getSiblingDB('script').system.js.save({
             throw Error("[coll] must be a collection");
 
         // Get list of indexes
-        var indexes = coll.getIndexes();
+        let indexes = coll.getIndexes();
         if (typeof filter == 'string') {
             indexes = indexes.filter((doc) => doc.name == filter);
         } else if (filter instanceof RegExp) {
@@ -18,7 +18,7 @@ db.getSiblingDB('script').system.js.save({
 
         // Re-create indexes
         indexes.forEach((idx) => {
-            var key = idx.key;
+            let key = idx.key;
             delete idx.key;
             delete idx.v;
             delete idx.ns;
@@ -27,7 +27,7 @@ db.getSiblingDB('script').system.js.save({
                 return;
             }
 
-            var res;
+            let res;
             res = coll.dropIndex(idx.name);
             if (!(res.ok)) {
                 log('dropIndex ' + tojson(res), coll._shortName, 'REINDEX', 'E');
@@ -41,4 +41,6 @@ db.getSiblingDB('script').system.js.save({
             log('Index ' + idx.name + ' re-created: ' + tojsononeline(key), coll._shortName, 'REINDEX', 'I');
         });
     }
+,   version: 1.1
+,   process: 'Database Maintenance'
 }); db.getSiblingDB('script').loadServerScripts();
