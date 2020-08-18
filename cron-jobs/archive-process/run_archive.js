@@ -1,6 +1,10 @@
+-- ln-env.js --
 active_connstr = 'mongodb://';
 archive_connstr = 'mongodb://';
+load('run-archive.js');
+quit();
 
+-- run-archive.js --
 // Active and archive database
 db_active = (new Mongo(active_connstr)).getDB('minigame');
 db_arc = (new Mongo(archive_connstr)).getDB('minigame_arc');
@@ -28,6 +32,7 @@ archiveGame(db_active, db_arc, 'kenomax2');
 archiveGame(db_active, db_arc, 'kenomini');
 archiveGame(db_active, db_arc, 'kenomini2');
 archiveGame(db_active, db_arc, 'kenoproviet');
+archiveGame(db_active, db_arc, 'roulette');
 
 // Archive user
 archiveTable(db_active, db_arc, 'usersessions', 'recheckInTime');
@@ -49,4 +54,3 @@ archiveTable(db_active, db_arc, 'member_auths', 'time');
 print("=========================================================================================\n\n");
 db_active._session.endSession();
 db_arc._session.endSession();
-quit();
