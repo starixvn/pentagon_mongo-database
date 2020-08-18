@@ -25,7 +25,7 @@ db.getSiblingDB('script').system.js.save({
             log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (!(typeof group == "string")) {
+        if (typeof group != "string") {
             log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
@@ -33,8 +33,6 @@ db.getSiblingDB('script').system.js.save({
             log('[cutOffDate] must be a date', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-
-        let e;
 
         // Initialize group collections' name
         let coll = {
@@ -62,7 +60,7 @@ db.getSiblingDB('script').system.js.save({
                 toDB[coll_bk.phien].insertMany(phiens, {ordered: false});
             } catch (e) {
                 log('- phiens.insertMany: ' + e.message, group, e.name, 'E');
-            };
+            }
 
             // Prepare update archive flag pipe for this batch
             let bulkUpdatePipe_id = [];
@@ -96,7 +94,7 @@ db.getSiblingDB('script').system.js.save({
                             toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
                         } catch (e) {
                             log('- phien_logs.insertMany: ' + e.message, group, e.name, 'E');
-                        };
+                        }
                         phien_logs = [];
                     }
 
@@ -108,7 +106,7 @@ db.getSiblingDB('script').system.js.save({
                     toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
                 } catch (e) {
                     log('- phien_logs.insertMany: ' + e.message, group, e.name, 'E');
-                };
+                }
                 log('- Archived ' + phien_logs_cnt + ' phien logs', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.phien_log].bulkWrite(bulkUpdatePipe_id, {ordered : false});
@@ -135,7 +133,7 @@ db.getSiblingDB('script').system.js.save({
                             toDB[coll_bk.one].insertMany(ones, {ordered: false});
                         } catch (e) {
                             log('- ones.insertMany: ' + e.message, group, e.name, 'E');
-                        };
+                        }
                         ones = [];
                     }
 
@@ -147,7 +145,7 @@ db.getSiblingDB('script').system.js.save({
                     toDB[coll_bk.one].insertMany(ones, {ordered: false});
                 } catch (e) {
                     log('- ones.insertMany: ' + e.message, group, e.name, 'E');
-                };
+                }
                 log('- Archived ' + ones_cnt + ' ones', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.one].bulkWrite(bulkUpdatePipe, {ordered : false});
@@ -173,7 +171,7 @@ db.getSiblingDB('script').system.js.save({
                             toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                         } catch (e) {
                             log('- cuocs.insertMany: ' + e.message, group, e.name, 'E');
-                        };
+                        }
                         cuocs = [];
                     }
 
@@ -185,7 +183,7 @@ db.getSiblingDB('script').system.js.save({
                     toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                 } catch (e) {
                     log('- cuocs.insertMany: ' + e.message, group, e.name, 'E');
-                };
+                }
                 log('- Archived ' + cuocs_cnt + ' cuocs', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.cuoc].bulkWrite(bulkUpdatePipe, {ordered : false});

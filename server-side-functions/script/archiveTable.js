@@ -29,11 +29,11 @@ db.getSiblingDB('script').system.js.save({
             log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (!(typeof group == "string")) {
+        if (typeof group != "string") {
             log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (!(typeof column == "string")) {
+        if (typeof column != "string") {
             log('[column] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
@@ -41,8 +41,6 @@ db.getSiblingDB('script').system.js.save({
             log('[cutOffDate] must be a date', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-
-        let e;
 
         // Initialize group collections' name
         let coll = {
@@ -64,7 +62,7 @@ db.getSiblingDB('script').system.js.save({
             } catch (e) {
                 log('- insertMany: ' + e.message, group, e.name, 'E');
             }
-            bulkUpdatePipe = [];
+            let bulkUpdatePipe = [];
             docs.forEach( (_doc) => {
                 let eventtime = new Date();
                 try {

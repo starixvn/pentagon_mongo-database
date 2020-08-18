@@ -1,8 +1,6 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'log'
 ,   value:  (str, title, label, type) => {
-        let e;
-
         try {
             if (typeof str == "object")
                 str = tojson(str);

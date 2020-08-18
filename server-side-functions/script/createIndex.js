@@ -18,14 +18,14 @@ db.getSiblingDB('script').system.js.save({
 
         // Create index
         let idx;
-        idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_opts.name + '$').test(idx.name))[0];
+        idx = coll.getIndexes().filter((_idx) => RegExp('^' + idx_opts.name + '$').test(_idx.name))[0];
         if (!idx) {
             let idx_name = '';
             Object.keys(idx_keys).forEach((key) => {
                 idx_name += '_' + key + '_' + JSON.stringify(idx_keys[key]);
             });
             idx_name = idx_name.substr(1);
-            idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx = coll.getIndexes().filter((_idx) => RegExp('^' + idx_name + '$').test(_idx.name))[0];
         }
         if (!idx) {
             let res = coll.createIndex(idx_keys, idx_opts);
@@ -33,7 +33,7 @@ db.getSiblingDB('script').system.js.save({
                 printjson(res);
                 return;
             }
-            idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_opts.name + '$').test(idx.name))[0];
+            idx = coll.getIndexes().filter((_idx) => RegExp('^' + idx_opts.name + '$').test(_idx.name))[0];
             idx.____________________________________________________CREATED = true;
         } else {
             idx._____________exists = true;
