@@ -1,10 +1,10 @@
--- ln-env.js --
+// -- ln-env.js -- //
 active_connstr = 'mongodb://';
 archive_connstr = 'mongodb://';
 load('run-archive.js');
 quit();
 
--- run-archive.js --
+// -- run-archive.js -- //
 // Active and archive database
 db_active = (new Mongo(active_connstr)).getDB('minigame');
 db_arc = (new Mongo(archive_connstr)).getDB('minigame_arc');

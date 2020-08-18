@@ -1,4 +1,4 @@
--- ln-env.js --
+// -- ln-env.js -- //
 db = 'mongodb://';
 db = (new Mongo(db_connstr)).getDB('minigame');
 load('run-summary.js');
@@ -6,6 +6,6 @@ print("=========================================================================
 db._session.endSession();
 quit();
 
--- run-summary.js --
+// -- run-summary.js -- //
 db.getSiblingDB('script').loadServerScripts();
 summarizeDaily();
