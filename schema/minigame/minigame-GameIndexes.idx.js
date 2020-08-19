@@ -1,8 +1,8 @@
 // Archive TTL indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     if (RegExp('(_phiens|_cuocs|_ones|_phiens_log)$').test(coll)) {
-        var idx_keys = {'__archive.eventtime': 1};
-        var idx_opts = {expireAfterSeconds: 3600*24*8, name: 'TTL_' + coll};
+        let idx_keys = {'__archive.eventtime': 1};
+        let idx_opts = {expireAfterSeconds: 3600*24*8, name: 'TTL_' + coll};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 });
@@ -19,8 +19,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'taixiu_ones'
     ||  coll == 'txturbo_ones'
     ) {
-        var idx_keys = {uid: 1, phien: 1, red: 1};
-        var idx_opts = {unique: true, name: 'UIX_' + coll + '_uid_phien_red'};
+        let idx_keys = {uid: 1, phien: 1, red: 1};
+        let idx_opts = {unique: true, name: 'UIX_' + coll + '_uid_phien_red'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 
@@ -43,8 +43,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'roulette_ones'
     ||  coll == 'roulette_tmpones'
     ) {
-        var idx_keys = {uid: 1, phien: 1};
-        var idx_opts = {unique: true, name: 'UIX_' + coll + '_uid_phien'};
+        let idx_keys = {uid: 1, phien: 1};
+        let idx_opts = {unique: true, name: 'UIX_' + coll + '_uid_phien'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 
@@ -54,8 +54,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'xocxoc_cuocs'
     ||  coll == 'minidragontiger_cuocs'
     ) {
-        var idx_keys = {uid: 1, thanhtoan: 1, red: 1, _id: 1};
-        var idx_opts = {name: 'IX_' + coll + '_uid_thanhtoan__id'};
+        let idx_keys = {uid: 1, thanhtoan: 1, red: 1, _id: 1};
+        let idx_opts = {name: 'IX_' + coll + '_uid_thanhtoan__id'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 
@@ -69,8 +69,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'chanle_cuocs'
     ||  coll == 'chanleturbo_cuocs'
     ) {
-        var idx_keys = {uid: 1, thanhtoan: 1, _id: 1};
-        var idx_opts = {name: 'IX_' + coll + '_uid_thanhtoan__id'};
+        let idx_keys = {uid: 1, thanhtoan: 1, _id: 1};
+        let idx_opts = {name: 'IX_' + coll + '_uid_thanhtoan__id'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 
@@ -87,8 +87,8 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'kenoproviet_cuocs'
     ||  coll == 'roulette_cuocs'
     ) {
-        var idx_keys = {uid: 1, _id: 1};
-        var idx_opts = {name: 'IX_' + coll + '_uid__id'};
+        let idx_keys = {uid: 1, _id: 1};
+        let idx_opts = {name: 'IX_' + coll + '_uid__id'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 });
@@ -96,14 +96,14 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
 // Time indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     if (RegExp('_phiens$').test(coll)) {
-        var idx_keys = {time: 1};
-        var idx_opts = {name: 'IX_' + coll + '_time'};
+        let idx_keys = {time: 1};
+        let idx_opts = {name: 'IX_' + coll + '_time'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
 
-        var one = coll.substring(0, coll.length - 7) + '_ones';
-        var cuoc = coll.substring(0, coll.length - 7) + '_cuocs';
-        var tmpcuoc = coll.substring(0, coll.length - 7) + '_tmpcuocs';
-        var tmpone = coll.substring(0, coll.length - 7) + '_tmpones';
+        let one = coll.substring(0, coll.length - 7) + '_ones';
+        let cuoc = coll.substring(0, coll.length - 7) + '_cuocs';
+        let tmpcuoc = coll.substring(0, coll.length - 7) + '_tmpcuocs';
+        let tmpone = coll.substring(0, coll.length - 7) + '_tmpones';
 
         if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: one})[0]) {
             // Index for one
@@ -133,14 +133,14 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
 // Phien indexes
 db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     if (RegExp('_phiens$').test(coll)) {
-        var idx_keys = {id: 1};
-        var idx_opts = {unique: true, name: 'UIX_' + coll + '_id'};
+        let idx_keys = {id: 1};
+        let idx_opts = {unique: true, name: 'UIX_' + coll + '_id'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 
     if (RegExp('(_cuocs|_ones)$').test(coll)) {
-        var idx_keys = {phien: 1, _id: 1};
-        var idx_opts = {name: 'IX_' + coll + '_phien'};
+        let idx_keys = {phien: 1, _id: 1};
+        let idx_opts = {name: 'IX_' + coll + '_phien'};
         createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
     }
 });
