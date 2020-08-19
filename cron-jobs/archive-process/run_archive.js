@@ -1,19 +1,24 @@
 // -- ln-env.js -- //
 {
     let active_connstr = 'mongodb://';
-    let archive_connstr = 'mongodb://';
+    let arc_connstr = 'mongodb://';
+    var mongo_active = new Mongo(active_connstr);
+    var mongo_arc = new Mongo(arc_connstr);
+    let wc = new WriteConcern("majority", 0, true);
+    mongo_active.setWriteConcern(wc);
+    mongo_arc.setWriteConcern(wc);
     load('run-archive.js');
     quit();
 }
 
 // -- run-archive.js -- //
-// Active and archive database
 {
-    let db_active = (new Mongo(active_connstr)).getDB('minigame');
-    let db_arc = (new Mongo(archive_connstr)).getDB('minigame_arc');
+    // Active and archive database
+    let db_active = mongo_active.getDB('minigame');
+    let db_arc = mongo_arc.getDB('minigame_arc');
 
     // Load script
-    db_active.getSiblingDB('script').loadServerScripts();
+    mongo_active.getDB('script').loadServerScripts();
 
     // Run archive
     archiveGame(db_active, db_arc, 'taixiu');
@@ -41,20 +46,18 @@
     archiveTable(db_active, db_arc, 'usersessions', 'recheckInTime');
 
     // Archive Log
-    db_active = db_active.getSiblingDB('log');
-    db_arc = db_arc.getSiblingDB('log_arc');
+    db_active = mongo_active.getDB('log');
+    db_arc = mongo_arc.getDB('log_arc');
     // Run archive
     archiveLog(db_active, db_arc, 'bets');
     archiveLog(db_active, db_arc, 'end_games');
     archiveLog(db_active, db_arc, 'failed_requests');
 
     // Archive Member
-    db_active = db_active.getSiblingDB('member');
-    db_arc = db_arc.getSiblingDB('member_arc');
+    db_active = mongo_active.getDB('member');
+    db_arc = mongo_arc.getDB('member_arc');
     // Run archive
     archiveTable(db_active, db_arc, 'member_auths', 'time');
 
     print("=========================================================================================\n\n");
-    db_active._session.endSession();
-    db_arc._session.endSession();
 }
