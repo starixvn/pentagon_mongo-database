@@ -80,8 +80,8 @@ db.getSiblingDB('script').system.js.save({
             fromDB[coll.name].bulkWrite(bulkUpdatePipe, {ordered : false});
         }
 
-        let docs = [];
-        let docs_cnt = 0;
+        let doc_arr = [];
+        let doc_arr_cnt = 0;
 
         log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
         let filter = {};
@@ -89,21 +89,21 @@ db.getSiblingDB('script').system.js.save({
         filter['__archive.eventtime'] = {$exists: false};
 
         fromDB[coll.name].find(filter).forEach( (doc) => {
-            docs.push(doc);
-            docs_cnt++;
+            doc_arr.push(doc);
+            doc_arr_cnt++;
 
-            if (docs_cnt % 1000 === 0) {
-                archiveByBatch(docs);
-                docs = [];
+            if (doc_arr_cnt % 1000 === 0) {
+                archiveByBatch(doc_arr);
+                doc_arr = [];
             }
 
-            if (docs_cnt % 10000 === 0) {
-                log('- Archiving ' + docs_cnt + ' docs', group, 'ARCHIVE', 'I');
+            if (doc_arr_cnt % 10000 === 0) {
+                log('- Archiving ' + doc_arr_cnt + ' docs', group, 'ARCHIVE', 'I');
             }
         });
-        archiveByBatch(docs);
-        log('Archived ' + docs_cnt + ' docs', group, 'ARCHIVE', 'I');
+        archiveByBatch(doc_arr);
+        log('Archived ' + doc_arr_cnt + ' docs', group, 'ARCHIVE', 'I');
     }
-,   version: 2.8
+,   version: 2.9
 ,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();

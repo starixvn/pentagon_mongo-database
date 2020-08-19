@@ -199,23 +199,23 @@ db.getSiblingDB('script').system.js.save({
         });
 
         // Running archive
-        let phiens = [];
-        let phiens_id = [];
+        let phien_arr = [];
+        let phien_id_arr = [];
 
         log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
 
         fromDB[coll.phien].find({time: {$lt: cutOffDate}, '__archive.eventtime': {$exists: false}}).forEach((phien) => {
-            phiens.push(phien);
-            phiens_id.push(phien.id);
+            phien_arr.push(phien);
+            phien_id_arr.push(phien.id);
 
-            if (phiens_id.length % 1000 == 0) {
-                archiveByPhiens(phiens, phiens_id);
-                phiens = [];
-                phiens_id = [];
+            if (phien_id_arr.length % 1000 == 0) {
+                archiveByPhiens(phien_arr, phien_id_arr);
+                phien_arr = [];
+                phien_id_arr = [];
             }
         });
-        archiveByPhiens(phiens, phiens_id);
+        archiveByPhiens(phien_arr, phien_id_arr);
     }
-,   version: 2.8
+,   version: 2.9
 ,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();
