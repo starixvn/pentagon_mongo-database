@@ -1,7 +1,7 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'summarizeDaily'
-,   value: (summaryDay) => {
-        if (db == null || typeof(db) == "undefined") {
+,   value: (mongo, summaryDay) => {
+        if (typeof(mongo) == "undefined" || mongo == null) {
             log('Must be connected to Mongo instance to run this function.', 'Audit', 'SUMMARY', 'E');
             return;
         }
@@ -11,15 +11,15 @@ db.getSiblingDB('script').system.js.save({
             summaryDay = new Date(Date.now() - dayLen);
 
         // Parameters' type verification
-        if (!(db instanceof DB)) {
-            log('[db] must be a database', 'Audit', 'SUMMARY', 'E');
+        if (!(mongo instanceof Mongo)) {
+            log('[mongo] must be a MongoDB connection.', 'Audit', 'SUMMARY', 'E');
             return;
         }
         if (typeof summaryDay == 'string' && Date.parse(summaryDay)) {
             summaryDay = new Date(Date.parse(summaryDay));
         }
         if (!(summaryDay instanceof Date)) {
-            log('[summaryDay] must be a date', 'Audit', 'SUMMARY', 'E');
+            log('[summaryDay] must be a date.', 'Audit', 'SUMMARY', 'E');
             return;
         }
         if ((new Date(Math.floor(Date.now() / dayLen) * dayLen)) - summaryDay.valueOf() > 7 * 24 * 3600 * 1000) {
@@ -38,7 +38,7 @@ db.getSiblingDB('script').system.js.save({
         // Run summary from config
         log('Data summary started.', timeFrom.toISOString().substr(0,10), 'SUMMARY', 'I');
 
-        db.getSiblingDB('summary').game_summary_config.find().forEach((game) => {
+        mongo.getDB('summary').game_summary_config.find().forEach((game) => {
             let agg = [];
 
             agg[ 0] = {$match: {$expr: {$and: [{$gte: [game.fields.time, timeFrom]}, {$lt: [game.fields.time, timeTo]}]}}};
@@ -68,9 +68,9 @@ db.getSiblingDB('script').system.js.save({
             }};
 
             let time = new Date();
-            let summaries = db.getSiblingDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).toArray();
+            let summaries = mongo.getDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).toArray();
             summaries.forEach((doc) => {
-                let res = db.getSiblingDB('summary').daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
+                let res = mongo.getDB('summary').daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
                 if (res.upsertedId)
                     log('- Inserted new summary record for ' + doc.key.currency, game.name.en, 'SUMMARY', 'I');
                 else if (res.modifiedCount > 0)
@@ -80,6 +80,6 @@ db.getSiblingDB('script').system.js.save({
         });
         log('Data summary finished.', timeFrom.toISOString().substr(0,10), 'SUMMARY', 'I');
     }
-,   version: 1.2
+,   version: 1.3
 ,   process: 'Daily Summary'
 }); db.getSiblingDB('script').loadServerScripts();
