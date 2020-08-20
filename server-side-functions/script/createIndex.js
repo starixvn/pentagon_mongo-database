@@ -1,6 +1,6 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'createIndex'
-,   value: (coll, idx_keys, idx_opts) => {
+,   value: (coll, idx_keys, idx_opts, show_exist = false) => {
         if (coll == null || typeof(coll) == "undefined")
             throw Error("[coll] must be defined");
         if (idx_keys == null || typeof(idx_keys) == "undefined")
@@ -18,14 +18,14 @@ db.getSiblingDB('script').system.js.save({
 
         // Create index
         let idx;
-        idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_opts.name + '$').test(idx.name))[0];
+        idx = coll.getIndexes().filter((_idx) => RegExp('^' + idx_opts.name + '$').test(_idx.name))[0];
         if (!idx) {
             let idx_name = '';
             Object.keys(idx_keys).forEach((key) => {
                 idx_name += '_' + key + '_' + JSON.stringify(idx_keys[key]);
             });
             idx_name = idx_name.substr(1);
-            idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_name + '$').test(idx.name))[0];
+            idx = coll.getIndexes().filter((_idx) => RegExp('^' + idx_name + '$').test(_idx.name))[0];
         }
         if (!idx) {
             let res = coll.createIndex(idx_keys, idx_opts);
@@ -33,22 +33,24 @@ db.getSiblingDB('script').system.js.save({
                 printjson(res);
                 return;
             }
-            idx = coll.getIndexes().filter((idx)=>RegExp('^' + idx_opts.name + '$').test(idx.name))[0];
-            idx.__________________________________________________CREATED = true;
+            idx = coll.getIndexes().filter((_idx) => RegExp('^' + idx_opts.name + '$').test(_idx.name))[0];
+            idx.____________________________________________________CREATED = true;
         } else {
-            idx._________________________exists = true;
+            idx._____________exists = true;
         }
         if (JSON.stringify(idx.key) != JSON.stringify(idx_keys)) {
-            idx.__________________________________________________WARNING = '[keys] is NOT correct!!!';
+            idx.__________________________WARNING = '[keys] is NOT correct!!!';
         }
         Object.keys(idx_opts).forEach((opt) => {
             if (JSON.stringify(idx[opt]) != JSON.stringify(idx_opts[opt])) {
-                idx.__________________________________________________WARNING = '[' + opt + '] option is NOT correct!!!';
+                idx.__________________________WARNING = '[' + opt + '] option is NOT correct!!!';
             }
         });
         delete idx.v;
-        printjson(idx);
+        if (show_exist || !idx._____________exists || idx.__________________________WARNING) {
+            printjson(idx);
+        }
     }
-,   version: 1.1
+,   version: 1.2
 ,   process: 'Database Maintenance'
 }); db.getSiblingDB('script').loadServerScripts();

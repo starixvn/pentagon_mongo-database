@@ -25,7 +25,7 @@ db.getSiblingDB('script').system.js.save({
             log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (!(typeof group == "string")) {
+        if (typeof group != "string") {
             log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
@@ -33,8 +33,6 @@ db.getSiblingDB('script').system.js.save({
             log('[cutOffDate] must be a date', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-
-        let e;
 
         // Initialize group collections' name
         let coll = {
@@ -62,7 +60,7 @@ db.getSiblingDB('script').system.js.save({
                 toDB[coll_bk.phien].insertMany(phiens, {ordered: false});
             } catch (e) {
                 log('- phiens.insertMany: ' + e.message, group, e.name, 'E');
-            };
+            }
 
             // Prepare update archive flag pipe for this batch
             let bulkUpdatePipe_id = [];
@@ -96,7 +94,7 @@ db.getSiblingDB('script').system.js.save({
                             toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
                         } catch (e) {
                             log('- phien_logs.insertMany: ' + e.message, group, e.name, 'E');
-                        };
+                        }
                         phien_logs = [];
                     }
 
@@ -108,7 +106,7 @@ db.getSiblingDB('script').system.js.save({
                     toDB[coll_bk.phien_log].insertMany(phien_logs, {ordered: false});
                 } catch (e) {
                     log('- phien_logs.insertMany: ' + e.message, group, e.name, 'E');
-                };
+                }
                 log('- Archived ' + phien_logs_cnt + ' phien logs', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.phien_log].bulkWrite(bulkUpdatePipe_id, {ordered : false});
@@ -135,7 +133,7 @@ db.getSiblingDB('script').system.js.save({
                             toDB[coll_bk.one].insertMany(ones, {ordered: false});
                         } catch (e) {
                             log('- ones.insertMany: ' + e.message, group, e.name, 'E');
-                        };
+                        }
                         ones = [];
                     }
 
@@ -147,7 +145,7 @@ db.getSiblingDB('script').system.js.save({
                     toDB[coll_bk.one].insertMany(ones, {ordered: false});
                 } catch (e) {
                     log('- ones.insertMany: ' + e.message, group, e.name, 'E');
-                };
+                }
                 log('- Archived ' + ones_cnt + ' ones', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.one].bulkWrite(bulkUpdatePipe, {ordered : false});
@@ -173,7 +171,7 @@ db.getSiblingDB('script').system.js.save({
                             toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                         } catch (e) {
                             log('- cuocs.insertMany: ' + e.message, group, e.name, 'E');
-                        };
+                        }
                         cuocs = [];
                     }
 
@@ -185,7 +183,7 @@ db.getSiblingDB('script').system.js.save({
                     toDB[coll_bk.cuoc].insertMany(cuocs, {ordered: false});
                 } catch (e) {
                     log('- cuocs.insertMany: ' + e.message, group, e.name, 'E');
-                };
+                }
                 log('- Archived ' + cuocs_cnt + ' cuocs', group, 'ARCHIVE', 'I');
 
                 fromDB[coll.cuoc].bulkWrite(bulkUpdatePipe, {ordered : false});
@@ -201,23 +199,23 @@ db.getSiblingDB('script').system.js.save({
         });
 
         // Running archive
-        let phiens = [];
-        let phiens_id = [];
+        let phien_arr = [];
+        let phien_id_arr = [];
 
         log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
 
         fromDB[coll.phien].find({time: {$lt: cutOffDate}, '__archive.eventtime': {$exists: false}}).forEach((phien) => {
-            phiens.push(phien);
-            phiens_id.push(phien.id);
+            phien_arr.push(phien);
+            phien_id_arr.push(phien.id);
 
-            if (phiens_id.length % 1000 == 0) {
-                archiveByPhiens(phiens, phiens_id);
-                phiens = [];
-                phiens_id = [];
+            if (phien_id_arr.length % 1000 == 0) {
+                archiveByPhiens(phien_arr, phien_id_arr);
+                phien_arr = [];
+                phien_id_arr = [];
             }
         });
-        archiveByPhiens(phiens, phiens_id);
+        archiveByPhiens(phien_arr, phien_id_arr);
     }
-,   version: 2.8
+,   version: 2.9
 ,   process: 'Archive Process'
 }); db.getSiblingDB('script').loadServerScripts();
