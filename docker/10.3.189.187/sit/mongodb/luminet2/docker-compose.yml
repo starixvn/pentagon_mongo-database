@@ -1,0 +1,35 @@
+version: '3.3'
+services:
+  l2_saba_sit_db01:
+    build:
+      context: .
+      dockerfile: Dockerfile_mongod
+    container_name: L2_SabaSITDB01
+    hostname: l2_saba_sit_db01
+    restart: always
+    networks:
+      l2_sabasitdb_network:
+        ipv4_address: 172.39.84.193
+    ports:
+      - '0.0.0.0:37301:37301'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '-'
+    volumes:
+      - ./.storage/l2_mongositdb01/db:/data/db:rw
+      - ./.storage/l2_mongositdb01/log:/data/db/.log:rw
+      - ./config/mongod.pri.conf:/etc/mongod.conf:ro
+    secrets:
+      - keyFile
+    command: --config /etc/mongod.conf --replSet SabaL2SIT --auth
+    security_opt:
+      - 'seccomp=unconfined'
+
+secrets:
+  keyFile:
+    file: ./secret/keyFile
+
+networks:
+  l2_sabasitdb_network:
+    external:
+      name: luminet2_l2_sabadb_network

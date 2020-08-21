@@ -1,0 +1,4 @@
+FROM mongo:4.2.3
+RUN mkdir -p /data/log \
+ && chown -R mongodb:mongodb /data/log
+VOLUME /data/log

@@ -1,0 +1,70 @@
+version: '3.3'
+services:
+  l1_saba_bi01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongobi_debian_slim
+    container_name: L1_SabaBI01
+    hostname: l1_saba_bi01
+    restart: always
+    networks:
+      l1_sabadb_network:
+        ipv4_address: 172.39.56.65
+    ports:
+      - '10.99.99.187:28101:28101'
+    volumes:
+      - ./.storage/l1_mongobi01/log:/var/log/mongosqld:rw
+      - ./config/mongosqld.l1.conf:/etc/mongosqld.conf:ro
+    secrets:
+      - mongosqld_ssl
+
+  l2_saba_bi01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongobi_debian_slim
+    container_name: L2_SabaBI01
+    hostname: l2_saba_bi01
+    restart: always
+    networks:
+      l2_sabadb_network:
+        ipv4_address: 172.39.88.65
+    ports:
+      - '10.99.99.187:38101:38101'
+    volumes:
+      - ./.storage/l2_mongobi01/log:/var/log/mongosqld:rw
+      - ./config/mongosqld.l2.conf:/etc/mongosqld.conf:ro
+    secrets:
+      - mongosqld_ssl
+
+  l3_saba_bi01:
+    build:
+      context: Dockerfile.d
+      dockerfile: Dockerfile_mongobi_debian_slim
+    container_name: L3_SabaBI01
+    hostname: l3_saba_bi01
+    restart: always
+    networks:
+      l3_sabadb_network:
+        ipv4_address: 172.39.120.65
+    ports:
+      - '10.99.99.187:48101:48101'
+    volumes:
+      - ./.storage/l3_mongobi01/log:/var/log/mongosqld:rw
+      - ./config/mongosqld.l3.conf:/etc/mongosqld.conf:ro
+    secrets:
+      - mongosqld_ssl
+
+secrets:
+  mongosqld_ssl:
+    file: ./secret/mongosqld.pem
+
+networks:
+  l1_sabadb_network:
+    external:
+      name: luminet1_l1_sabadb_network
+  l2_sabadb_network:
+    external:
+      name: luminet2_l2_sabadb_network
+  l3_sabadb_network:
+    external:
+      name: luminet3_l3_sabadb_network

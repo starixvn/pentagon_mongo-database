@@ -1,0 +1,13 @@
+FROM ubuntu:xenial
+WORKDIR /tmp
+RUN apt-get update \
+ && apt-get install -y apt-utils \
+ && apt-get install -y curl rsyslog \
+ && curl https://info-mongodb-com.s3.amazonaws.com/mongodb-bi/v2/mongodb-bi-linux-x86_64-ubuntu1604-v2.13.4.tgz -o mongodb-bi.tgz \
+ && tar -xvzf mongodb-bi.tgz \
+ && mv /tmp/mongodb-bi-linux-x86_64-ubuntu1604-v2.13.4/bin/* /usr/local/bin \
+ && rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/*
+COPY mongosqld /var/mongosqld/
+ENTRYPOINT ["/bin/sh", "/var/mongosqld/run.sh"]
+

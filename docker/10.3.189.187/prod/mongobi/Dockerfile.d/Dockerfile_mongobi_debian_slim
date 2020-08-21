@@ -1,0 +1,13 @@
+FROM debian:10.4-slim
+WORKDIR /tmp
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y curl rsyslog ca-certificates \
+ && curl https://info-mongodb-com.s3.amazonaws.com/mongodb-bi/v2/mongodb-bi-linux-x86_64-debian10-v2.13.4.tgz -o mongodb-bi.tgz \
+ && tar -xvzf mongodb-bi.tgz \
+ && mv /tmp/mongodb-bi-linux-x86_64-debian10-v2.13.4/bin/mongosqld /usr/local/bin \
+ && apt-get purge -y curl \
+ && rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/* \
+ && sed -i '/imklog/s/^/#/' /etc/rsyslog.conf
+COPY mongosqld /var/mongosqld/
+ENTRYPOINT ["/bin/sh", "/var/mongosqld/run.sh"]
