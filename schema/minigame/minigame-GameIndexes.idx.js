@@ -51,7 +51,6 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     // uid - thanhtoan - red - _id
     if (
         coll == 'baucua_cuocs'
-    ||  coll == 'xocxoc_cuocs'
     ||  coll == 'minidragontiger_cuocs'
     ) {
         let idx_keys = {uid: 1, thanhtoan: 1, red: 1, _id: 1};
@@ -68,6 +67,7 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll == 'baccarat_cuocs'
     ||  coll == 'chanle_cuocs'
     ||  coll == 'chanleturbo_cuocs'
+    ||  coll == 'xocxoc_cuocs'
     ) {
         let idx_keys = {uid: 1, thanhtoan: 1, _id: 1};
         let idx_opts = {name: 'IX_' + coll + '_uid_thanhtoan__id'};
