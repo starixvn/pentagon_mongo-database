@@ -51,6 +51,11 @@ db.getSiblingDB('admin').createUser({
 ,   pwd: passwordPrompt()
 ,   roles: []
 });
+db.getSiblingDB('admin').createUser({
+    user: 'lmn_summary'
+,   pwd: passwordPrompt()
+,   roles: []
+});
 
 
 db.getSiblingDB('admin').grantRolesToUser('billy.bui', [
@@ -70,12 +75,14 @@ db.getSiblingDB('admin').grantRolesToUser('lmn_backend', [
 ,   {role: 'read', db: 'log_arc'}
 ,   {role: 'read', db: 'member_arc'}
 ,   {role: 'read', db: 'minigame_rm'}
+,   {role: 'read', db: 'summary_arc'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('lmn_readonly', [
     {role: 'read', db: 'minigame_arc'}
 ,   {role: 'read', db: 'log_arc'}
 ,   {role: 'read', db: 'member_arc'}
 ,   {role: 'read', db: 'minigame_rm'}
+,   {role: 'read', db: 'summary_arc'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('mongodb_exporter', [
     {role: 'readAnyDatabase', db: 'admin'}
@@ -89,5 +96,11 @@ db.getSiblingDB('admin').grantRolesToUser('mongosqld', [
 ,   {role: 'read', db: 'member_arc'}
 ,   {role: 'read', db: 'minigame_rm'}
 ,   {role: 'readWrite', db: 'schema'}
+,   {role: 'read', db: 'summary_arc'}
+]);
+db.getSiblingDB('admin').grantRolesToUser('lmn_summary', [
+    {role: 'read', db: 'minigame_arc'}
+,   {role: 'read', db: 'script'}
+,   {role: 'readWrite', db: 'summary_arc'}
 ]);
 
