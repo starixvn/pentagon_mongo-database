@@ -1,25 +1,25 @@
 // member_auths
 {
-    let coll = 'member_auths';
+    const coll = 'member_auths';
 
     // memberId - iP
     {
-        let idx_keys = {memberId: 1, iP: 1};
-        let idx_opts = {name: 'IX_' + coll + '_memberId_iP'};
-        createIndex(db.getSiblingDB('member')[coll], idx_keys, idx_opts);
+        const idxKeys = {memberId: 1, iP: 1};
+        const idxOpts = {name: `IX_${coll}_memberId_iP`};
+        createIndex(db.getSiblingDB('member')[coll], idxKeys, idxOpts);
     }
 
     // token
     {
-        let idx_keys = {token: 1};
-        let idx_opts = {name: 'IX_' + coll + '_token'};
-        createIndex(db.getSiblingDB('member')[coll], idx_keys, idx_opts);
+        const idxKeys = {token: 1};
+        const idxOpts = {name: `IX_${coll}_token`};
+        createIndex(db.getSiblingDB('member')[coll], idxKeys, idxOpts);
     }
 
     // TTL index for archive
     {
-        let idx_keys = {'__archive.eventtime': 1};
-        let idx_opts = {expireAfterSeconds: 3600*24*8, name: 'TTL_' + coll + ''};
-        createIndex(db.getSiblingDB('member')[coll], idx_keys, idx_opts);
+        const idxKeys = {'__archive.eventtime': 1};
+        const idxOpts = {expireAfterSeconds: 3600*24*8, name: `TTL_${coll}`};
+        createIndex(db.getSiblingDB('member')[coll], idxKeys, idxOpts);
     }
 }

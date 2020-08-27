@@ -1,12 +1,14 @@
 // game_summary_config
 {
-    let coll = 'game_summary_config';
+    const coll = 'game_summary_config';
+    let idxKeys = null;
+    let idxOpts = null;
 
     // gameId
     {
-        let idx_keys = {gameId: 1};
-        let idx_opts = {unique: true, name: 'UIX_' + coll + '_gameId'};
-        createIndex(db.getSiblingDB('summary')[coll], idx_keys, idx_opts);
+        idxKeys = {gameId: 1};
+        idxOpts = {unique: true, name: `UIX_${coll}_gameId`};
+        createIndex(db.getSiblingDB('summary')[coll], idxKeys, idxOpts);
     }
 }
 
