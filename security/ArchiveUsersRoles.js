@@ -1,6 +1,6 @@
 // Roles
 {
-    var monitorActions = ['collStats', 'indexStats'];
+    const monitorActions = ['collStats', 'indexStats'];
     db.getSiblingDB('admin').createRole({
         role: 'monitorSystem'
     ,   roles: []

@@ -1,6 +1,6 @@
 // Roles
 {
-    var monitorActions = ['collStats', 'indexStats'];
+    const monitorActions = ['collStats', 'indexStats'];
     db.getSiblingDB('admin').createRole({
         role: 'monitorSystem'
     ,   roles: []
@@ -68,7 +68,6 @@ db.getSiblingDB('admin').grantRolesToUser('lmn_archive', [
     {role: 'readWrite', db: 'minigame'}
 ,   {role: 'readWrite', db: 'member'}
 ,   {role: 'readWrite', db: 'log'}
-,   {role: 'readWrite', db: 'summary'}
 ,   {role: 'read', db: 'script'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('lmn_backend', [
