@@ -1,12 +1,14 @@
 // game_summary_config
 {
-    let coll = 'game_summary_config';
+    const coll = 'game_summary_config';
+    let idxKeys = null;
+    let idxOpts = null;
 
     // gameId
     {
-        let idx_keys = {gameId: 1};
-        let idx_opts = {unique: true, name: 'UIX_' + coll + '_gameId'};
-        createIndex(db.getSiblingDB('summary')[coll], idx_keys, idx_opts);
+        idxKeys = {gameId: 1};
+        idxOpts = {unique: true, name: `UIX_${coll}_gameId`};
+        createIndex(db.getSiblingDB('summary')[coll], idxKeys, idxOpts);
     }
 }
 
@@ -30,6 +32,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -51,6 +56,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$chan', '$le', '$red3', '$red4', '$white3', '$white4'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -72,6 +80,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$0', '$1', '$2', '$3', '$4', '$5'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -93,6 +104,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -114,6 +128,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -135,6 +152,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$bet'],
             payout: [{$multiply: ['$betwin', {$toInt: '$win'}]}, {$multiply: ['$bet', {$toInt: '$win'}]}, {$multiply: ['$tralai', {$toInt: {$not: '$win'}}]}]
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -156,6 +176,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$dragon', '$tie', '$tiger'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -177,6 +200,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -198,6 +224,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$even', '$odd', '$red3', '$red4', '$white3', '$white4'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -219,6 +248,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$banker', '$bankerPair', '$player', '$playerPair', '$tie', '$big', '$small'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -240,6 +272,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -261,6 +296,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -282,6 +320,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -303,6 +344,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -324,6 +368,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -345,6 +392,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -366,6 +416,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -387,6 +440,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -408,6 +464,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$big', '$small', '$even', '$odd', '$gold', '$wood', '$fire', '$water', '$earth'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -429,6 +488,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$settled',
             stake: ['$totalBet'],
             payout: ['$win']
+        },
+        config: {
+            hasCurrency: false
         }
     },
 
@@ -450,6 +512,9 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             settled: '$thanhtoan',
             stake: ['$totalAmount'],
             payout: ['$betwin']
+        },
+        config: {
+            hasCurrency: false
         }
     }
 ]

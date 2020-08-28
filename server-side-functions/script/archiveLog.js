@@ -23,32 +23,32 @@ db.getSiblingDB('script').system.js.save({
             log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (typeof group != "string") {
+        if (typeof(group) != "string") {
             log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
 
         // Initialize group collections' name
-        let coll = {
-            log: group
+        const coll = {
+            log: `${group}`
         };
-        let coll_bk = {
-            log: group + '_bk'
+        const collBK = {
+            log: `${group}_bk`
         };
 
         // Group must have collection
-        if (fromDB.getCollectionInfos({name: coll.log}).length != 1) {
-            log('Cannot run archive because [' + fromDB._name + '.' + coll.log + '] does NOT exist', group, 'ARCHIVE', 'E');
+        if (fromDB.getCollectionInfos({name: coll.log}).length !== 1) {
+            log(`Cannot run archive because [${fromDB._name}.${coll.log}] does NOT exist`, group, 'ARCHIVE', 'E');
             return;
         }
 
-        let archiveByBatch = (docs) => {
+        const archiveByBatch = (docs) => {
             try {
-                toDB[coll_bk.log].insertMany(docs, {ordered: false});
+                toDB[collBK.log].insertMany(docs, {ordered: false});
             } catch (e) {
-                log('- log.insertMany: ' + e.message, group, e.name, 'E');
+                log(`- log.insertMany: ${e.message}`, group, e.name, 'E');
             }
-            let bulkUpdatePipe = [];
+            const bulkUpdatePipe = [];
             docs.forEach( (_doc) => {
                 bulkUpdatePipe.push(
                     {   updateMany: {
@@ -61,25 +61,26 @@ db.getSiblingDB('script').system.js.save({
             fromDB[coll.log].bulkWrite(bulkUpdatePipe, {ordered : false});
         }
 
-        let doc_arr = [];
-        let doc_arr_cnt = 0;
+        let docArr = [];
+        let docArrCnt = 0;
 
         fromDB[coll.log].find({'__archive.eventtime': {$exists: false}}).forEach( (doc) => {
-            doc_arr.push(doc);
-            doc_arr_cnt++;
+            docArr.push(doc);
+            docArrCnt++;
 
-            if (doc_arr_cnt % 1000 === 0) {
-                archiveByBatch(doc_arr);
-                doc_arr = [];
+            if (docArrCnt % 1000 === 0) {
+                archiveByBatch(docArr);
+                docArr = [];
             }
 
-            if (doc_arr_cnt % 10000 === 0) {
-                log('- Archiving ' + doc_arr_cnt + ' logs', group, 'ARCHIVE', 'I');
+            if (docArrCnt % 10000 === 0) {
+                log(`- Archiving ${docArrCnt} logs`, group, 'ARCHIVE', 'I');
             }
         });
-        archiveByBatch(doc_arr);
-        log('Archived ' + doc_arr_cnt + ' logs', group, 'ARCHIVE', 'I');
+        archiveByBatch(docArr);
+        log(`Archived ${docArrCnt} logs`, group, 'ARCHIVE', 'I');
     }
-,   version: 2.9
+,   version: 2.10
 ,   process: 'Archive Process'
-}); db.getSiblingDB('script').loadServerScripts();
+});
+db.getSiblingDB('script').loadServerScripts();

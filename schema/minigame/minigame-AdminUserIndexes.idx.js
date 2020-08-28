@@ -1,23 +1,27 @@
 // admins
 {
-    let coll = 'admins';
+    const coll = 'admins';
+    let idxKeys = null;
+    let idxOpts = null;
 
     // [UNIQUE] username
     {
-        let idx_keys = {username: 1};
-        let idx_opts = {unique: true, name: 'UIX_' + coll + '_username'};
-        createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
+        idxKeys = {username: 1};
+        idxOpts = {unique: true, name: `UIX_${coll}_username`};
+        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
     }
 }
 
 // admin_users
 {
-    let coll = 'admin_users';
+    const coll = 'admin_users';
+    let idxKeys = null;
+    let idxOpts = null;
 
     // [UNIQUE] username
     {
-        let idx_keys = {username: 1};
-        let idx_opts = {unique: true, name: 'UIX_' + coll + '_username'};
-        createIndex(db.getSiblingDB('minigame')[coll], idx_keys, idx_opts);
+        idxKeys = {username: 1};
+        idxOpts = {unique: true, name: `UIX_${coll}_username`};
+        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
     }
 }

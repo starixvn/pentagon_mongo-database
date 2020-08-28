@@ -17,8 +17,9 @@ db.getSiblingDB('script').system.js.save({
             log('[column] must be defined', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (cutOffDate == null || typeof(cutOffDate) == "undefined")
+        if (cutOffDate == null || typeof(cutOffDate) == "undefined") {
             cutOffDate = new Date((Math.floor(Date.now() / 3600000) - 24) * 3600000);
+        }
 
         // Parameters' type verification
         if (!(fromDB instanceof DB)) {
@@ -29,11 +30,11 @@ db.getSiblingDB('script').system.js.save({
             log('[toDB] must be a database', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (typeof group != "string") {
+        if (typeof(group) != "string") {
             log('[group] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
-        if (typeof column != "string") {
+        if (typeof(column) != "string") {
             log('[column] must be a string', 'Audit', 'ARCHIVE', 'E');
             return;
         }
@@ -43,30 +44,34 @@ db.getSiblingDB('script').system.js.save({
         }
 
         // Initialize group collections' name
-        let coll = {
-            name: group
+        const coll = {
+            name: `${group}`
         };
-        let coll_bk = {
-            name: group + '_bk'
+        const collBK = {
+            name: `${group}_bk`
         };
 
         // Group must have collection
-        if (fromDB.getCollectionInfos({name: coll.name}).length != 1) {
-            log('Cannot run archive because [' + fromDB._name + '.' + coll.name + '] does NOT exist', group, 'ARCHIVE', 'E');
+        if (fromDB.getCollectionInfos({name: coll.name}).length !== 1) {
+            log(`Cannot run archive because [${fromDB._name}.${coll.name}] does NOT exist`, group, 'ARCHIVE', 'E');
             return;
         }
 
-        let archiveByBatch = (docs) => {
+        const archiveByBatch = (docs) => {
             try {
-                toDB[coll_bk.name].insertMany(docs, {ordered: false});
+                toDB[collBK.name].insertMany(docs, {ordered: false});
             } catch (e) {
-                log('- insertMany: ' + e.message, group, e.name, 'E');
+                log(`- insertMany: ${e.message}`, group, e.name, 'E');
             }
-            let bulkUpdatePipe = [];
+            const bulkUpdatePipe = [];
             docs.forEach( (_doc) => {
                 let eventtime = new Date();
                 try {
-                    eventtime = (_doc[column] instanceof Date) ? _doc[column] : (typeof _doc[column] == 'string') ? ISODate(date) : new Date();
+                    if (_doc[column] instanceof Date) {
+                        eventtime = _doc[column];
+                    } else {
+                        eventtime = (typeof(_doc[column]) == "string") ? ISODate(date) : new Date();
+                    }
                 } catch (e) {}
 
                 bulkUpdatePipe.push(
@@ -80,30 +85,31 @@ db.getSiblingDB('script').system.js.save({
             fromDB[coll.name].bulkWrite(bulkUpdatePipe, {ordered : false});
         }
 
-        let doc_arr = [];
-        let doc_arr_cnt = 0;
+        let docArr = [];
+        let docArrCnt = 0;
 
-        log(cutOffDate.toISOString(), 'CutOffTime', 'ARCHIVE', 'I');
-        let filter = {};
+        log(`${cutOffDate.toISOString()}`, 'CutOffTime', 'ARCHIVE', 'I');
+        const filter = {};
         filter[column] = {$lt: cutOffDate};
         filter['__archive.eventtime'] = {$exists: false};
 
         fromDB[coll.name].find(filter).forEach( (doc) => {
-            doc_arr.push(doc);
-            doc_arr_cnt++;
+            docArr.push(doc);
+            docArrCnt++;
 
-            if (doc_arr_cnt % 1000 === 0) {
-                archiveByBatch(doc_arr);
-                doc_arr = [];
+            if (docArrCnt % 1000 === 0) {
+                archiveByBatch(docArr);
+                docArr = [];
             }
 
-            if (doc_arr_cnt % 10000 === 0) {
-                log('- Archiving ' + doc_arr_cnt + ' docs', group, 'ARCHIVE', 'I');
+            if (docArrCnt % 10000 === 0) {
+                log(`- Archiving ${docArrCnt} docs`, group, 'ARCHIVE', 'I');
             }
         });
-        archiveByBatch(doc_arr);
-        log('Archived ' + doc_arr_cnt + ' docs', group, 'ARCHIVE', 'I');
+        archiveByBatch(docArr);
+        log(`Archived ${docArrCnt} docs`, group, 'ARCHIVE', 'I');
     }
-,   version: 2.9
+,   version: 2.10
 ,   process: 'Archive Process'
-}); db.getSiblingDB('script').loadServerScripts();
+});
+db.getSiblingDB('script').loadServerScripts();

@@ -1,12 +1,14 @@
 // -- ln-env.js -- //
+var mongoActive;
+var mongoArc;
 {
-    let active_connstr = 'mongodb://';
-    let arc_connstr = 'mongodb://';
-    var mongo_active = new Mongo(active_connstr);
-    var mongo_arc = new Mongo(arc_connstr);
-    let wc = new WriteConcern("majority", 0, true);
-    mongo_active.setWriteConcern(wc);
-    mongo_arc.setWriteConcern(wc);
+    const activeConnstr = 'mongodb://';
+    const arcConnstr = 'mongodb://';
+    mongoActive = new Mongo(activeConnstr);
+    mongoArc = new Mongo(arcConnstr);
+    const wc = new WriteConcern("majority", 0, true);
+    mongoActive.setWriteConcern(wc);
+    mongoArc.setWriteConcern(wc);
     load('run-archive.js');
     quit();
 }
@@ -14,50 +16,50 @@
 // -- run-archive.js -- //
 {
     // Active and archive database
-    let db_active = mongo_active.getDB('minigame');
-    let db_arc = mongo_arc.getDB('minigame_arc');
+    let dbActive = mongoActive.getDB('minigame');
+    let dbArc = mongoArc.getDB('minigame_arc');
 
     // Load script
-    mongo_active.getDB('script').loadServerScripts();
+    mongoActive.getDB('script').loadServerScripts();
 
     // Run archive
-    archiveGame(db_active, db_arc, 'taixiu');
-    archiveGame(db_active, db_arc, 'baucua');
-    archiveGame(db_active, db_arc, 'xocxoc');
-    archiveGame(db_active, db_arc, 'txturbo');
-    archiveGame(db_active, db_arc, 'chanle');
-    archiveGame(db_active, db_arc, 'chanleturbo');
-    archiveGame(db_active, db_arc, 'minidragontiger');
-    archiveGame(db_active, db_arc, 'kenopromax');
-    archiveGame(db_active, db_arc, 'minisedie');
-    archiveGame(db_active, db_arc, 'baccarat');
-    archiveGame(db_active, db_arc, 'kenoeast');
-    archiveGame(db_active, db_arc, 'kenowest');
-    archiveGame(db_active, db_arc, 'kenosouth');
-    archiveGame(db_active, db_arc, 'kenonorth');
-    archiveGame(db_active, db_arc, 'kenomax');
-    archiveGame(db_active, db_arc, 'kenomax2');
-    archiveGame(db_active, db_arc, 'kenomini');
-    archiveGame(db_active, db_arc, 'kenomini2');
-    archiveGame(db_active, db_arc, 'kenoproviet');
-    archiveGame(db_active, db_arc, 'roulette');
+    archiveGame(dbActive, dbArc, 'taixiu');
+    archiveGame(dbActive, dbArc, 'baucua');
+    archiveGame(dbActive, dbArc, 'xocxoc');
+    archiveGame(dbActive, dbArc, 'txturbo');
+    archiveGame(dbActive, dbArc, 'chanle');
+    archiveGame(dbActive, dbArc, 'chanleturbo');
+    archiveGame(dbActive, dbArc, 'minidragontiger');
+    archiveGame(dbActive, dbArc, 'kenopromax');
+    archiveGame(dbActive, dbArc, 'minisedie');
+    archiveGame(dbActive, dbArc, 'baccarat');
+    archiveGame(dbActive, dbArc, 'kenoeast');
+    archiveGame(dbActive, dbArc, 'kenowest');
+    archiveGame(dbActive, dbArc, 'kenosouth');
+    archiveGame(dbActive, dbArc, 'kenonorth');
+    archiveGame(dbActive, dbArc, 'kenomax');
+    archiveGame(dbActive, dbArc, 'kenomax2');
+    archiveGame(dbActive, dbArc, 'kenomini');
+    archiveGame(dbActive, dbArc, 'kenomini2');
+    archiveGame(dbActive, dbArc, 'kenoproviet');
+    archiveGame(dbActive, dbArc, 'roulette');
 
     // Archive user
-    archiveTable(db_active, db_arc, 'usersessions', 'recheckInTime');
+    archiveTable(dbActive, dbArc, 'usersessions', 'recheckInTime');
 
     // Archive Log
-    db_active = mongo_active.getDB('log');
-    db_arc = mongo_arc.getDB('log_arc');
+    dbActive = mongoActive.getDB('log');
+    dbArc = mongoArc.getDB('log_arc');
     // Run archive
-    archiveLog(db_active, db_arc, 'bets');
-    archiveLog(db_active, db_arc, 'end_games');
-    archiveLog(db_active, db_arc, 'failed_requests');
+    archiveLog(dbActive, dbArc, 'bets');
+    archiveLog(dbActive, dbArc, 'end_games');
+    archiveLog(dbActive, dbArc, 'failed_requests');
 
     // Archive Member
-    db_active = mongo_active.getDB('member');
-    db_arc = mongo_arc.getDB('member_arc');
+    dbActive = mongoActive.getDB('member');
+    dbArc = mongoArc.getDB('member_arc');
     // Run archive
-    archiveTable(db_active, db_arc, 'member_auths', 'time');
+    archiveTable(dbActive, dbArc, 'member_auths', 'time');
 
     print("=========================================================================================\n\n");
 }
