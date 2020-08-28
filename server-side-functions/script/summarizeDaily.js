@@ -10,9 +10,10 @@ dbs.script.system.js.save({
             return;
         }
 
-        let dayLen = 24 * 3600 * 1000;
-        if (summaryDay == null || typeof(summaryDay) == "undefined")
+        const dayLen = 24 * 3600 * 1000;
+        if (summaryDay == null || typeof(summaryDay) == "undefined") {
             summaryDay = new Date(Date.now() - dayLen);
+        }
 
         // Parameters' type verification
         if (!(mongo instanceof Mongo)) {
@@ -30,24 +31,24 @@ dbs.script.system.js.save({
             log(`[summaryDB] must be a string.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
-        if (!bypassExpired && (new Date(Math.floor(Date.now() / dayLen) * dayLen)) - summaryDay.valueOf() > 7 * dayLen) {
+        if (!bypassExpired && (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() > 7 * dayLen)) {
             log(`The [summaryDay] is expired. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
-        if ((new Date(Math.floor(Date.now() / dayLen) * dayLen)) - summaryDay.valueOf() <= 0) {
+        if (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() <= 0) {
             log(`The [summaryDay] is not finished. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
 
         // Initialize time frame for data summary
-        let timeFrom = new Date(Math.floor(summaryDay.valueOf() / dayLen) * dayLen);
-        let timeTo = new Date(timeFrom.valueOf() + dayLen);
+        const timeFrom = new Date(Math.floor(summaryDay.valueOf() / dayLen) * dayLen);
+        const timeTo = new Date(timeFrom.valueOf() + dayLen);
 
         // Run summary from config
         log(`Data summary for ${timeFrom.toISOString().substr(0,10)} started.`, summaryDB, 'SUMMARY', 'I');
 
         mongo.getDB(summaryDB).game_summary_config.find().forEach((game) => {
-            let agg = [];
+            const agg = [];
 
             agg.push({$match: {$expr: {$and: [{$gte: [game.fields.time, timeFrom]}, {$lt: [game.fields.time, timeTo]}]}}});
             agg.push({$project: {_id: 0, id: 1}});
@@ -81,49 +82,60 @@ dbs.script.system.js.save({
                 'value.stake': '$stake', 'value.payout': '$payout', 'value.tickets': '$tickets'
             }});
 
-            let time = new Date();
+            const time = new Date();
 
-            let oldSummaries = [];
+            const oldSummaries = [];
             mongo.getDB(summaryDB).daily_summaries.find(
                 {time: timeFrom, gameId: game.gameId},
                 {_id: 0, time: 1, gameId: 1, currency: 1}
             ).forEach((doc) => {
-                let _doc = {};
+                const _doc = {};
                 Object.keys(doc).sort().forEach((k) => {
                     _doc[k] = doc[k];
                 });
                 oldSummaries.push(tojson(_doc));
             });
 
-            let summaries = mongo.getDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).toArray();
+            const summaries = mongo.getDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).toArray();
             summaries.forEach((doc) => {
-                let res = mongo.getDB(summaryDB).daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
-                if (res.upsertedId)
+                const res = mongo.getDB(summaryDB).daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
+                if (res.upsertedId) {
                     log(`- Inserted new summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
-                else if (res.modifiedCount > 0)
+                } else if (res.modifiedCount > 0) {
                     log(`- Modified summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
+                }
 
-                let _doc = {};
+                const _doc = {};
                 Object.keys(doc.key).sort().forEach((k) => {
                     _doc[k] = doc.key[k];
                 });
-                let idx = oldSummaries.indexOf(tojson(_doc));
-                if (idx >= 0)
+                const idx = oldSummaries.indexOf(tojson(_doc));
+                if (idx >= 0) {
                     oldSummaries.splice(idx, 1);
+                }
             });
             oldSummaries.forEach((doc) => {
-                let _doc;
-                eval(`_doc = ${doc}`);
-                let res = mongo.getDB(summaryDB).daily_summaries.deleteOne(_doc);
-                if (res.deletedCount > 0)
-                    log(`- Deleted summary record for ${doc.currency}`, game.name.en, 'SUMMARY', 'I');
-                else
+                try {
+                    let _doc = null;
+                    eval(`_doc = ${doc}`);
+                    if (typeof(_doc) != "object") {
+                        _doc = null;
+                    }
+                    const res = mongo.getDB(summaryDB).daily_summaries.deleteOne(_doc);
+                    if (res.deletedCount > 0) {
+                        log(`- Deleted summary record for ${doc.currency}`, game.name.en, 'SUMMARY', 'I');
+                    } else {
+                        log(`- No summary record deleted for ${doc.currency}`, game.name.en, 'SUMMARY', 'W');
+                    }
+                } catch (e) {
                     log(`- Something is WRONG while deleting summary record for ${doc.currency}`, game.name.en, 'SUMMARY', 'W');
+                }
             })
             log(`Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`, game.name.en, 'SUMMARY', 'I');
         });
         log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, 'SUMMARY', 'I');
     }
-,   version: 1.4
+,   version: 1.5
 ,   process: 'Daily Summary'
-}); dbs.script.loadServerScripts();
+});
+dbs.script.loadServerScripts();
