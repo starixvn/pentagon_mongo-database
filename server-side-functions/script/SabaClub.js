@@ -1,12 +1,12 @@
 {
     // Saba.summarizeDaily()
-    const summarizeDailyFunc = (mongo, summaryDay, bypassExpired = false, summaryDB = 'summary') => {
+    const summarizeDailyFunc = (mongo, summaryDay, bypassExpired = false, summaryDB = `summary`) => {
         if (!mongo) {
-            Misc.log(`Must be connected to Mongo instance to run this function.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Must be connected to Mongo instance to run this function.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
         if (!summaryDB) {
-            Misc.log(`Must specify the summary DB.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Must specify the summary DB.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
 
@@ -15,26 +15,26 @@
 
         // Parameters' type verification
         if (!(mongo instanceof Mongo)) {
-            Misc.log(`[mongo] must be a MongoDB connection.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`[mongo] must be a MongoDB connection.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
         if (!isNaN(Date.parse(summaryDay))) {
             summaryDay = new Date(Date.parse(summaryDay));
         }
         if (!(summaryDay instanceof Date)) {
-            Misc.log(`Summary day [${tojsononeline(summaryDay)}] must be a date.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Summary day [${tojsononeline(summaryDay)}] must be a date.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
         if (typeof summaryDB != "string") {
-            Misc.log(`Summary DB [${tojsononeline(summaryDB)}] must be a string.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Summary DB [${tojsononeline(summaryDB)}] must be a string.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
         if (!bypassExpired && (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() > 7 * dayLen)) {
-            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is expired. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is expired. Cannot run data summary for this day.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
         if (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() <= 0) {
-            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is not finished. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is not finished. Cannot run data summary for this day.`, `Audit`, `SUMMARY`, `E`);
             return;
         }
 
@@ -43,7 +43,7 @@
         const timeTo = new Date(timeFrom.valueOf() + dayLen);
 
         // Run summary from config
-        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} started.`, summaryDB, 'SUMMARY', 'I');
+        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} started.`, summaryDB, `SUMMARY`, `I`);
 
         mongo.getDB(summaryDB).game_summary_config.find().forEach((game) => {
             const agg = [];
@@ -98,9 +98,9 @@
             summaries.forEach((doc) => {
                 const res = mongo.getDB(summaryDB).daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
                 if (res.upsertedId) {
-                    Misc.log(`- Inserted new summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
+                    Misc.log(`- Inserted new summary record for ${doc.key.currency}`, game.name.en, `SUMMARY`, `I`);
                 } else if (res.modifiedCount > 0) {
-                    Misc.log(`- Modified summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
+                    Misc.log(`- Modified summary record for ${doc.key.currency}`, game.name.en, `SUMMARY`, `I`);
                 }
 
                 const _doc = {};
@@ -121,17 +121,17 @@
                     }
                     const res = mongo.getDB(summaryDB).daily_summaries.deleteOne(_doc);
                     if (res.deletedCount > 0) {
-                        Misc.log(`- Deleted summary record for ${_doc.currency}`, game.name.en, 'SUMMARY', 'I');
+                        Misc.log(`- Deleted summary record for ${_doc.currency}`, game.name.en, `SUMMARY`, `I`);
                     } else {
-                        Misc.log(`- No summary record deleted for ${_doc.currency}`, game.name.en, 'SUMMARY', 'W');
+                        Misc.log(`- No summary record deleted for ${_doc.currency}`, game.name.en, `SUMMARY`, `W`);
                     }
                 } catch (e) {
-                    Misc.log(`- Something is WRONG while deleting summary record for ${doc}`, game.name.en, 'SUMMARY', 'W');
+                    Misc.log(`- Something is WRONG while deleting summary record for ${doc}`, game.name.en, `SUMMARY`, `W`);
                 }
             })
-            Misc.log(`Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`, game.name.en, 'SUMMARY', 'I');
+            Misc.log(`Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`, game.name.en, `SUMMARY`, `I`);
         });
-        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, 'SUMMARY', 'I');
+        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, `SUMMARY`, `I`);
     };
 
     // Saba.runArchive()
@@ -190,12 +190,73 @@
         });
     }
 
+    // Saba.removeData()
+    const removeDataFunc = (fromDB, toDB, collName, filter, debug = 1) => {
+        // Parameters' type verification
+        if (!(fromDB instanceof DB)) {
+            Misc.log('[fromDB] must be a database', `Audit`, `REMOVE`, `E`);
+            return;
+        }
+        if (!(toDB instanceof DB)) {
+            Misc.log('[toDB] must be a database', `Audit`, `REMOVE`, `E`);
+            return;
+        }
+        if (typeof collName != "string") {
+            Misc.log('[group] must be a string', `Audit`, `REMOVE`, `E`);
+            return;
+        }
+        if (typeof filter != "object") {
+            Misc.log('[filter] must be a object', `Audit`, `REMOVE`, `E`);
+            return;
+        }
+
+        // Initialize group collections' name
+        const coll = {
+            name: `${collName}`
+        };
+        const collRM = {
+            name: `${collName}_rm`
+        };
+
+        // Group must have collection
+        if (fromDB.getCollectionInfos({name: coll.name}).length != 1) {
+            Misc.log(`Cannot remove data because [${fromDB._name}.${coll.name}] does NOT exist`, collName, `REMOVE`, `E`);
+            return;
+        }
+
+        const docs = [];
+        const bulkUpdatePipe = [];
+        const rmDate = new Date();
+        fromDB[coll.name].find(filter).forEach((doc) => {
+            docs.push({rm: doc, rmDate: rmDate});
+            bulkUpdatePipe.push({deleteOne: {filter: {_id: doc._id}}});
+        });
+
+        if (!docs || docs.length == 0) {
+            Misc.log(`Cannot remove data because [${fromDB._name}.${coll.name}] has NO documents matching with the filter`, collName, `REMOVE`, `E`);
+        } else {
+            if (debug == 0) {
+                try {
+                    toDB[collRM.name].insertMany(docs, {ordered: false});
+                    fromDB[coll.name].bulkWrite(bulkUpdatePipe, {ordered : false});
+                    Misc.log(`Removed ${docs.length} documents`, collName, `REMOVE`, `I`);
+                } catch (e) {
+                    Misc.log(e.message, collName, e.name, `E`);
+                    return;
+                }
+            } else {
+                print(`\n${tojson(docs)}\n`);
+            }
+        }
+    };
+
     // Saba
     db.getSiblingDB('script').system.js.save({
         _id: 'Saba'
     ,   value:  new Code(`{
             summarizeDaily: ${summarizeDailyFunc.toString()}
         ,   runArchive: ${runArchiveFunc.toString()}
+        ,   removeData: ${removeDataFunc.toString()}
         }`)
     ,   version: 2.1
     ,   name: 'SabaClub'
