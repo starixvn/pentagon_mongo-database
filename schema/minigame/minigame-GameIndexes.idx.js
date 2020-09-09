@@ -15,7 +15,6 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ||  coll === 'chanle_ones'
     ||  coll === 'chanleturbo_ones'
     ||  coll === 'minidragontiger_cuocs'
-    ||  coll === 'xocxoc_cuocs'
     ||  coll === 'taixiu_ones'
     ||  coll === 'txturbo_ones'
     ) {
@@ -45,6 +44,15 @@ db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
     ) {
         const idxKeys = {uid: 1, phien: 1};
         const idxOpts = {unique: true, name: `UIX_${coll}_uid_phien`};
+        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
+    }
+
+    // [UNIQUE] uid - phien - freeBet
+    if (
+        coll === 'xocxoc_cuocs'
+    ) {
+        const idxKeys = {uid: 1, phien: 1, freeBet: 1};
+        const idxOpts = {unique: true, name: `UIX_${coll}_uid_phien_freeBet`};
         createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
     }
 

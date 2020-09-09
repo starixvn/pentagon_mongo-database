@@ -54,7 +54,7 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             map: 'phien',
             time: '$time',
             settled: '$thanhtoan',
-            stake: ['$chan', '$le', '$red3', '$red4', '$white3', '$white4'],
+            stake: [{$multiply: [{$add: [{$ifNull: ['$chan', 0]}, {$ifNull: ['$le', 0]}, '$red3', '$red4', '$white3', '$white4', {$ifNull: ['$odd', 0]}, {$ifNull: ['$even', 0]}]}, {$toInt: {$not: '$freeBet'}}]}],
             payout: ['$betwin']
         },
         config: {
