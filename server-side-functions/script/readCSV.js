@@ -1,6 +1,9 @@
 db.getSiblingDB('script').system.js.save({
     _id: 'readCSV'
 ,   value:  (file, schema, hasHeader = false) => {
+        // Timer
+        const timer = {start: Date.now()};
+
         if (!(typeof(file) == "string" && fileExists(file))) {
             log(`File [${tojsononeline(file)}] does NOT exist.`, `Audit`, `READ-CSV`, `E`);
             return [];
@@ -11,9 +14,6 @@ db.getSiblingDB('script').system.js.save({
 
         // Making sure hasHeader is boolean
         hasHeader = hasHeader ? true : false;
-
-        // Timer
-        const timer = {};
 
         // Start reading file
         timer.startReading = Date.now();
@@ -33,7 +33,7 @@ db.getSiblingDB('script').system.js.save({
             timer.startHeaderChecking = Date.now();
             if (fileContent[0].length !== schema.length) {
                 log(`- Schema length [${schema.length}] does not match with Header length [${fileContent[0].length}]`, `Header Checking`, `READ-CSV`, `E`);
-                return;
+                return [];
             }
             for (let index = 0; index < schema.length; index++) {
                 if (fileContent[0][index] !== schema[index].name) {
@@ -59,7 +59,13 @@ db.getSiblingDB('script').system.js.save({
                             item[schema[index].name] = this[schema[index].type.class](line[index] && !(line[index] in ["false", "0"]));
                             break;
                         case "Date":
-                            item[schema[index].name] = line[index] ? new this[schema[index].type.class](`${line[index]} ${schema[index].type.timezone ? schema[index].type.timezone : 'UTC'}`) : new Date();
+                            if (!line[index]) {
+                                item[schema[index].name] = new Date();
+                            } else if (schema[index].type.timezone) {
+                                item[schema[index].name] = new this[schema[index].type.class](`${line[index]} ${schema[index].type.timezone}`);
+                            } else {
+                                item[schema[index].name] = new this[schema[index].type.class](`${line[index]} UTC`);
+                            }
                             break;
                         case "ISODate":
                             item[schema[index].name] = this[schema[index].type.class](line[index]);
@@ -87,9 +93,11 @@ db.getSiblingDB('script').system.js.save({
         log(`- Current data object size is ${bsonsize(fileData)} bytes.`, `Data Mapping`, `READ-CSV`, `I`);
         log(`Finish mapping data in ${timer.finishMapping - timer.startMapping} ms.`, `Data Mapping`, `READ-CSV`, `I`);
 
+        timer.finish = Date.now();
+        log(`Function finished in ${timer.finish - timer.start} ms.`, `Timer`, `READ-CSV`, `I`);
         return fileData;
     }
-,   version: 1.0
+,   version: 1.1
 ,   process: 'Global Functions'
 });
 db.getSiblingDB('script').loadServerScripts();
