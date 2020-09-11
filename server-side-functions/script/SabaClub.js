@@ -1,42 +1,40 @@
-dbs.script.system.js.save({
-    _id: 'summarizeDaily'
-,   value: (mongo, summaryDay, bypassExpired = false, summaryDB = 'summary') => {
+{
+    // Saba.summarizeDaily()
+    const summarizeDailyFunc = (mongo, summaryDay, bypassExpired = false, summaryDB = 'summary') => {
         if (!mongo) {
-            log(`Must be connected to Mongo instance to run this function.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Must be connected to Mongo instance to run this function.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
         if (!summaryDB) {
-            log(`Must specify the summary DB.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Must specify the summary DB.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
 
         const dayLen = 24 * 3600 * 1000;
-        if (summaryDay == null || typeof(summaryDay) == "undefined") {
-            summaryDay = new Date(Date.now() - dayLen);
-        }
+        summaryDay = summaryDay || new Date(Date.now() - dayLen);
 
         // Parameters' type verification
         if (!(mongo instanceof Mongo)) {
-            log(`[mongo] must be a MongoDB connection.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`[mongo] must be a MongoDB connection.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
-        if (typeof(summaryDay) == 'string' && Date.parse(summaryDay)) {
+        if (!isNaN(Date.parse(summaryDay))) {
             summaryDay = new Date(Date.parse(summaryDay));
         }
         if (!(summaryDay instanceof Date)) {
-            log(`[summaryDay] must be a date.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`Summary day [${tojsononeline(summaryDay)}] must be a date.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
-        if (typeof(summaryDB) != 'string') {
-            log(`[summaryDB] must be a string.`, 'Audit', 'SUMMARY', 'E');
+        if (typeof summaryDB != "string") {
+            Misc.log(`Summary DB [${tojsononeline(summaryDB)}] must be a string.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
         if (!bypassExpired && (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() > 7 * dayLen)) {
-            log(`The [summaryDay] is expired. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is expired. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
         if (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() <= 0) {
-            log(`The [summaryDay] is not finished. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
+            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is not finished. Cannot run data summary for this day.`, 'Audit', 'SUMMARY', 'E');
             return;
         }
 
@@ -45,7 +43,7 @@ dbs.script.system.js.save({
         const timeTo = new Date(timeFrom.valueOf() + dayLen);
 
         // Run summary from config
-        log(`Data summary for ${timeFrom.toISOString().substr(0,10)} started.`, summaryDB, 'SUMMARY', 'I');
+        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} started.`, summaryDB, 'SUMMARY', 'I');
 
         mongo.getDB(summaryDB).game_summary_config.find().forEach((game) => {
             const agg = [];
@@ -100,9 +98,9 @@ dbs.script.system.js.save({
             summaries.forEach((doc) => {
                 const res = mongo.getDB(summaryDB).daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
                 if (res.upsertedId) {
-                    log(`- Inserted new summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
+                    Misc.log(`- Inserted new summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
                 } else if (res.modifiedCount > 0) {
-                    log(`- Modified summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
+                    Misc.log(`- Modified summary record for ${doc.key.currency}`, game.name.en, 'SUMMARY', 'I');
                 }
 
                 const _doc = {};
@@ -118,24 +116,35 @@ dbs.script.system.js.save({
                 try {
                     let _doc = null;
                     eval(`_doc = ${doc}`);
-                    if (typeof(_doc) != "object") {
+                    if (typeof _doc != "object") {
                         _doc = null;
                     }
                     const res = mongo.getDB(summaryDB).daily_summaries.deleteOne(_doc);
                     if (res.deletedCount > 0) {
-                        log(`- Deleted summary record for ${doc.currency}`, game.name.en, 'SUMMARY', 'I');
+                        Misc.log(`- Deleted summary record for ${_doc.currency}`, game.name.en, 'SUMMARY', 'I');
                     } else {
-                        log(`- No summary record deleted for ${doc.currency}`, game.name.en, 'SUMMARY', 'W');
+                        Misc.log(`- No summary record deleted for ${_doc.currency}`, game.name.en, 'SUMMARY', 'W');
                     }
                 } catch (e) {
-                    log(`- Something is WRONG while deleting summary record for ${doc.currency}`, game.name.en, 'SUMMARY', 'W');
+                    Misc.log(`- Something is WRONG while deleting summary record for ${doc}`, game.name.en, 'SUMMARY', 'W');
                 }
             })
-            log(`Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`, game.name.en, 'SUMMARY', 'I');
+            Misc.log(`Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`, game.name.en, 'SUMMARY', 'I');
         });
-        log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, 'SUMMARY', 'I');
-    }
-,   version: 1.5
-,   process: 'Daily Summary'
-});
-dbs.script.loadServerScripts();
+        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, 'SUMMARY', 'I');
+    };
+
+    // Saba
+    db.getSiblingDB('script').system.js.save({
+        _id: 'Saba'
+    ,   value:  new Code(`{
+            summarizeDaily: ${summarizeDailyFunc.toString()}
+        }`)
+    ,   version: 2.0
+    ,   name: 'SabaClub'
+    });
+
+    // Reload scripts
+    db.getSiblingDB('script').loadServerScripts();
+}
+
