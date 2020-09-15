@@ -1,155 +1,227 @@
-// Archive TTL indexes
-db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    if (RegExp('(_phiens|_cuocs|_ones|_phiens_log)$').test(coll)) {
-        const idxKeys = {'__archive.eventtime': 1};
-        const idxOpts = {expireAfterSeconds: 3600*24*8, name: `TTL_${coll}`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-});
-
-// Indexes for bets
-db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    // [UNIQUE] uid - phien - red
-    if (
-        coll === 'baucua_cuocs'
-    ||  coll === 'chanle_ones'
-    ||  coll === 'chanleturbo_ones'
-    ||  coll === 'minidragontiger_cuocs'
-    ||  coll === 'taixiu_ones'
-    ||  coll === 'txturbo_ones'
-    ) {
-        const idxKeys = {uid: 1, phien: 1, red: 1};
-        const idxOpts = {unique: true, name: `UIX_${coll}_uid_phien_red`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-
-    // [UNIQUE] uid - phien
-    if (
-        coll === 'kenopromax_cuocs'
-    ||  coll === 'kenopromax_tmpcuocs'
-    ||  coll === 'minisedie_cuocs'
-    ||  coll === 'baccarat_cuocs'
-    ||  coll === 'baccarat_tmpcuocs'
-    ||  coll === 'kenoeast_ones'
-    ||  coll === 'kenowest_ones'
-    ||  coll === 'kenosouth_ones'
-    ||  coll === 'kenonorth_ones'
-    ||  coll === 'kenomax_ones'
-    ||  coll === 'kenomax2_ones'
-    ||  coll === 'kenomini_ones'
-    ||  coll === 'kenomini2_ones'
-    ||  coll === 'kenoproviet_ones'
-    ||  coll === 'roulette_ones'
-    ||  coll === 'roulette_tmpones'
-    ) {
-        const idxKeys = {uid: 1, phien: 1};
-        const idxOpts = {unique: true, name: `UIX_${coll}_uid_phien`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-
-    // [UNIQUE] uid - phien - freeBet
-    if (
-        coll === 'xocxoc_cuocs'
-    ) {
-        const idxKeys = {uid: 1, phien: 1, freeBet: 1};
-        const idxOpts = {unique: true, name: `UIX_${coll}_uid_phien_freeBet`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-
-    // uid - thanhtoan - red - _id
-    if (
-        coll === 'baucua_cuocs'
-    ||  coll === 'minidragontiger_cuocs'
-    ) {
-        const idxKeys = {uid: 1, thanhtoan: 1, red: 1, _id: 1};
-        const idxOpts = {name: `IX_${coll}_uid_thanhtoan__id`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-
-    // uid - thanhtoan - _id
-    if (
-        coll === 'taixiu_cuocs'
-    ||  coll === 'txturbo_cuocs'
-    ||  coll === 'kenopromax_cuocs'
-    ||  coll === 'minisedie_cuocs'
-    ||  coll === 'baccarat_cuocs'
-    ||  coll === 'chanle_cuocs'
-    ||  coll === 'chanleturbo_cuocs'
-    ||  coll === 'xocxoc_cuocs'
-    ) {
-        const idxKeys = {uid: 1, thanhtoan: 1, _id: 1};
-        const idxOpts = {name: `IX_${coll}_uid_thanhtoan__id`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-
-    // uid - _id
-    if (
-        coll === 'kenoeast_cuocs'
-    ||  coll === 'kenowest_cuocs'
-    ||  coll === 'kenosouth_cuocs'
-    ||  coll === 'kenonorth_cuocs'
-    ||  coll === 'kenomax_cuocs'
-    ||  coll === 'kenomax2_cuocs'
-    ||  coll === 'kenomini_cuocs'
-    ||  coll === 'kenomini2_cuocs'
-    ||  coll === 'kenoproviet_cuocs'
-    ||  coll === 'roulette_cuocs'
-    ) {
-        const idxKeys = {uid: 1, _id: 1};
-        const idxOpts = {name: `IX_${coll}_uid__id`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-    }
-});
-
-// Time indexes
-db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    if (RegExp('_phiens$').test(coll)) {
-        const idxKeys = {time: 1};
-        let idxOpts = {name: `IX_${coll}_time`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
-
-        const one = `${coll.substring(0, coll.length - 7)}_ones`;
-        const cuoc = `${coll.substring(0, coll.length - 7)}_cuocs`;
-        const tmpcuoc = `${coll.substring(0, coll.length - 7)}_tmpcuocs`;
-        const tmpone = `${coll.substring(0, coll.length - 7)}_tmpones`;
-
-        if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: one})[0]) {
-            // Index for one
-            idxOpts = {name: `IX_${one}_time`};
-            createIndex(db.getSiblingDB('minigame')[one], idxKeys, idxOpts);
-        } else if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: cuoc})[0]) {
-            // Index for cuoc
-            idxOpts = {name: `IX_${cuoc}_time`};
-            createIndex(db.getSiblingDB('minigame')[cuoc], idxKeys, idxOpts);
-        } else {
-            log(`WARNING: No associated one or cuoc available!!!`, coll, 'INDEX', 'W');
+{
+    const idxs = {
+        TTL : {
+            idxKeys : {'__archive.eventtime': 1}
+        ,   idxOpts : {expireAfterSeconds: 3600*24*8}
         }
-
-        if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: tmpcuoc})[0]) {
-            // Index for tmpcuoc
-            idxOpts = {expireAfterSeconds: 120, name: `IX_TTL_${tmpcuoc}_time`};
-            createIndex(db.getSiblingDB('minigame')[tmpcuoc], idxKeys, idxOpts);
+    ,   uid_phien: {
+            idxKeys : {uid: 1, phien: 1}
+        ,   idxOpts : {unique: true}
         }
-        if (db.getSiblingDB('minigame')._getCollectionInfosCommand({name: tmpone})[0]) {
-            // Index for tmpone
-            idxOpts = {expireAfterSeconds: 120, name: `IX_TTL_${tmpone}_time`};
-            createIndex(db.getSiblingDB('minigame')[tmpone], idxKeys, idxOpts);
+    ,   uid_thanhtoan__id: {
+            idxKeys : {uid: 1, thanhtoan: 1, _id: 1}
+        ,   idxOpts : {}
         }
-    }
-});
+    ,   uid__id: {
+            idxKeys : {uid: 1, _id: 1}
+        ,   idxOpts : {}
+        }
+    ,   time: {
+            idxKeys : {time: 1}
+        ,   idxOpts : {}
+        }
+    ,   timeTTL: {
+            idxKeys : {time: 1}
+        ,   idxOpts : {expireAfterSeconds: 120}
+        }
+    ,   id: {
+            idxKeys : {id: 1}
+        ,   idxOpts : {unique: true}
+        }
+    ,   phien__id: {
+            idxKeys : {phien: 1, _id: 1}
+        ,   idxOpts : {}
+        }
+    };
 
-// Phien indexes
-db.getSiblingDB('minigame').getCollectionNames().forEach((coll) => {
-    if (RegExp('_phiens$').test(coll)) {
-        const idxKeys = {id: 1};
-        const idxOpts = {unique: true, name: `UIX_${coll}_id`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
+    {   // 01 - Tai Xiu
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.taixiu_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.taixiu_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.taixiu_ones, idx.idxKeys, idx.idxOpts)});
     }
 
-    if (RegExp('(_cuocs|_ones)$').test(coll)) {
-        const idxKeys = {phien: 1, _id: 1};
-        const idxOpts = {name: `IX_${coll}_phien`};
-        createIndex(db.getSiblingDB('minigame')[coll], idxKeys, idxOpts);
+    {   // 02 - Xoc Dia
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.timeTTL       , idxs.phien__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
-});
 
+    {   // 03 - Bau Cua
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.baucua_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.baucua_cuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 04 - Tai Xiu Turbo
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.txturbo_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.txturbo_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.txturbo_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 05 - Chan Le
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.chanle_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.chanle_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.chanle_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 06 - Chan Le Turbo
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.chanleturbo_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.chanleturbo_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.chanleturbo_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 07 - Rong Ho
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.minidragontiger_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.minidragontiger_cuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 08 - Keno Pro Max
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenopromax_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenopromax_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.timeTTL       , idxs.phien__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenopromax_tmpcuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 09 - Xoc Dia Mini
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.minisedie_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.minisedie_cuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 10 - Baccarat
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.baccarat_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.baccarat_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.timeTTL       , idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.baccarat_tmpcuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 11 - Keno Pro Viet
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoproviet_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoproviet_phiens_logs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoproviet_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoproviet_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 12 - Keno Max
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 13 - Keno Max 2
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax2_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax2_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax2_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 14 - Keno Mini
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 15 - Keno Mini 2
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini2_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini2_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini2_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 16 - Keno East
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoeast_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoeast_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenoeast_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 17 - Keno West
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenowest_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenowest_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenowest_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 18 - Keno South
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenosouth_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenosouth_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenosouth_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 19 - Keno North
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenonorth_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenonorth_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.kenonorth_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 20 - Bola Tangkas
+        // Not supported
+    }
+
+    {   // 21 - Roulette
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL           , idxs.phien__id, idxs.uid__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_ones, idx.idxKeys, idx.idxOpts)});
+        [idxs.timeTTL       , idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_tmpones, idx.idxKeys, idx.idxOpts)});
+    }
+
+    {   // 22 - Xoc Dia VIP
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.timeTTL       , idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_tmpcuocs, idx.idxKeys, idx.idxOpts)});
+    }
+}

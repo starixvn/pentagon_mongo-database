@@ -536,6 +536,30 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
             hasCurrency: false
         }
     }
+
+    ,   {   gameId: 22
+        ,   owGameTypeId: 1633
+        ,   name: {
+                en: 'VIP Se Die'
+            ,   vi: 'Xóc Đĩa VIP'
+            }
+        ,   coll: {
+                db: 'minigame'
+            ,   group: 'vipsedie'
+            ,   round: '_phiens'
+            ,   postfix: '_ones'
+            }
+        ,   fields: {
+                map: 'phien'
+            ,   time: '$time'
+            ,   settled: '$thanhtoan'
+            ,   stake: ['$odd', '$even', '$white4', '$white3', '$red2', '$red3', '$red4']
+            ,   payout: ['$betwin']
+            }
+        ,   config: {
+                hasCurrency: false
+            }
+        }
 ]
 ,   {ordered: false}
 );
