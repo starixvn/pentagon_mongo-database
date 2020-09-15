@@ -3,15 +3,15 @@
     const createIndexFunc = (coll, idxKeys, idxOpts = {}) => {
         // Parameters' type verification
         if (!(coll instanceof DBCollection)) {
-            Misc.log(`Collection [${tojsononeline(coll)}] must be a collection.`, 'Audit', 'CREATE-IDX', 'E');
+            Misc.log(`Collection [${tojsononeline(coll)}] must be a collection.`, `Audit`, `CREATE-IDX`, `E`);
             return;
         }
         if (!(idxKeys instanceof Object)) {
-            Misc.log(`Index keys [${tojsononeline(idxKeys)}] must be an object.`, 'Audit', 'CREATE-IDX', 'E');
+            Misc.log(`Index keys [${tojsononeline(idxKeys)}] must be an object.`, `Audit`, `CREATE-IDX`, `E`);
             return;
         }
         if (!(idxOpts instanceof Object)) {
-            Misc.log(`Index options [${tojsononeline(idxOpts)}] must be an object.`, 'Audit', 'CREATE-IDX', 'E');
+            Misc.log(`Index options [${tojsononeline(idxOpts)}] must be an object.`, `Audit`, `CREATE-IDX`, `E`);
             return;
         }
 
@@ -21,9 +21,9 @@
 
         // Index name generation
         if (!_idxOpts.name) {
-            let name = 'IX';
-            name = `${_idxOpts.unique ? 'U' : ''}${name}`;
-            name = `${_idxOpts.partialFilterExpression ? 'F' : ''}${name}`;
+            let name = `IX`;
+            name = _idxOpts.unique ? `U${name}` : name;
+            name = _idxOpts.partialFilterExpression ? `F${name}` : name;
             name = `${name}_${coll._shortName}_${Object.keys(_idxKeys).join('_')}`;
             name = _idxOpts.expireAfterSeconds ? `TTL_${coll._shortName}` : name;
 
@@ -35,7 +35,7 @@
 
         // Create index
         let idx = null;
-        let idxName = '';
+        let idxName = ``;
         Object.keys(_idxKeys).forEach((key) => {
             idxName += `_${key}_${String(_idxKeys[key]).toString()}`;
         });
@@ -54,7 +54,12 @@
 
         delete idx.v;
         if (JSON.stringify(idx.key) !== JSON.stringify(_idxKeys)) {
-            Misc.log(`  • Index ${_idxOpts.name} with keys ${tojsononeline(idx.key)} is NOT MATCHED with input ${tojsononeline(_idxKeys)}.`, `${coll._shortName}`, `CREATE-IDX`, `W`);
+            Misc.log(
+                `  • Index ${_idxOpts.name} with keys ${tojsononeline(idx.key)} is NOT MATCHED with input ${tojsononeline(_idxKeys)}.`
+            ,   `${coll._shortName}`
+            ,   `CREATE-IDX`
+            ,   `W`
+            );
         }
         const warning = [];
         [...Object.keys(idx), ...Object.keys(_idxOpts)].
@@ -74,7 +79,7 @@
 
     // Maint.reIndex()
     const reIndexFunc = (coll, filter) => {
-        // Parameters' type verification
+        // Parameters` type verification
         if (!(coll instanceof DBCollection)) {
             throw Error(`Collection [${tojsononeline(coll)}] must be a collection`);
         }
@@ -94,38 +99,38 @@
             delete idx.v;
             delete idx.ns;
 
-            if (tojson(Object.keys(key)) === tojson(['_id'])) {
-                log(`Index ${idx.name} cannot be re-indexed.`, coll._shortName, 'REINDEX', 'E');
+            if (tojson(Object.keys(key)) === tojson([`_id`])) {
+                log(`Index ${idx.name} cannot be re-indexed.`, coll._shortName, `REINDEX`, `E`);
                 return;
             }
 
             let res;
             res = coll.dropIndex(idx.name);
             if (!(res.ok)) {
-                log(`dropIndex ${tojson(res)}`, coll._shortName, 'REINDEX', 'E');
+                log(`dropIndex ${tojson(res)}`, coll._shortName, `REINDEX`, `E`);
                 return;
             }
             res = coll.createIndex(key, idx);
             if (!(res.ok)) {
-                log(`createIndex ${tojson(res)}`, coll._shortName, 'REINDEX', 'E');
+                log(`createIndex ${tojson(res)}`, coll._shortName, `REINDEX`, `E`);
                 return;
             }
-            log(`Index ${idx.name} re-created: ${tojsononeline(key)}`, coll._shortName, 'REINDEX', 'I');
+            log(`Index ${idx.name} re-created: ${tojsononeline(key)}`, coll._shortName, `REINDEX`, `I`);
         });
     };
 
     // Maint
-    db.getSiblingDB('script').system.js.save({
-        _id: 'Maint'
+    db.getSiblingDB(`script`).system.js.save({
+        _id: `Maint`
     ,   value:  new Code(`{
             createIndex: ${createIndexFunc.toString()}
         ,   reIndex: ${reIndexFunc.toString()}
         }`)
     ,   version: 2.0
-    ,   name: 'Maintenance'
+    ,   name: `Maintenance`
     });
 
     // Reload scripts
-    db.getSiblingDB('script').loadServerScripts();
+    db.getSiblingDB(`script`).loadServerScripts();
 }
 
