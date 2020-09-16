@@ -1,7 +1,6 @@
 {   // admins
     [
-        {
-            idxKeys : {username: 1}
+        {   idxKeys : {username: 1}
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {
@@ -11,8 +10,7 @@
 
 {   // admin_users
     [
-        {
-            idxKeys : {username: 1}
+        {   idxKeys : {username: 1}
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {

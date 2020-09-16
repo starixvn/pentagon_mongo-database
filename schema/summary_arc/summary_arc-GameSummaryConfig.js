@@ -1,19 +1,15 @@
-// game_summary_config
-{
-    const coll = 'game_summary_config';
-    let idxKeys = null;
-    let idxOpts = null;
-
-    // gameId
-    {
-        idxKeys = {gameId: 1};
-        idxOpts = {unique: true, name: `UIX_${coll}_gameId`};
-        createIndex(db.getSiblingDB('summary_arc')[coll], idxKeys, idxOpts);
-    }
+{   // game_summary_config
+    [
+        {   idxKeys : {gameId: 1}
+        ,   idxOpts : {unique: true}
+        }
+    ].forEach((idx) => {
+        Maint.createIndex(dbs.summary_arc.game_summary_config, idx.idxKeys, idx.idxOpts);
+    });
 }
 
-db.getSiblingDB('summary_arc').game_summary_config.remove({});
-db.getSiblingDB('summary_arc').game_summary_config.insertMany([
+dbs.summary_arc.game_summary_config.remove({});
+dbs.summary_arc.game_summary_config.insertMany([
     {   gameId: 1
     ,   owGameTypeId: 1612
     ,   name: {
@@ -59,10 +55,9 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   time: '$time'
         ,   settled: '$thanhtoan'
         ,   stake: [
-                {$multiply: [
-                    {$add: [{$ifNull: ['$chan', 0]}, {$ifNull: ['$le', 0]}, '$red3', '$red4', '$white3', '$white4', {$ifNull: ['$odd', 0]}, {$ifNull: ['$even', 0]}]}
-                ,   {$toInt: {$not: '$freeBet'}}
-                ]}
+                {$ifNull: ['$chan', 0]}, {$ifNull: ['$le', 0]}
+            ,   '$red3', '$red4', '$white3', '$white4'
+            ,   {$ifNull: ['$odd', 0]}, {$ifNull: ['$even', 0]}
             ]
         ,   payout: ['$betwin']
         }

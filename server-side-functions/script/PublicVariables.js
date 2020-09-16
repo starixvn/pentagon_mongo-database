@@ -21,6 +21,7 @@
         if (typeof prompt == "undefined" || typeof prompt != "function") {
             return () => {
                 try {
+                    this.dbs = {};
                     db.getSiblingDB('script').loadServerScripts();
                 } catch (e) {}
                 return defaultPrompt();
@@ -29,7 +30,7 @@
             const promptStr = prompt.toString();
             const promptArr = promptStr.slice(promptStr.indexOf('{') + 1, promptStr.lastIndexOf('}')).split(/\r\n|\n/g);
             if (!promptArr.some((item) => RegExp(/db.getSiblingDB\('script'\).loadServerScripts\(\)/).test(item))) {
-                promptArr.splice(0, 0, `    try {\n        db.getSiblingDB('script').loadServerScripts();\n    } catch (e) {}\n`);
+                promptArr.splice(0, 0, `    dbs = {};\n    try {\n        db.getSiblingDB('script').loadServerScripts();\n    } catch (e) {}\n`);
                 return Function(promptArr.join('\n'));
             }
             return prompt;

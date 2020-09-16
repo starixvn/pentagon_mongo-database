@@ -1,11 +1,9 @@
 {   // daily_summaries
     [
-        {
-            idxKeys : {time: 1, currency: 1, gameId: 1}
+        {   idxKeys : {time: 1, currency: 1, gameId: 1}
         ,   idxOpts : {unique: true}
         }
-    ,   {
-            idxKeys : {time: 1}
+    ,   {   idxKeys : {time: 1}
         ,   idxOpts : {expireAfterSeconds: 3600*24*8}
         }
     ].forEach((idx) => {
