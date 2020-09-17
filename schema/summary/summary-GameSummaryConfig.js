@@ -544,7 +544,7 @@ dbs.summary.game_summary_config.insertMany([
                 db: 'minigame'
             ,   group: 'vipsedie'
             ,   round: '_phiens'
-            ,   postfix: '_ones'
+            ,   postfix: '_cuocs'
             }
         ,   fields: {
                 map: 'phien'
