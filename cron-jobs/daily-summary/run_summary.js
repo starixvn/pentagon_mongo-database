@@ -16,13 +16,13 @@ var mongoArc;
 // -- run-summary.js -- //
 {
     mongoActive.getDB('script').loadServerScripts();
-    summarizeDaily(mongoActive);
+    Saba.summarizeDaily(mongoActive);
 
     print("=========================================================================================\n\n");
 
     const yesterday = new Date(Date.now() - 2 * 24 * 3600 * 1000);
     mongoArc.getDB('script').loadServerScripts();
-    summarizeDaily(mongoArc, yesterday, undefined, 'summary_arc');
+    Saba.summarizeDaily(mongoArc, yesterday, undefined, 'summary_arc');
 
     print("=========================================================================================\n\n");
 }

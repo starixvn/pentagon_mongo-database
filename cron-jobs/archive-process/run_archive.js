@@ -43,6 +43,7 @@ var mongoArc;
     archiveGame(dbActive, dbArc, 'kenomini2');
     archiveGame(dbActive, dbArc, 'kenoproviet');
     archiveGame(dbActive, dbArc, 'roulette');
+    archiveGame(dbActive, dbArc, 'vipsedie');
 
     // Archive user
     archiveTable(dbActive, dbArc, 'usersessions', 'recheckInTime');
