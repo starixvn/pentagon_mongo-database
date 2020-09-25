@@ -16,8 +16,8 @@
         }
 
         // Copy params
-        const _idxKeys = Object.extend({}, idxKeys, true);
-        const _idxOpts = Object.extend({}, idxOpts, true);
+        const _idxKeys = Object.extend({}, idxKeys);
+        const _idxOpts = Object.extend({}, idxOpts);
 
         // Index name generation
         if (!_idxOpts.name) {
@@ -100,22 +100,22 @@
             delete idx.ns;
 
             if (tojson(Object.keys(key)) === tojson([`_id`])) {
-                log(`Index ${idx.name} cannot be re-indexed.`, coll._shortName, `REINDEX`, `E`);
+                Misc.log(`Index ${idx.name} cannot be re-indexed.`, coll._shortName, `REINDEX`, `E`);
                 return;
             }
 
             let res;
             res = coll.dropIndex(idx.name);
             if (!(res.ok)) {
-                log(`dropIndex ${tojson(res)}`, coll._shortName, `REINDEX`, `E`);
+                Misc.log(`dropIndex ${tojson(res)}`, coll._shortName, `REINDEX`, `E`);
                 return;
             }
             res = coll.createIndex(key, idx);
             if (!(res.ok)) {
-                log(`createIndex ${tojson(res)}`, coll._shortName, `REINDEX`, `E`);
+                Misc.log(`createIndex ${tojson(res)}`, coll._shortName, `REINDEX`, `E`);
                 return;
             }
-            log(`Index ${idx.name} re-created: ${tojsononeline(key)}`, coll._shortName, `REINDEX`, `I`);
+            Misc.log(`Index ${idx.name} re-created: ${tojsononeline(key)}`, coll._shortName, `REINDEX`, `I`);
         });
     };
 
@@ -126,11 +126,10 @@
             createIndex: ${createIndexFunc.toString()}
         ,   reIndex: ${reIndexFunc.toString()}
         }`)
-    ,   version: 2.0
+    ,   version: 2.1
     ,   name: `Maintenance`
     });
 
     // Reload scripts
     db.getSiblingDB(`script`).loadServerScripts();
 }
-

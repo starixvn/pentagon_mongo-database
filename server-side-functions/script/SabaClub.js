@@ -134,13 +134,67 @@
         Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, 'SUMMARY', 'I');
     };
 
+    // Saba.runArchive()
+    const runArchiveFunc = (mongoFrom, mongoTo, config) => {
+        if (!(mongoFrom instanceof Mongo)) {
+            Misc.log(`[mongoFrom] must be a MongoDB connection.`, `Audit`, `ARCHIVE`, `E`);
+            return;
+        }
+        if (!(mongoTo instanceof Mongo)) {
+            Misc.log(`[mongoTo] must be a MongoDB connection.`, `Audit`, `ARCHIVE`, `E`);
+            return;
+        }
+        if (!(config instanceof DBCollection)) {
+            Misc.log(`[config] must be a collection.`, `Audit`, `ARCHIVE`, `E`);
+            return;
+        }
+
+        // The schema of config document
+        const configSchema = {
+            from: {db: "string", coll: "string"}
+        ,   to: {db: "string", coll: "string"}
+        ,   config: {timeField: "string", cutOffsetHours: "number", join: "string"}
+        ,   childs: Array
+        };
+
+        // All needed information is in config collection.
+        config.find().forEach((item) => {
+            // If the document does NOT have correct schema, skip it
+
+            const dbFrom = mongoFrom.getDB(item.from.db);
+            const dbTo = mongoTo.getDB(item.to.db);
+
+            // Building options
+            const arcOpts = {
+                timeField: item.config.timeField
+            ,   cutOffTime: new Date((Math.floor(Date.now() / 3600000) + item.config.cutOffsetHours) * 3600000)
+            };
+            const childOpts = [];
+            item.childs.forEach((child) => {
+                childOpts.push({
+                    fromColl: dbFrom[child.from]
+                ,   toColl: dbTo[child.to]
+                ,   joinParent: item.config.join
+                ,   joinChild: child.join
+                ,   updateOnly: child.updateOnly
+                ,   filter: child.filter
+                ,   exCols: child.exCols
+                });
+            });
+
+            // Run archive
+            Archive.archiveByTimes(dbFrom[item.from.coll], dbTo[item.to.coll], arcOpts, childOpts);
+        });
+    }
+
     // Saba
     db.getSiblingDB('script').system.js.save({
         _id: 'Saba'
     ,   value:  new Code(`{
             summarizeDaily: ${summarizeDailyFunc.toString()}
+        ,   runArchive: ${runArchiveFunc.toString()}
         }`)
-    ,   version: 2.0
+    ,   version: 2.1
     ,   name: 'SabaClub'
     });
 
