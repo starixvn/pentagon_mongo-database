@@ -160,6 +160,9 @@
         // All needed information is in config collection.
         config.find().forEach((item) => {
             // If the document does NOT have correct schema, skip it
+            if (!Misc.auditSchema(item, configSchema)) {
+                return;
+            }
 
             const dbFrom = mongoFrom.getDB(item.from.db);
             const dbTo = mongoTo.getDB(item.to.db);
