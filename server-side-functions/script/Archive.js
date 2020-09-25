@@ -70,7 +70,7 @@
         // • Each child archive process may have its own joining strategy
         // • This object will collect all values that needed for joining
         //   to pass into child archive process
-        let ids = {};
+        const ids = {};
         childOpts.forEach((child) => {
             if (!ids[child.joinParent]) {
                 ids[child.joinParent] = [];
@@ -96,7 +96,7 @@
                     acc[ErrorCodeStrings[cur.code]] = acc[ErrorCodeStrings[cur.code]] ? acc[ErrorCodeStrings[cur.code]] + 1 : 1;
                     return acc;
                 }, {});
-                for (let key in err) {
+                for (const key in err) {
                     Misc.log(`- ${msg}: ${key} - ${err[key]} ops`, `${fromColl._shortName}`, `ARC-BY-TIME`, `E`);
                 }
             } else {
@@ -131,7 +131,7 @@
                     {$set: {__archive: {eventtime: arcOpts.timeField ? doc[arcOpts.timeField] : arcOpts.cutOffTime}}}
                 ]
             }});
-            for (let field in ids) {
+            for (const field in ids) {
                 ids[field].push({joinVal: doc[field], time: arcOpts.timeField ? doc[arcOpts.timeField] : arcOpts.cutOffTime});
             }
 
@@ -166,7 +166,7 @@
                 // Reset all pipes
                 insPipe = [];
                 updPipe = [];
-                for (let key in ids) {
+                for (const key in ids) {
                     ids[key] = [];
                 }
             }
@@ -233,7 +233,7 @@
         // Update pipe
         // • The list of operation that will update the flags of copied documents
         //   in source collection
-        let updPipe = [];
+        const updPipe = [];
 
         // Building filter and updPipe
         // • Check if the archive flag exists
@@ -264,7 +264,7 @@
                     acc[ErrorCodeStrings[cur.code]] = acc[ErrorCodeStrings[cur.code]] ? acc[ErrorCodeStrings[cur.code]] + 1 : 1;
                     return acc;
                 }, {});
-                for (let key in err) {
+                for (const key in err) {
                     Misc.log(`- ${msg}: ${key} - ${err[key]} ops`, `${fromColl._shortName}`, `ARC-BY-ID  `, `E`);
                 }
             } else {

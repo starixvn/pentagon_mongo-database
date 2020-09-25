@@ -120,7 +120,7 @@
         if (obj == null || sch == null) {
             return false;
         }
-        for (let k in sch) {
+        for (const k in sch) {
             if (!mandatory && obj[k] == null) {
                 continue;
             } else if (!sch[k] && obj.hasOwnProperty(k)) {
