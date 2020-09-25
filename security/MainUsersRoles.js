@@ -69,6 +69,7 @@ db.getSiblingDB('admin').grantRolesToUser('lmn_archive', [
 ,   {role: 'readWrite', db: 'member'}
 ,   {role: 'readWrite', db: 'log'}
 ,   {role: 'read', db: 'script'}
+,   {role: 'read', db: 'archive'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('lmn_backend', [
     {role: 'readWrite', db: 'minigame'}

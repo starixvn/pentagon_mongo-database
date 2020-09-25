@@ -111,18 +111,45 @@
         return fileData;
     };
 
+    // Misc.auditSchema()
+    const auditSchemaFunc = (_obj, _sch) => {
+        const obj = Object.extend({}, _obj);
+        const sch = Object.extend({}, _sch);
+        const mandatory = sch['!'] ? true : false;
+        delete sch['!'];
+        if (obj == null || sch == null) {
+            return false;
+        }
+        for (let k in sch) {
+            if (!mandatory && obj[k] == null) {
+                continue;
+            } else if (!sch[k] && obj.hasOwnProperty(k)) {
+                continue;
+            } else if (typeof sch[k] == "string" && typeof obj[k] == sch[k]) {
+                continue;
+            } else if (typeof sch[k] == "function" && obj[k] instanceof sch[k]) {
+                continue;
+            } else if (typeof sch[k] == "object") {
+                Misc.auditSchema(obj[k], sch[k]);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    };
+
     // Misc
     db.getSiblingDB('script').system.js.save({
         _id: 'Misc'
     ,   value:  new Code(`{
             log: ${logFunc.toString()}
         ,   readCSV: ${readCSVFunc.toString()}
+        ,   auditSchema: ${auditSchemaFunc.toString()}
         }`)
-    ,   version: 2.0
+    ,   version: 2.1
     ,   name: 'Miscellaneous'
     });
 
     // Reload scripts
     db.getSiblingDB('script').loadServerScripts();
 }
-
