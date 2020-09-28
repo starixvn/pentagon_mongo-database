@@ -250,6 +250,11 @@
         }
     };
 
+    // Saba.env()
+    const envFunc = (mongo = db._mongo) => {
+        return mongo.getDB(`admin`).env.findOne({_id: `SC`}).value;
+    }
+
     // Saba
     db.getSiblingDB('script').system.js.save({
         _id: 'Saba'
@@ -257,6 +262,7 @@
             summarizeDaily: ${summarizeDailyFunc.toString()}
         ,   runArchive: ${runArchiveFunc.toString()}
         ,   removeData: ${removeDataFunc.toString()}
+        ,   env: ${envFunc.toString()}
         }`)
     ,   version: 2.1
     ,   name: 'SabaClub'
