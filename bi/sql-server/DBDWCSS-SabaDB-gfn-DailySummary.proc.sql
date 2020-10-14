@@ -1,0 +1,175 @@
+USE	SabaDB;
+SET NOCOUNT ON;
+GO
+IF	OBJECT_ID('gfn.DailySummary') IS NULL
+BEGIN;
+	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE gfn.DailySummary AS';
+END;
+GO
+ALTER PROCEDURE	gfn.DailySummary
+					@DateFrom			DATETIME
+				,	@DateTo				DATETIME
+				,	@L					TINYINT			= NULL
+				,	@Field				NVARCHAR(128)	= NULL
+				,	@GroupBy			NVARCHAR(128)	= NULL
+WITH ENCRYPTION
+AS
+BEGIN;
+	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+	SET NOCOUNT ON;
+
+	DECLARE	@Query		NVARCHAR(MAX)
+		,	@WaitFor	VARCHAR(16)		= '00:00:0'
+										+ CAST((CAST(RAND() * 10 AS INT)) % 3 AS CHAR(1))
+										+ '.'
+										+ CAST(CAST(RAND() * 1000 AS INT) AS CHAR(3))
+		,	@Value		NVARCHAR(256)
+		,	@Group		NVARCHAR(256)
+		,	@ErrMsg		NVARCHAR(MAX)
+		;
+
+	DECLARE	@Return AS TABLE (
+				time		DATETIME
+			,	metric		NVARCHAR(128)
+			,	value		DECIMAL(19,4)
+			,	PRIMARY KEY CLUSTERED (metric, time)
+			);
+
+	DECLARE	@Temporary AS TABLE (
+				time		DATETIME
+			,	metric		NVARCHAR(128)
+			,	value		DECIMAL(19,4)
+			,	PRIMARY KEY CLUSTERED (metric, time)
+			);
+
+	WAITFOR DELAY @WaitFor;
+
+	SELECT	@Value	=	CASE @Field
+							WHEN N'Stake' THEN N'ds.`stake`'
+							WHEN N'WinLost' THEN N'ds.`stake` - ds.`payout`'
+							WHEN N'Ticket' THEN N'ds.`tickets`'
+							ELSE NULL
+						END
+		,	@Group	=	CASE @GroupBy
+							WHEN N'Game' THEN N'cfg.`name.en`'
+							WHEN N'Currency' THEN N'ds.`currency`'
+							WHEN N'Summary' THEN N'"Summary"'
+							ELSE NULL
+						END
+		;
+
+	IF	@Value IS NULL OR @Group IS NULL
+	BEGIN;
+		SELECT	r.time, r.metric, r.value
+		FROM	@Return AS r;
+
+		RETURN;
+	END;
+
+	SELECT	@Query = N'';
+	SELECT	@Query += N'\
+SELECT	ds.`time` AS time
+	,	' + @Group + N' AS metric
+	,	SUM(' + @Value + N') AS value
+FROM		summary_arc.game_summary_config AS cfg
+INNER JOIN	summary_arc.daily_summaries AS ds
+		ON	ds.gameId = cfg.gameId
+WHERE	ds.currency <> "UUS"
+	AND	ds.time >= "' + CONVERT(NVARCHAR(MAX), @DateFrom, 121) + N'"
+	AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"
+GROUP BY ds.`time`, ' + @Group + N'
+ORDER BY time, value ASC;
+';
+
+	IF	@L = 1
+	BEGIN TRY;
+		DELETE	@Temporary;
+		INSERT INTO	@Temporary (time, metric, value)
+		EXECUTE	(@Query) AT L1_SABAARCBI;
+		MERGE INTO	@Return AS r
+		USING	@Temporary AS t
+			ON	r.time = t.time
+			AND	r.metric = t.metric
+		WHEN MATCHED THEN
+			UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
+		WHEN NOT MATCHED THEN
+			INSERT	(time, metric, value)
+			VALUES	(t.time, t.metric, ISNULL(t.value, 0))
+		;
+	END TRY
+	BEGIN CATCH
+		SELECT	@ErrMsg = N'\
+Query from L1_SABAARCBI
+	- ' + ERROR_MESSAGE()
+		RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
+	END CATCH;
+
+	IF	@L = 2
+	BEGIN TRY;
+		DELETE	@Temporary;
+		INSERT INTO	@Temporary (time, metric, value)
+		EXECUTE	(@Query) AT L2_SABAARCBI;
+		MERGE INTO	@Return AS r
+		USING	@Temporary AS t
+			ON	r.time = t.time
+			AND	r.metric = t.metric
+		WHEN MATCHED THEN
+			UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
+		WHEN NOT MATCHED THEN
+			INSERT	(time, metric, value)
+			VALUES	(t.time, t.metric, ISNULL(t.value, 0))
+		;
+	END TRY
+	BEGIN CATCH
+		SELECT	@ErrMsg = N'\
+Query from L2_SABAARCBI
+	- ' + ERROR_MESSAGE()
+		RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
+	END CATCH;
+
+	IF	@L = 3
+	BEGIN TRY;
+		DELETE	@Temporary;
+		INSERT INTO	@Temporary (time, metric, value)
+		EXECUTE	(@Query) AT L3_SABAARCBI;
+		MERGE INTO	@Return AS r
+		USING	@Temporary AS t
+			ON	r.time = t.time
+			AND	r.metric = t.metric
+		WHEN MATCHED THEN
+			UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
+		WHEN NOT MATCHED THEN
+			INSERT	(time, metric, value)
+			VALUES	(t.time, t.metric, ISNULL(t.value, 0))
+		;
+	END TRY
+	BEGIN CATCH
+		SELECT	@ErrMsg = N'\
+Query from L3_SABAARCBI
+	- ' + ERROR_MESSAGE()
+		RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
+	END CATCH;
+
+	IF	@Field = N'WinLost'
+	BEGIN;
+		DELETE	@Temporary;
+		INSERT INTO	@Temporary (time, metric, value)
+		SELECT	[time]		= DATEADD(HOUR, 8, r.time)
+			,	[metric]	= r.metric
+			,	[value]		= CASE WHEN r.value < 0 THEN r.value ELSE NULL END
+		FROM	@Return AS r;
+
+		UPDATE	@Return
+		SET		value = NULL
+		WHERE	value < 0;
+
+		INSERT INTO	@Return (time, metric, value)
+		SELECT	t.time, t.metric, t.value
+		FROM	@Temporary AS t;
+	END;
+
+	SELECT	r.time, r.metric, r.value
+	FROM	@Return AS r
+	ORDER BY r.time, r.metric;
+END;
+GO
