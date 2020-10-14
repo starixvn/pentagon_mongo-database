@@ -4,6 +4,10 @@
             idxKeys : {uid: 1, phien: 1}
         ,   idxOpts : {unique: true}
         }
+    ,   uid_phien_freeBet_U: {
+            idxKeys : {uid: 1, phien: 1, freeBet: 1}
+        ,   idxOpts : {unique: true}
+        }
     ,   uid_phien: {
             idxKeys : {uid: 1, phien: 1}
         ,   idxOpts : {}
@@ -34,7 +38,7 @@
     {   // 02 - Xoc Dia
         [idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.xocxoc_phiens_bk, idx.idxKeys, idx.idxOpts)});
-        [idxs.time, idxs.phien, idxs.uid_phien_U].
+        [idxs.time, idxs.phien, idxs.uid_phien_freeBet_U].
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.xocxoc_cuocs_bk, idx.idxKeys, idx.idxOpts)});
     }
 

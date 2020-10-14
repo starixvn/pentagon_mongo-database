@@ -8,6 +8,10 @@
             idxKeys : {uid: 1, phien: 1}
         ,   idxOpts : {unique: true}
         }
+    ,   uid_phien_freeBet: {
+            idxKeys : {uid: 1, phien: 1, freeBet: 1}
+        ,   idxOpts : {unique: true}
+        }
     ,   uid_thanhtoan__id: {
             idxKeys : {uid: 1, thanhtoan: 1, _id: 1}
         ,   idxOpts : {}
@@ -46,7 +50,7 @@
     {   // 02 - Xoc Dia
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_phiens, idx.idxKeys, idx.idxOpts)});
-        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien_freeBet, idxs.uid_thanhtoan__id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_cuocs, idx.idxKeys, idx.idxOpts)});
         [idxs.timeTTL       , idxs.phien__id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_tmpcuocs, idx.idxKeys, idx.idxOpts)});
