@@ -1,3 +1,4 @@
+if ((2 ** Saba.env() & 6) > 0)
 {
     const currency = {
         coll: 'userinfos'
@@ -610,6 +611,37 @@
         ,   childs: [
                 {   from: 'vipsedie_cuocs'
                 ,   to: 'vipsedie_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: [currency]
+                }
+            ]
+        }
+    ,   {   _id: 39024
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'specialsedie_phiens'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'specialsedie_phiens_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'specialsedie_cuocs'
+                ,   to: 'specialsedie_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: [currency]
+                }
+            ,   {   from: 'specialsedie_ones'
+                ,   to: 'specialsedie_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter

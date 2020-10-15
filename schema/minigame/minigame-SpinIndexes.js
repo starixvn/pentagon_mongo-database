@@ -1,3 +1,4 @@
+if ((2 ** Saba.env() & 4) > 0)
 {   // spins
     [
         {   idxKeys : {memberId: 1}
@@ -8,6 +9,7 @@
     });
 }
 
+if ((2 ** Saba.env() & 4) > 0)
 {   // spin_results
     [
         {   idxKeys : {id: 1}
@@ -18,6 +20,7 @@
     });
 }
 
+if ((2 ** Saba.env() & 4) > 0)
 {   // spin_logs
     [   {   idxKeys : {key: 1, memberId: 1}
         ,   idxOpts : {unique: true}

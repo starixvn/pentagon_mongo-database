@@ -6,6 +6,7 @@ END;
 GO
 ALTER PROCEDURE	gfn.DailySummaryComparison
 					@ReportDate		DATETIME
+				,	@Panel			TINYINT		= 1
 WITH ENCRYPTION
 AS
 /*
@@ -186,31 +187,49 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 		END;
 	END;
 
-
-	SELECT	[Id]			= ow.gameTypeId
-		,	[Game]			= ow.gameType
-		,	[Currency]		= ow.currency
-		,	[OW =>]			= ''
-		,	[Round Cnt.]	= ow.phienCount
-		,	[Ticket Cnt.]	= ow.betCount
-		,	[Stake]			= ow.stake
-		,	[Payout]		= ow.payOut
-		,	[SC =>] = ''
-		,	[Ticket Cnt.]	= sc.betCount
-		,	[Stake]			= sc.stake
-		,	[Payout]		= sc.payOut
-		,	[ ] = ''
-		,	[Ticket Status]	= CASE	WHEN ow.betCount = sc.betCount THEN 1
-									ELSE 0 END
-		,	[Stake Status]	= CASE	WHEN ow.stake = sc.stake THEN 1
-									ELSE 0 END
-		,	[Payout Status]	= CASE	WHEN ow.payOut = sc.payOut THEN 1
-									ELSE 0 END
-	FROM			@OW_DailySummary AS ow
-	FULL OUTER JOIN	@DS_DailySummary AS sc
-				ON	ow.gameTypeId = sc.gameTypeId
-				AND	ow.currency = sc.currency
-	WHERE	ISNULL(ow.currency, sc.currency) <> 'UUS'
-	ORDER BY CASE WHEN ISNULL(ow.currency, sc.currency) = 'UUS' THEN 1 ELSE 0 END, ow.gameTypeId, sc.gameTypeId, ow.currency, sc.currency;
+	IF	@Panel = 1
+	BEGIN;
+		SELECT	[Id]			= ow.gameTypeId
+			,	[Game]			= ow.gameType
+			,	[Currency]		= ow.currency
+			,	[Round Cnt.]	= ow.phienCount
+			,	[ ]				= '||'
+			,	[(OW)]			= CASE	WHEN ow.betCount > sc.betCount THEN ow.betCount - sc.betCount
+										ELSE 0 END
+			,	[Ticket]		= CASE	WHEN ow.betCount > sc.betCount THEN -1
+										WHEN ow.betCount < sc.betCount THEN 1
+										ELSE '' END
+			,	[(SC)]			= CASE	WHEN ow.betCount < sc.betCount THEN sc.betCount - ow.betCount
+										ELSE 0 END
+			,	[ ]				= '||'
+			,	[(OW)]			= CASE	WHEN ow.stake > sc.stake THEN ow.stake - sc.stake
+										ELSE 0 END
+			,	[Stake]			= CASE	WHEN ow.stake > sc.stake THEN -1
+										WHEN ow.stake < sc.stake THEN 1
+										ELSE '' END
+			,	[(SC)]			= CASE	WHEN ow.stake < sc.stake THEN sc.stake - ow.stake
+										ELSE 0 END
+			,	[ ]				= '||'
+			,	[(OW)]			= CASE	WHEN ow.payOut > sc.payOut THEN ow.payOut - sc.payOut
+										ELSE 0 END
+			,	[PayOut]		= CASE	WHEN ow.payOut > sc.payOut THEN -1
+										WHEN ow.payOut < sc.payOut THEN 1
+										ELSE 0 END
+			,	[(SC)]			= CASE	WHEN ow.payOut < sc.payOut THEN sc.payOut - ow.payOut
+										ELSE 0 END
+			,	[ ]				= '||'
+			,	[Ticket Status]	= CASE	WHEN ow.betCount = sc.betCount THEN 1
+										ELSE 0 END
+			,	[Stake Status]	= CASE	WHEN ow.stake = sc.stake THEN 1
+										ELSE 0 END
+			,	[Payout Status]	= CASE	WHEN ow.payOut = sc.payOut THEN 1
+										ELSE 0 END
+		FROM			@OW_DailySummary AS ow
+		FULL OUTER JOIN	@DS_DailySummary AS sc
+					ON	ow.gameTypeId = sc.gameTypeId
+					AND	ow.currency = sc.currency
+		WHERE	ISNULL(ow.currency, sc.currency) <> 'UUS'
+		ORDER BY CASE WHEN ISNULL(ow.currency, sc.currency) = 'UUS' THEN 1 ELSE 0 END, ow.gameTypeId, sc.gameTypeId, ow.currency, sc.currency;
+	END;
 END;
 GO

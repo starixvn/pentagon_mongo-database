@@ -38,6 +38,7 @@
         }
     };
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 01 - Tai Xiu
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.taixiu_phiens, idx.idxKeys, idx.idxOpts)});
@@ -47,15 +48,23 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.taixiu_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 02 - Xoc Dia
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_phiens, idx.idxKeys, idx.idxOpts)});
-        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien_freeBet, idxs.uid_thanhtoan__id].
-            forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_cuocs, idx.idxKeys, idx.idxOpts)});
+        if ((2 ** Saba.env() & 2) > 0) {    // L1
+            [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id].
+                forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_cuocs, idx.idxKeys, idx.idxOpts)});
+        }
+        if ((2 ** Saba.env() & 4) > 0) {    // L2
+            [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien_freeBet, idxs.uid_thanhtoan__id].
+                forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_cuocs, idx.idxKeys, idx.idxOpts)});
+        }
         [idxs.timeTTL       , idxs.phien__id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.xocxoc_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 03 - Bau Cua
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.baucua_phiens, idx.idxKeys, idx.idxOpts)});
@@ -63,6 +72,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.baucua_cuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 04 - Tai Xiu Turbo
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.txturbo_phiens, idx.idxKeys, idx.idxOpts)});
@@ -72,6 +82,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.txturbo_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 05 - Chan Le
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.chanle_phiens, idx.idxKeys, idx.idxOpts)});
@@ -81,6 +92,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.chanle_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env()  & 6) > 0)
     {   // 06 - Chan Le Turbo
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.chanleturbo_phiens, idx.idxKeys, idx.idxOpts)});
@@ -90,6 +102,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.chanleturbo_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 07 - Rong Ho
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.minidragontiger_phiens, idx.idxKeys, idx.idxOpts)});
@@ -97,6 +110,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.minidragontiger_cuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 08 - Keno Pro Max
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenopromax_phiens, idx.idxKeys, idx.idxOpts)});
@@ -106,6 +120,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenopromax_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 09 - Xoc Dia Mini
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.minisedie_phiens, idx.idxKeys, idx.idxOpts)});
@@ -113,6 +128,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.minisedie_cuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 10 - Baccarat
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.baccarat_phiens, idx.idxKeys, idx.idxOpts)});
@@ -122,6 +138,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.baccarat_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 11 - Keno Pro Viet
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenoproviet_phiens, idx.idxKeys, idx.idxOpts)});
@@ -133,6 +150,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenoproviet_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 12 - Keno Max
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax_phiens, idx.idxKeys, idx.idxOpts)});
@@ -142,6 +160,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 13 - Keno Max 2
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax2_phiens, idx.idxKeys, idx.idxOpts)});
@@ -151,6 +170,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomax2_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 14 - Keno Mini
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini_phiens, idx.idxKeys, idx.idxOpts)});
@@ -160,6 +180,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 15 - Keno Mini 2
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini2_phiens, idx.idxKeys, idx.idxOpts)});
@@ -169,6 +190,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenomini2_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 16 - Keno East
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenoeast_phiens, idx.idxKeys, idx.idxOpts)});
@@ -178,6 +200,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenoeast_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 17 - Keno West
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenowest_phiens, idx.idxKeys, idx.idxOpts)});
@@ -187,6 +210,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenowest_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 18 - Keno South
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenosouth_phiens, idx.idxKeys, idx.idxOpts)});
@@ -196,6 +220,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenosouth_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 19 - Keno North
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.kenonorth_phiens, idx.idxKeys, idx.idxOpts)});
@@ -209,6 +234,7 @@
         // Not supported
     }
 
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 21 - Roulette
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_phiens, idx.idxKeys, idx.idxOpts)});
@@ -220,6 +246,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_tmpones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 2) > 0)
     {   // 22 - Xoc Dia VIP
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_phiens, idx.idxKeys, idx.idxOpts)});
@@ -227,5 +254,15 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_cuocs, idx.idxKeys, idx.idxOpts)});
         [idxs.timeTTL       , idxs.phien__id, idxs.uid_phien].
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_tmpcuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    if ((2 ** Saba.env() & 2) > 0)
+    {   // 24 - Xoc Dia Can Cua
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_ones, idx.idxKeys, idx.idxOpts)});
     }
 }

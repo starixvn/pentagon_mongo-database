@@ -1,3 +1,4 @@
+if ((2 ** Saba.env() & 6) > 0)
 {   // users
     [
         {   idxKeys : {'local.username': 1}
@@ -8,6 +9,7 @@
     });
 }
 
+if ((2 ** Saba.env() & 6) > 0)
 {   // userinfos
     [
         {   idxKeys : {id: 1}
@@ -30,6 +32,7 @@
     });
 }
 
+if ((2 ** Saba.env() & 6) > 0)
 {   // usersessions
     [
         {   idxKeys : {sessionId: 1}

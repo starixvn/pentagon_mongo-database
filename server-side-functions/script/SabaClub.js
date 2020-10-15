@@ -219,7 +219,7 @@
         };
 
         // Group must have collection
-        if (fromDB.getCollectionInfos({name: coll.name}).length != 1) {
+        if (fromDB.getCollectionInfos({name: coll.name}).length !== 1) {
             Misc.log(`Cannot remove data because [${fromDB._name}.${coll.name}] does NOT exist`, collName, `REMOVE`, `E`);
             return;
         }
@@ -232,10 +232,10 @@
             bulkUpdatePipe.push({deleteOne: {filter: {_id: doc._id}}});
         });
 
-        if (!docs || docs.length == 0) {
+        if (!docs || docs.length === 0) {
             Misc.log(`Cannot remove data because [${fromDB._name}.${coll.name}] has NO documents matching with the filter`, collName, `REMOVE`, `E`);
         } else {
-            if (debug == 0) {
+            if (debug === 0) {
                 try {
                     toDB[collRM.name].insertMany(docs, {ordered: false});
                     fromDB[coll.name].bulkWrite(bulkUpdatePipe, {ordered : false});

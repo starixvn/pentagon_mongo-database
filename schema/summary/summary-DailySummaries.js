@@ -1,3 +1,4 @@
+if ((2 ** Saba.env() & 14) > 0)
 {   // daily_summaries
     [
         {   idxKeys : {time: 1, currency: 1, gameId: 1}

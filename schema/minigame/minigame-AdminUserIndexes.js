@@ -1,3 +1,4 @@
+if ((2 ** Saba.env() & 6) > 0)
 {   // admins
     [
         {   idxKeys : {username: 1}
@@ -8,6 +9,7 @@
     });
 }
 
+if ((2 ** Saba.env() & 6) > 0)
 {   // admin_users
     [
         {   idxKeys : {username: 1}
