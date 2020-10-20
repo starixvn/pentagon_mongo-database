@@ -1,10 +1,5 @@
+if ((2 ** Saba.env() & 6) > 0)
 {
-    const currency = {
-        coll: 'userinfos'
-    ,   localField: 'uid'
-    ,   foreignField: 'id'
-    ,   fields: ['currency']
-    };
     const filter = {
         memberId: {$gt: 0}
     };
@@ -30,14 +25,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'taixiu_ones'
                 ,   to: 'taixiu_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -61,7 +56,7 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -85,7 +80,7 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -109,14 +104,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'txturbo_ones'
                 ,   to: 'txturbo_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -140,14 +135,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'chanle_ones'
                 ,   to: 'chanle_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -171,14 +166,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'chanleturbo_ones'
                 ,   to: 'chanleturbo_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -202,7 +197,7 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -226,7 +221,7 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -250,7 +245,7 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -274,7 +269,7 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -298,14 +293,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenoproviet_ones'
                 ,   to: 'kenoproviet_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenoproviet_phiens_log'
                 ,   to: 'kenoproviet_phiens_log_bk'
@@ -334,14 +329,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenomax_ones'
                 ,   to: 'kenomax_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -365,14 +360,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenomax2_ones'
                 ,   to: 'kenomax2_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -396,14 +391,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenomini_ones'
                 ,   to: 'kenomini_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -427,14 +422,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenomini2_ones'
                 ,   to: 'kenomini2_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -458,14 +453,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenoeast_ones'
                 ,   to: 'kenoeast_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -489,14 +484,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenowest_ones'
                 ,   to: 'kenowest_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -520,14 +515,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenosouth_ones'
                 ,   to: 'kenosouth_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -551,14 +546,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'kenonorth_ones'
                 ,   to: 'kenonorth_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -582,14 +577,14 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ,   {   from: 'roulette_ones'
                 ,   to: 'roulette_ones_bk'
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
                 }
             ]
         }
@@ -613,7 +608,38 @@
                 ,   join: 'phien'
                 ,   updateOnly: false
                 ,   filter: filter
-                ,   exCols: [currency]
+                ,   exCols: []
+                }
+            ]
+        }
+    ,   {   _id: 39024
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'specialsedie_phiens'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'specialsedie_phiens_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'specialsedie_cuocs'
+                ,   to: 'specialsedie_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ,   {   from: 'specialsedie_ones'
+                ,   to: 'specialsedie_ones_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
                 }
             ]
         }

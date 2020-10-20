@@ -1,3 +1,4 @@
+if ((2 ** Saba.env() & 14) > 0)
 {   // game_summary_config
     [
         {   idxKeys : {gameId: 1}
@@ -537,29 +538,57 @@ dbs.summary.game_summary_config.insertMany([
         }
     }
 
-    ,   {   gameId: 22
-        ,   owGameTypeId: 1633
-        ,   name: {
-                en: 'VIP Se Die'
-            ,   vi: 'Xóc Đĩa VIP'
-            }
-        ,   coll: {
-                db: 'minigame'
-            ,   group: 'vipsedie'
-            ,   round: '_phiens'
-            ,   postfix: '_cuocs'
-            }
-        ,   fields: {
-                map: 'phien'
-            ,   time: '$time'
-            ,   settled: '$thanhtoan'
-            ,   stake: ['$odd', '$even', '$white4', '$white3', '$red2', '$red3', '$red4']
-            ,   payout: ['$betwin']
-            }
-        ,   config: {
-                hasCurrency: false
-            }
+,   {   gameId: 22
+    ,   owGameTypeId: 1633
+    ,   name: {
+            en: 'VIP Se Die'
+        ,   vi: 'Xóc Đĩa VIP'
         }
+    ,   coll: {
+            db: 'minigame'
+        ,   group: 'vipsedie'
+        ,   round: '_phiens'
+        ,   postfix: '_cuocs'
+        }
+    ,   fields: {
+            map: 'phien'
+        ,   time: '$time'
+        ,   settled: '$thanhtoan'
+        ,   stake: ['$odd', '$even', '$white4', '$white3', '$red2', '$red3', '$red4']
+        ,   payout: ['$betwin']
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 24
+    ,   owGameTypeId: 1635
+    ,   name: {
+            en: 'Special Se Die'
+        ,   vi: 'Xóc Đĩa Cân Cửa'
+        }
+    ,   coll: {
+            db: 'minigame'
+        ,   group: 'specialsedie'
+        ,   round: '_phiens'
+        ,   postfix: '_ones'
+        }
+    ,   fields: {
+            map: 'phien'
+        ,   time: '$time'
+        ,   settled: '$thanhtoan'
+        ,   stake: ['$amount']
+        ,   payout: [
+                {$multiply: ['$betwin', {$toInt: '$win'}]}
+            ,   {$multiply: ['$amount', {$toInt: '$win'}]}
+            ,   {$multiply: ['$refund', {$toInt: {$not: '$win'}}]}
+            ]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
 ]
 ,   {ordered: false}
 );
