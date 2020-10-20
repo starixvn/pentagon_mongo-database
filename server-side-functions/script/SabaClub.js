@@ -59,21 +59,35 @@
             agg.push({$unwind: '$bets'});
             agg.push({$replaceWith: '$bets'});
             agg.push({$match: {$expr: {$and: [{$gt: ['$memberId', 0]}, {$eq: [game.fields.settled, true]}]}}});
-            if (game.config.hasCurrency) {
-                agg.push({$project: {_id: 0, stake: {$sum: game.fields.stake}, payout: {$sum: game.fields.payout}, currency: 1}});
-                agg.push({$group: {_id: '$currency', stake: {$sum: '$stake'}, payout: {$sum: '$payout'}, tickets: {$sum: 1}}});
+
+            // Add currency to document if not exists
+            if (!game.config.hasCurrency) {
+                agg.push({$project: {_id: 0, uid: 1}});
+
+                const uids = [];
+                mongo.getDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).forEach(doc => {
+                    uids.push(doc.uid);
+                });
+                const updCurrencyPipe = [];
+                mongo.getDB(game.coll.db).userinfos.find({id: {$in: uids}}, {_id: 0, id: 1, currency: 1}).forEach(doc => {
+                    updCurrencyPipe.push({updateMany: {
+                        filter: {uid: doc.id, '__archive.currency': {$exists: false}}
+                    ,   update: [
+                            {$set: {'__archive.currency': {$literal: doc.currency}}}
+                        ]
+                    }});
+                });
+                const res = mongo.getDB(game.coll.db)[game.coll.group + game.coll.postfix].bulkWrite(updCurrencyPipe, {ordered: false});
+
+                agg.pop();
+                if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
+                    Misc.log(`Added into [${game.coll.group + game.coll.postfix}] collection.`, game.name.en, `SUMMARY`, `I`);
+                    Misc.log(` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`, game.name.en, `SUMMARY`, `I`);
+                }
             }
-            else {
-                agg.push({$project: {_id: 0, stake: {$sum: game.fields.stake}, payout: {$sum: game.fields.payout}, uid: 1}});
-                agg.push({$lookup: {
-                    from: 'userinfos',
-                    localField: 'uid',
-                    foreignField: 'id',
-                    as: 'usr'
-                }});
-                agg.push({$unwind: '$usr'});
-                agg.push({$group: {_id: '$usr.currency', stake: {$sum: '$stake'}, payout: {$sum: '$payout'}, tickets: {$sum: 1}}});
-            }
+
+            agg.push({$project: {_id: 0, stake: {$sum: game.fields.stake}, payout: {$sum: game.fields.payout}, '__archive.currency': 1}});
+            agg.push({$group: {_id: '$__archive.currency', stake: {$sum: '$stake'}, payout: {$sum: '$payout'}, tickets: {$sum: 1}}});
             agg.push({$project: {
                 _id: 0,
                 'key.time': {$literal: timeFrom}, 'key.gameId': {$literal: game.gameId}, 'key.currency': '$_id',
@@ -264,7 +278,7 @@
         ,   removeData: ${removeDataFunc.toString()}
         ,   env: ${envFunc.toString()}
         }`)
-    ,   version: 2.1
+    ,   version: 2.2
     ,   name: 'SabaClub'
     });
 

@@ -27,6 +27,7 @@ BEGIN;
 										+ CAST(CAST(RAND() * 1000 AS INT) AS CHAR(3))
 		,	@Value		NVARCHAR(256)
 		,	@Group		NVARCHAR(256)
+		,	@Filter		NVARCHAR(256)
 		,	@ErrMsg		NVARCHAR(MAX)
 		;
 
@@ -49,6 +50,8 @@ BEGIN;
 	SELECT	@Value	=	CASE @Field
 							WHEN N'Stake' THEN N'ds.`stake`'
 							WHEN N'WinLost' THEN N'ds.`stake` - ds.`payout`'
+							WHEN N'Win' THEN N'ds.`stake` - ds.`payout`'
+							WHEN N'Lose' THEN N'ds.`payout` - ds.`stake`'
 							WHEN N'Ticket' THEN N'ds.`tickets`'
 							ELSE NULL
 						END
@@ -57,6 +60,11 @@ BEGIN;
 							WHEN N'Currency' THEN N'ds.`currency`'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
+						END
+		,	@Filter	=	CASE @Field
+							WHEN N'Win' THEN N'WHERE	q.value >= 0'
+							WHEN N'Lose' THEN N'WHERE	q.value < 0'
+							ELSE N''
 						END
 		;
 
@@ -72,6 +80,8 @@ BEGIN;
 	BEGIN;
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
+SELECT	time, metric, value
+FROM	(
 	SELECT	ds.`time` AS time
 		,	' + @Group + N' AS metric
 		,	SUM(' + @Value + N') AS value
@@ -81,7 +91,9 @@ BEGIN;
 	WHERE	ds.currency <> "UUS"
 		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 121) + N'"
 	GROUP BY ds.`time`, ' + @Group + N'
-	ORDER BY time, value DESC;
+) AS q
+' + @Filter + N'
+ORDER BY q.time, q.value DESC;
 	';
 
 		IF	@L = 1
@@ -157,6 +169,8 @@ Query from L3_SABABI
 	BEGIN;
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
+SELECT	time, metric, value
+FROM	(
 	SELECT	ds.`time` AS time
 		,	' + @Group + N' AS metric
 		,	SUM(' + @Value + N') AS value
@@ -166,7 +180,9 @@ Query from L3_SABABI
 	WHERE	ds.currency <> "UUS"
 		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 121) + N'"
 	GROUP BY ds.`time`, ' + @Group + N'
-	ORDER BY time, value DESC;
+) AS q
+' + @Filter + N'
+ORDER BY q.time, q.value DESC;
 	';
 
 		IF	@L = 1
