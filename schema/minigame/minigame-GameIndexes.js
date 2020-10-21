@@ -261,6 +261,14 @@
     }
 
     if ((2 ** Saba.env() & 2) > 0)
+    {   // 23 - Blackjack
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.blackjack_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.id, idxs.uid_thanhtoan__id, idxs.currency].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.blackjack_cuocs, idx.idxKeys, idx.idxOpts)});
+    }
+
+    if ((2 ** Saba.env() & 2) > 0)
     {   // 24 - Xoc Dia Can Cua
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_phiens, idx.idxKeys, idx.idxOpts)});

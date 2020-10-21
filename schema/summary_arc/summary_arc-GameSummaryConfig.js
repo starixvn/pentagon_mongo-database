@@ -562,6 +562,30 @@ dbs.summary_arc.game_summary_config.insertMany([
         }
     }
 
+,   {   gameId: 23
+    ,   owGameTypeId: 1634
+    ,   name: {
+            en: 'Blackjack'
+        ,   vi: 'Blackjack'
+        }
+    ,   coll: {
+            db: 'minigame_arc'
+        ,   group: 'blackjack'
+        ,   round: '_phiens_bk'
+        ,   postfix: '_cuocs_bk'
+        }
+    ,   fields: {
+            map: 'phien'
+        ,   time: '$time'
+        ,   settled: '$thanhtoan'
+        ,   stake: ['$bet']
+        ,   payout: ['$betwin']
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
 ,   {   gameId: 24
     ,   owGameTypeId: 1635
     ,   name: {
