@@ -62,11 +62,13 @@
 
             // Add currency to document if not exists
             if (!game.config.hasCurrency) {
-                agg.push({$project: {_id: 0, uid: 1}});
-
                 const uids = [];
-                mongo.getDB(game.coll.db)[game.coll.group + game.coll.round].aggregate(agg).forEach(doc => {
-                    uids.push(doc.uid);
+                mongo.getDB(game.coll.db)[game.coll.group + game.coll.postfix].aggregate([
+                    {$match: {'__archive.currency': {$exists: false}, memberId: {$gt: 0}}}
+                ,   {$project: {_id: 0, uid: 1}}
+                ,   {$group: {_id: '$uid'}}
+                ]).forEach(doc => {
+                    uids.push(doc._id);
                 });
                 const updCurrencyPipe = [];
                 mongo.getDB(game.coll.db).userinfos.find({id: {$in: uids}}, {_id: 0, id: 1, currency: 1}).forEach(doc => {
@@ -79,7 +81,6 @@
                 });
                 const res = mongo.getDB(game.coll.db)[game.coll.group + game.coll.postfix].bulkWrite(updCurrencyPipe, {ordered: false});
 
-                agg.pop();
                 if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
                     Misc.log(`Added into [${game.coll.group + game.coll.postfix}] collection.`, game.name.en, `SUMMARY`, `I`);
                     Misc.log(` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`, game.name.en, `SUMMARY`, `I`);
@@ -278,7 +279,7 @@
         ,   removeData: ${removeDataFunc.toString()}
         ,   env: ${envFunc.toString()}
         }`)
-    ,   version: 2.2
+    ,   version: 2.3
     ,   name: 'SabaClub'
     });
 

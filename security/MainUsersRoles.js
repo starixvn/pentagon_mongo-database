@@ -95,7 +95,7 @@ db.getSiblingDB('admin').grantRolesToUser('mongosqld', [
 ,   {role: 'readWrite', db: 'schema'}
 ]);
 db.getSiblingDB('admin').grantRolesToUser('lmn_summary', [
-    {role: 'read', db: 'minigame'}
+    {role: 'readWrite', db: 'minigame'}
 ,   {role: 'read', db: 'script'}
 ,   {role: 'readWrite', db: 'summary'}
 ]);
