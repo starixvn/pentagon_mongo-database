@@ -612,6 +612,30 @@ if ((2 ** Saba.env() & 6) > 0)
                 }
             ]
         }
+    ,   {   _id: 39023
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'blackjack_phiens'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'blackjack_phiens_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'blackjack_cuocs'
+                ,   to: 'blackjack_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ]
+        }
     ,   {   _id: 39024
         ,   from: {
                 db: 'minigame'

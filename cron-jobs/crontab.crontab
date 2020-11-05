@@ -1,0 +1,5 @@
+1 * * * * cd /var/crontab/mongodb/archive-process && mongo --nodb --quiet run_archive.sit.js >> log/archive.log 2>&1
+
+10 0 * * * cd /var/crontab/mongodb/daily-summary && mongo --nodb --quiet run_summary.js >> log/summary.log 2>&1
+
+0,30 * * * * cd /var/crontab/mongodb/database-backup/daily && ./daily-backup.sh >> log/daily-backup.log 2>&1

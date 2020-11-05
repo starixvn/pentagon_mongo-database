@@ -224,12 +224,20 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.roulette_ones_bk, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 22 - Xoc Dia VIP
         [idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipsedie_phiens_bk, idx.idxKeys, idx.idxOpts)});
         [idxs.time, idxs.phien, idxs.uid_phien_U].
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipsedie_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+    }
+
+    if ((2 ** Saba.env() & 2) > 0)
+    {   // 23 - Blackjack
+        [idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.blackjack_phiens_bk, idx.idxKeys, idx.idxOpts)});
+        [idxs.time, idxs.phien, idxs.id, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.blackjack_cuocs_bk, idx.idxKeys, idx.idxOpts)});
     }
 
     if ((2 ** Saba.env() & 2) > 0)
