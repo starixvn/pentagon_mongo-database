@@ -250,7 +250,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.roulette_tmpones, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 22 - Xoc Dia VIP
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_phiens, idx.idxKeys, idx.idxOpts)});

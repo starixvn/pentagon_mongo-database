@@ -19,6 +19,39 @@
         ]
     });
 }
+{   const roleName = 'readSystem';
+    const readAction = ['find', 'listIndexes'];
+
+    if (!dbs.admin.getRole(roleName)) {
+        dbs.admin.createRole({
+            role: roleName
+        ,   roles: []
+        ,   privileges: []
+        });
+    }
+
+    dbs.admin.grantRolesToRole(roleName, [
+        {role: 'readAnyDatabase', db: 'admin'}
+    ]);
+
+    dbs.admin.grantPrivilegesToRole(roleName, [
+        {resource: {db: 'admin', collection: ''}, actions: readAction}
+    ,   {resource: {db: 'admin', collection: 'system.keys'}, actions: readAction}
+    ,   {resource: {db: 'admin', collection: 'system.profile'}, actions: readAction}
+    ,   {resource: {db: 'admin', collection: 'system.roles'}, actions: readAction}
+    ,   {resource: {db: 'admin', collection: 'system.users'}, actions: readAction}
+    ,   {resource: {db: 'admin', collection: 'system.version'}, actions: readAction}
+    ,   {resource: {db: 'admin', collection: 'system.views'}, actions: readAction}
+    ,   {resource: {db: 'config', collection: ''}, actions: ['listCollections']}
+    ,   {resource: {db: 'config', collection: ''}, actions: readAction}
+    ,   {resource: {db: 'config', collection: 'system.profile'}, actions: readAction}
+    ,   {resource: {db: 'config', collection: 'system.sessions'}, actions: readAction}
+    ,   {resource: {db: 'local', collection: ''}, actions: readAction}
+    ,   {resource: {db: 'local', collection: 'system.profile'}, actions: readAction}
+    ,   {resource: {db: 'local', collection: 'system.replset'}, actions: readAction}
+    ,   {resource: {db: 'local', collection: 'system.rollback.id'}, actions: readAction}
+    ]);
+}
 
 
 db.getSiblingDB('admin').createUser({
@@ -53,6 +86,11 @@ db.getSiblingDB('admin').createUser({
 });
 db.getSiblingDB('admin').createUser({
     user: 'lmn_summary'
+,   pwd: passwordPrompt()
+,   roles: []
+});
+db.getSiblingDB('admin').createUser({
+    user: 'lmn_backup'
 ,   pwd: passwordPrompt()
 ,   roles: []
 });
@@ -98,5 +136,8 @@ db.getSiblingDB('admin').grantRolesToUser('lmn_summary', [
     {role: 'readWrite', db: 'minigame'}
 ,   {role: 'read', db: 'script'}
 ,   {role: 'readWrite', db: 'summary'}
+]);
+db.getSiblingDB('admin').grantRolesToUser('lmn_backup', [
+    {role: 'readSystem', db: 'admin'}
 ]);
 

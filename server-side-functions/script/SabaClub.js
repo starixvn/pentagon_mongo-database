@@ -286,4 +286,3 @@
     // Reload scripts
     db.getSiblingDB('script').loadServerScripts();
 }
-
