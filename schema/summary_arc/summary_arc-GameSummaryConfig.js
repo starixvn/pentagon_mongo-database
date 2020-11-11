@@ -613,6 +613,30 @@ dbs.summary_arc.game_summary_config.insertMany([
             hasCurrency: true
         }
     }
+
+,   {   gameId: 26
+    ,   owGameTypeId: 1633
+    ,   name: {
+            en: 'VIP Fish Prawn Crab'
+        ,   vi: 'Bầu Cua VIP'
+        }
+    ,   coll: {
+            db: 'minigame_arc'
+        ,   group: 'vipfishprawncrab'
+        ,   round: '_phiens_bk'
+        ,   postfix: '_cuocs_bk'
+        }
+    ,   fields: {
+            map: 'phien'
+        ,   time: '$time'
+        ,   settled: '$thanhtoan'
+        ,   stake: ['$stag', '$gourd', '$rooster', '$fish', '$crab', '$prawn', '$anyTriple']
+        ,   payout: ['$betwin']
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
 ]
 ,   {ordered: false}
 );
