@@ -630,7 +630,7 @@ dbs.summary_arc.game_summary_config.insertMany([
             map: 'phien'
         ,   time: '$time'
         ,   settled: '$thanhtoan'
-        ,   stake: ['$stag', '$gourd', '$rooster', '$fish', '$crab', '$prawn', '$anyTriple']
+        ,   stake: ['$stag', '$gourd', '$rooster', '$fish', '$crab', '$prawn', '$mountain', '$ocean', '$anyTriple']
         ,   payout: ['$betwin']
         }
     ,   config: {
