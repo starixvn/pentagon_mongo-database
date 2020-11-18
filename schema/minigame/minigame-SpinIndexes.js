@@ -22,7 +22,7 @@ if ((2 ** Saba.env() & 4) > 0)
 
 if ((2 ** Saba.env() & 4) > 0)
 {   // spin_logs
-    [   {   idxKeys : {key: 1, memberId: 1}
+    [   {   idxKeys : {roundId: 1, memberId: 1}
         ,   idxOpts : {unique: true}
         }
     ,   {   idxKeys : {memberId: 1, time: 1}

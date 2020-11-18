@@ -81,7 +81,13 @@
                             }
                             break;
                         case "ISODate":
-                            item[schema[index].name] = this[schema[index].type.class](line[index]);
+                            if (!line[index]) {
+                                item[schema[index].name] = ISODate();
+                            } else if (schema[index].type.timezone) {
+                                item[schema[index].name] = new this[schema[index].type.class](`${line[index]}${schema[index].type.timezone}`);
+                            } else {
+                                item[schema[index].name] = this[schema[index].type.class](line[index]);
+                            }
                             break;
                         case "Number":
                         case "NumberDecimal":
@@ -146,7 +152,7 @@
         ,   readCSV: ${readCSVFunc.toString()}
         ,   auditSchema: ${auditSchemaFunc.toString()}
         }`)
-    ,   version: 2.1
+    ,   version: 2.2
     ,   name: 'Miscellaneous'
     });
 
