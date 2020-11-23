@@ -4,6 +4,9 @@ if ((2 ** Saba.env() & 14) > 0)
         {   idxKeys : {gameId: 1}
         ,   idxOpts : {unique: true}
         }
+    ,   {   idxKeys : {owGameTypeId: 1}
+        ,   idxOpts : {unique: true}
+        }
     ].forEach((idx) => {
         Maint.createIndex(dbs.summary_arc.game_summary_config, idx.idxKeys, idx.idxOpts);
     });
@@ -615,7 +618,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 26
-    ,   owGameTypeId: 1633
+    ,   owGameTypeId: 1637
     ,   name: {
             en: 'VIP Fish Prawn Crab'
         ,   vi: 'Bầu Cua VIP'
