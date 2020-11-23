@@ -249,4 +249,12 @@
         [idxs.time, idxs.phien, idxs.uid_phien_U].
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.specialsedie_ones_bk, idx.idxKeys, idx.idxOpts)});
     }
+
+    if ((2 ** Saba.env() & 2) > 0)
+    {   // 26 - Bau Cua VIP
+        [idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipfishprawncrab_phiens_bk, idx.idxKeys, idx.idxOpts)});
+        [idxs.time, idxs.phien, idxs.uid_phien_U].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipfishprawncrab_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+    }
 }

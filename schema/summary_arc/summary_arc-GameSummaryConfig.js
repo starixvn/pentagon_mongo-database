@@ -4,6 +4,9 @@ if ((2 ** Saba.env() & 14) > 0)
         {   idxKeys : {gameId: 1}
         ,   idxOpts : {unique: true}
         }
+    ,   {   idxKeys : {owGameTypeId: 1}
+        ,   idxOpts : {unique: true}
+        }
     ].forEach((idx) => {
         Maint.createIndex(dbs.summary_arc.game_summary_config, idx.idxKeys, idx.idxOpts);
     });
@@ -608,6 +611,30 @@ dbs.summary_arc.game_summary_config.insertMany([
             ,   {$multiply: ['$amount', {$toInt: '$win'}]}
             ,   {$multiply: ['$refund', {$toInt: {$not: '$win'}}]}
             ]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
+,   {   gameId: 26
+    ,   owGameTypeId: 1637
+    ,   name: {
+            en: 'VIP Fish Prawn Crab'
+        ,   vi: 'Bầu Cua VIP'
+        }
+    ,   coll: {
+            db: 'minigame_arc'
+        ,   group: 'vipfishprawncrab'
+        ,   round: '_phiens_bk'
+        ,   postfix: '_cuocs_bk'
+        }
+    ,   fields: {
+            map: 'phien'
+        ,   time: '$time'
+        ,   settled: '$thanhtoan'
+        ,   stake: ['$stag', '$gourd', '$rooster', '$fish', '$crab', '$prawn', '$mountain', '$ocean', '$anyTriple']
+        ,   payout: ['$betwin']
         }
     ,   config: {
             hasCurrency: true
