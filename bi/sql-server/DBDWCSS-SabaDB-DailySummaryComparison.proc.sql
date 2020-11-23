@@ -98,7 +98,7 @@ INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 WHERE	b.vendorID = @VendorId
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
-	AND	b.statusID <> 101 --Reject
+	AND	b.statusID NOT IN (101, 0) -- Reject, running
 	AND	b.custid <> 0 -- Merged Tickets
 GROUP BY b.gameId, g.typenamee, b.CurrencyName
 ';
