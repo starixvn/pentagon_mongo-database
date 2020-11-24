@@ -1,38 +1,72 @@
 {
-    // Sec.resetRolesUser()
-    const resetRolesUserFunc = (user, roles = [], authDB = db.getSiblingDB(`admin`)) => {
-        // Parameters' type verification
-        if (typeof user !== `string`) {
-            Misc.log(`User [${tojsononeline(user)}] must be a string.`, `Audit`, `RESETROLES-USER`, `E`);
-            return;
-        }
-        if (!(roles instanceof Array)) {
-            Misc.log(`Roles list [${tojsononeline(roles)}] must be an array.`, `Audit`, `RESETROLES-USER`, `E`);
-            return;
-        }
-        if (!(authDB instanceof DB)) {
-            Misc.log(`Database [${tojsononeline(authDB)}] must be a database.`, `Audit`, `RESETROLES-USER`, `E`);
+    // Sec.defineRole()
+    const definePrincipalFunc = (principal, type) => {
+        if (!type) {
+            Misc.log(`Must specify the principal type.`, `Audit`, `PRINCIPAL`, `E`);
             return;
         }
 
-        let sUser = authDB.getUser(user);
-        if (!sUser) {
-            Misc.log(`User [${tojsononeline(user)}] does not exist in database [${tojsononeline(authDB)}].`, `Audit`, `RESETROLES-USER`, `E`);
+        const principalSchema = {
+            name: "string"
+        ,   db: "string"
+        ,   roles: Array
+        ,   privileges: Array
+        };
+        if (!Misc.auditSchema(principal, principalSchema)) {
+            Misc.log(`principal' schema is NOT correct.`, `Audit`, `PRINCIPAL`, `E`);
             return;
         }
 
-        try {
-            authDB.revokeRolesFromUser(user, sUser.roles);
-        } catch (e) {
-            Misc.log(`${e.toString()}.`, `Remove Roles`, `RESETROLES-USER`, `E`);
+        // Verify database existence
+        if (!dbs || !dbs[principal.db]) {
+            Misc.log(`Database [${principal.db}] does not exists.`, `Audit`, `PRINCIPAL`, `E`);
+            return;
         }
 
-        if (roles.length > 0) {
-            try {
-                authDB.grantRolesToUser(user, roles);
-            } catch (e) {
-                Misc.log(`${e.toString()}.`, `Grant Roles`, `RESETROLES-USER`, `E`);
-            }
+        let principalType;
+        switch (String.toLowerCase(type)) {
+            case `r`:
+            case `role`:
+                principalType = `Role`;
+                if (!dbs[principal.db].getRole(principal.name)) {
+                    dbs[principal.db].createRole({
+                        role: principal.name
+                    ,   roles: []
+                    ,   privileges: []
+                    });
+                    Misc.log(`${principalType} created.`, `${principal.db}.${principal.name}`, `${principalType}`, `I`);
+                }
+                break;
+            case `u`:
+            case `usr`:
+            case `user`:
+                principalType = `User`;
+                if (!dbs[principal.db].getUser(principal.name)) {
+                    Misc.log(`${principalType} does NOT exist. Creating one...`, `${principal.db}.${principal.name}`, `${principalType}`, `I`);
+                    dbs[principal.db].createUser({
+                        user: principal.name
+                    ,   pwd: passwordPrompt()
+                    ,   roles: []
+                    });
+                    Misc.log(`${principalType} created.`, `${principal.db}.${principal.name}`, `${principalType}`, `I`);
+                }
+                break;
+            default:
+                Misc.log(`Principal type [${type}] is not correct.`, `Audit`, `PRINCIPAL`, `E`);
+        };
+
+        // Check and create principal
+
+        // Grant roles
+        if ((principal.roles || []).length > 0) {
+            dbs[principal.db][`grantRolesTo${principalType}`](principal.name, principal.roles);
+            Misc.log(`${principal.roles.length} roles was granted to the ${principalType.toLowerCase()}.`, `${principal.db}.${principal.name}`, `${principalType}`, `I`);
+        }
+
+        // Grant privileges
+        if ((principal.privileges || []).length > 0) {
+            dbs[principal.db][`grantPrivilegesTo${principalType}`](principal.name, principal.privileges);
+            Misc.log(`${principal.privileges.length} privileges was granted to the ${principalType.toLowerCase()}.`, `${principal.db}.${principal.name}`, `${principalType}`, `I`);
         }
     };
 
@@ -40,9 +74,9 @@
     db.getSiblingDB(`script`).system.js.save({
         _id: `Sec`
     ,   value:  new Code(`{
-            resetRolesUser: ${resetRolesUserFunc.toString()}
+            definePrincipal: ${definePrincipalFunc.toString()}
         }`)
-    ,   version: 1.0
+    ,   version: 1.1
     ,   name: `Security`
     });
 
