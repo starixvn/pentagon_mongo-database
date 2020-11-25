@@ -18,11 +18,14 @@ BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
+	DECLARE	@Yesterday	DATETIME		= CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE)
+		;
+
 	DECLARE	@Query		NVARCHAR(MAX)
 		,	@WaitFor	VARCHAR(16)		= '00:00:0'
-										+ CAST((CAST(RAND() * 10 AS INT)) % 3 AS CHAR(1))
+										+ CAST(ABS(CHECKSUM(NEWID())) % 3 AS CHAR(1))
 										+ '.'
-										+ CAST(CAST(RAND() * 1000 AS INT) AS CHAR(3))
+										+ CAST(ABS(CHECKSUM(NEWID())) % 1000 AS CHAR(3))
 		,	@Value		NVARCHAR(256)
 		,	@Group		NVARCHAR(256)
 		,	@ErrMsg		NVARCHAR(MAX)
@@ -149,6 +152,93 @@ Query from L3_SABAARCBI
 	- ' + ERROR_MESSAGE()
 		RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
 	END CATCH;
+
+	-- Query yesterday if included
+	IF	@DateFrom <= @Yesterday AND @Yesterday <= @DateTo
+	BEGIN;
+		SELECT	@Query = N'';
+		SELECT	@Query += N'\
+SELECT	ds.`time` AS time
+	,	' + @Group + N' AS metric
+	,	SUM(' + @Value + N') AS value
+FROM		summary.game_summary_config AS cfg
+INNER JOIN	summary.daily_summaries AS ds
+		ON	ds.gameId = cfg.gameId
+WHERE	ds.currency <> "UUS"
+	AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"
+GROUP BY ds.`time`, ' + @Group + N'
+ORDER BY time, value ASC;
+';
+
+		IF	@L = 1
+		BEGIN TRY;
+			DELETE	@Temporary;
+			INSERT INTO	@Temporary (time, metric, value)
+			EXECUTE	(@Query) AT L1_SABABI;
+			MERGE INTO	@Return AS r
+			USING	@Temporary AS t
+				ON	r.time = t.time
+				AND	r.metric = t.metric
+			WHEN MATCHED THEN
+				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
+			WHEN NOT MATCHED THEN
+				INSERT	(time, metric, value)
+				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
+			;
+		END TRY
+		BEGIN CATCH
+			SELECT	@ErrMsg = N'\
+Query from L1_SABABI
+		- ' + ERROR_MESSAGE()
+			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
+		END CATCH;
+
+		IF	@L = 2
+		BEGIN TRY;
+			DELETE	@Temporary;
+			INSERT INTO	@Temporary (time, metric, value)
+			EXECUTE	(@Query) AT L2_SABABI;
+			MERGE INTO	@Return AS r
+			USING	@Temporary AS t
+				ON	r.time = t.time
+				AND	r.metric = t.metric
+			WHEN MATCHED THEN
+				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
+			WHEN NOT MATCHED THEN
+				INSERT	(time, metric, value)
+				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
+			;
+		END TRY
+		BEGIN CATCH
+			SELECT	@ErrMsg = N'\
+Query from L2_SABABI
+		- ' + ERROR_MESSAGE()
+			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
+		END CATCH;
+
+		IF	@L = 3
+		BEGIN TRY;
+			DELETE	@Temporary;
+			INSERT INTO	@Temporary (time, metric, value)
+			EXECUTE	(@Query) AT L3_SABABI;
+			MERGE INTO	@Return AS r
+			USING	@Temporary AS t
+				ON	r.time = t.time
+				AND	r.metric = t.metric
+			WHEN MATCHED THEN
+				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
+			WHEN NOT MATCHED THEN
+				INSERT	(time, metric, value)
+				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
+			;
+		END TRY
+		BEGIN CATCH
+			SELECT	@ErrMsg = N'\
+Query from L3_SABABI
+		- ' + ERROR_MESSAGE()
+			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
+		END CATCH;
+	END;
 
 	IF	@Field = N'WinLost'
 	BEGIN;
