@@ -624,7 +624,7 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   vi: `Sic Bo`
         }
     ,   coll: {
-            db: `minigame`
+            db: `minigame_arc`
         ,   group: `sicbo`
         ,   round: `_phiens_bk`
         ,   postfix: `_cuocs_bk`
