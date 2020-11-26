@@ -260,7 +260,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipsedie_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 23 - Blackjack
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.blackjack_phiens, idx.idxKeys, idx.idxOpts)});
@@ -278,7 +278,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_ones, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 26 - Bau Cua VIP
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipfishprawncrab_phiens, idx.idxKeys, idx.idxOpts)});
