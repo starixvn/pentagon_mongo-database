@@ -268,7 +268,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.blackjack_cuocs, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 24 - Xoc Dia Can Cua
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_phiens, idx.idxKeys, idx.idxOpts)});
