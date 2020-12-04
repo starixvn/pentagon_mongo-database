@@ -667,6 +667,37 @@ if ((2 ** Saba.env() & 6) > 0)
                 }
             ]
         }
+    ,   {   _id: 39025
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'sicbo_phiens'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'sicbo_phiens_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'sicbo_cuocs'
+                ,   to: 'sicbo_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ,   {   from: 'sicbo_ones'
+                ,   to: 'sicbo_ones_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ]
+        }
     ,   {   _id: 39026
         ,   from: {
                 db: 'minigame'

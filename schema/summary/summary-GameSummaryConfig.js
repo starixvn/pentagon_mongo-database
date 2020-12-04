@@ -627,13 +627,21 @@ dbs.summary.game_summary_config.insertMany([
             db: `minigame`
         ,   group: `sicbo`
         ,   round: `_phiens`
-        ,   postfix: `_cuocs`
+        ,   postfix: (
+                (2 ** Saba.env() & 2) > 0 ? `_ones`
+            :   (2 ** Saba.env() & 8) > 0 ? `_cuocs`
+            :   ``
+            )
         }
     ,   fields: {
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$totalBet`]
+        ,   stake: (
+                (2 ** Saba.env() & 2) > 0 ? [`$totalAmount`]
+            :   (2 ** Saba.env() & 8) > 0 ? [`$totalBet`]
+            :   [``]
+            )
         ,   payout: [`$betwin`]
         }
     ,   config: {
