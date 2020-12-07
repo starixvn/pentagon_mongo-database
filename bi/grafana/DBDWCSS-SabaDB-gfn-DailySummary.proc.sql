@@ -28,6 +28,7 @@ BEGIN;
 										+ CAST(ABS(CHECKSUM(NEWID())) % 1000 AS CHAR(3))
 		,	@Value		NVARCHAR(256)
 		,	@Group		NVARCHAR(256)
+		,	@Filter		NVARCHAR(256)
 		,	@ErrMsg		NVARCHAR(MAX)
 		;
 
@@ -50,14 +51,22 @@ BEGIN;
 	SELECT	@Value	=	CASE @Field
 							WHEN N'Stake' THEN N'ds.`stake`'
 							WHEN N'WinLost' THEN N'ds.`stake` - ds.`payout`'
+							WHEN N'Win' THEN N'ds.`stake` - ds.`payout`'
+							WHEN N'Lose' THEN N'ds.`payout` - ds.`stake`'
 							WHEN N'Ticket' THEN N'ds.`tickets`'
 							ELSE NULL
 						END
 		,	@Group	=	CASE @GroupBy
 							WHEN N'Game' THEN N'cfg.`name.en`'
+							WHEN N'Game Group' THEN N'cfg.`name.grp`'
 							WHEN N'Currency' THEN N'ds.`currency`'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
+						END
+		,	@Filter	=	CASE @Field
+							WHEN N'Win' THEN N'WHERE	q.value >= 0'
+							WHEN N'Lose' THEN N'WHERE	q.value < 0'
+							ELSE N''
 						END
 		;
 
@@ -71,17 +80,21 @@ BEGIN;
 
 	SELECT	@Query = N'';
 	SELECT	@Query += N'\
-SELECT	ds.`time` AS time
-	,	' + @Group + N' AS metric
-	,	SUM(' + @Value + N') AS value
-FROM		summary_arc.game_summary_config AS cfg
-INNER JOIN	summary_arc.daily_summaries AS ds
-		ON	ds.gameId = cfg.gameId
-WHERE	ds.currency <> "UUS"
-	AND	ds.time >= "' + CONVERT(NVARCHAR(MAX), @DateFrom, 121) + N'"
-	AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"
-GROUP BY ds.`time`, ' + @Group + N'
-ORDER BY time, value ASC;
+SELECT	time, metric, value
+FROM	(
+	SELECT	ds.`time` AS time
+		,	' + @Group + N' AS metric
+		,	SUM(' + @Value + N') AS value
+	FROM		summary_arc.game_summary_config AS cfg
+	INNER JOIN	summary_arc.daily_summaries AS ds
+			ON	ds.gameId = cfg.gameId
+	WHERE	ds.currency <> "UUS"
+		AND	ds.time >= "' + CONVERT(NVARCHAR(MAX), @DateFrom, 121) + N'"
+		AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"
+	GROUP BY ds.`time`, ' + @Group + N'
+) AS q
+' + @Filter + N'
+ORDER BY q.time, q.value DESC;
 ';
 
 	IF	@L = 1
@@ -158,16 +171,20 @@ Query from L3_SABAARCBI
 	BEGIN;
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	ds.`time` AS time
-	,	' + @Group + N' AS metric
-	,	SUM(' + @Value + N') AS value
-FROM		summary.game_summary_config AS cfg
-INNER JOIN	summary.daily_summaries AS ds
-		ON	ds.gameId = cfg.gameId
-WHERE	ds.currency <> "UUS"
-	AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"
-GROUP BY ds.`time`, ' + @Group + N'
-ORDER BY time, value ASC;
+SELECT	time, metric, value
+FROM	(
+	SELECT	ds.`time` AS time
+		,	' + @Group + N' AS metric
+		,	SUM(' + @Value + N') AS value
+	FROM		summary.game_summary_config AS cfg
+	INNER JOIN	summary.daily_summaries AS ds
+			ON	ds.gameId = cfg.gameId
+	WHERE	ds.currency <> "UUS"
+		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"
+	GROUP BY ds.`time`, ' + @Group + N'
+) AS q
+' + @Filter + N'
+ORDER BY q.time, q.value DESC;
 ';
 
 		IF	@L = 1

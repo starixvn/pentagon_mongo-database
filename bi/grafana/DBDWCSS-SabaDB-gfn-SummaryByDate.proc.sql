@@ -57,6 +57,7 @@ BEGIN;
 						END
 		,	@Group	=	CASE @GroupBy
 							WHEN N'Game' THEN N'cfg.`name.en`'
+							WHEN N'Game Group' THEN N'cfg.`name.grp`'
 							WHEN N'Currency' THEN N'ds.`currency`'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
