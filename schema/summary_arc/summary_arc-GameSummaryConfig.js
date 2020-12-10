@@ -19,6 +19,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Big Small`
         ,   vi: `Tài Xỉu`
+        ,   grp: `Big Small`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -47,6 +48,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Se Die`
         ,   vi: `Xóc Đĩa`
+        ,   grp: `Se Die`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -78,6 +80,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Fish Prawn Crab`
         ,   vi: `Bầu Cua`
+        ,   grp: `Fish Prawn Crab`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -102,6 +105,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Turbo Big Small`
         ,   vi: `Tài Xỉu Siêu Tốc`
+        ,   grp: `Big Small`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -130,6 +134,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Odd Even`
         ,   vi: `Chẵn Lẻ`
+        ,   grp: `Odd Even`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -158,6 +163,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Turbo Odd Even`
         ,   vi: `Chẵn Lẻ Siêu Tốc`
+        ,   grp: `Odd Even`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -186,6 +192,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Dragon Tiger`
         ,   vi: `Rồng Hổ`
+        ,   grp: `Dragon Tiger`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -210,6 +217,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno Pro Max`
         ,   vi: `Keno Pro Max`
+        ,   grp: `Keno Pro Max`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -234,6 +242,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Mini Se Die`
         ,   vi: `Xóc Đĩa Mini`
+        ,   grp: `Se Die`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -258,6 +267,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Baccarat`
         ,   vi: `Cào Baccarat`
+        ,   grp: `Baccarat`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -282,6 +292,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno Pro Viet`
         ,   vi: `Keno Pro Viet`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -306,6 +317,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno Max`
         ,   vi: `Keno Max`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -330,6 +342,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno Max 2`
         ,   vi: `Keno Max 2`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -354,6 +367,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno Mini`
         ,   vi: `Keno Mini`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -378,6 +392,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno Mini 2`
         ,   vi: `Keno Mini 2`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -402,6 +417,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno East`
         ,   vi: `Keno Đông`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -426,6 +442,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno West`
         ,   vi: `Keno Tây`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -450,6 +467,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno South`
         ,   vi: `Keno Nam`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -474,6 +492,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Keno North`
         ,   vi: `Keno Bắc`
+        ,   grp: `Mini Keno`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -498,6 +517,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Bola Tangkas`
         ,   vi: `Bola Tangkas`
+        ,   grp: `Bola Tangkas`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -522,6 +542,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Roulette`
         ,   vi: `Roulette`
+        ,   grp: `Roulette`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -546,6 +567,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `VIP Se Die`
         ,   vi: `Xóc Đĩa VIP`
+        ,   grp: `Se Die`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -570,6 +592,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Blackjack`
         ,   vi: `Blackjack`
+        ,   grp: `Blackjack`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -594,6 +617,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Special Se Die`
         ,   vi: `Xóc Đĩa Cân Cửa`
+        ,   grp: `Se Die`
         }
     ,   coll: {
             db: `minigame_arc`
@@ -622,18 +646,27 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `Sic Bo`
         ,   vi: `Sic Bo`
+        ,   grp: `Sic Bo`
         }
     ,   coll: {
             db: `minigame_arc`
         ,   group: `sicbo`
         ,   round: `_phiens_bk`
-        ,   postfix: `_cuocs_bk`
+        ,   postfix: (
+                (2 ** (Saba.env() & 2)) > 0 ? `_ones_bk`
+            :   (2 ** (Saba.env() & 8)) > 0 ? `_cuocs_bk`
+            :   ``
+            )
         }
     ,   fields: {
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$totalBet`]
+        ,   stake: (
+                (2 ** Saba.env() & 2) > 0 ? [`$totalAmount`]
+            :   (2 ** Saba.env() & 8) > 0 ? [`$totalBet`]
+            :   [``]
+            )
         ,   payout: [`$betwin`]
         }
     ,   config: {
@@ -646,6 +679,7 @@ dbs.summary_arc.game_summary_config.insertMany([
     ,   name: {
             en: `VIP Fish Prawn Crab`
         ,   vi: `Bầu Cua VIP`
+        ,   grp: `Fish Prawn Crab`
         }
     ,   coll: {
             db: `minigame_arc`

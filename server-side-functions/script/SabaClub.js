@@ -507,12 +507,16 @@
                 //   let's check the expiry log to see if we have done any expiration on it yet
                 // This step does not need to be done if there are no logs,
                 //   which means member has been granted spins without logging.
-                const lastLogExpiry = lastLog ? mongo.getDB(`minigame`).spin_logs.findOne({roundId: -lastLog.roundId, memberId: doc._id}) : null;
+                let lastLogExpiry = lastLog ? mongo.getDB(`minigame`).spin_logs.findOne({roundId: -lastLog.roundId, memberId: doc._id}) : null;
+                // If the last log don't have roundId, it may been added by admin
+                //   we will check the key for this type of log
+                lastLogExpiry = !lastLogExpiry ? mongo.getDB(`minigame`).spin_logs.findOne({key: `${lastLog.key}_expired`, memberId: doc._id}) : null;
 
                 // A round cannot be expired twice, or a spin cannot missing associated log.
                 // So if these cases happen, we need to revoke the invalid spins.
                 if (!lastLog || lastLogExpiry) {
-                    Misc.log(`   Cannot find any spin logs that match this expiration. Spins contamination suspected. ${expireSpins} spins will be discarded.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `W`);
+                    Misc.log(`     Cannot find any spin logs that match this expiration. Spins contamination suspected.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `W`);
+                    Misc.log(`     ${expireSpins} spins will be discarded.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `W`);
                     spinLogsExpirePipe.push({updateOne: {
                         filter: {
                             key: `${lastLog ? lastLog.key : `EmptyID`}_${doc._id}_${Date.now()}`
@@ -545,14 +549,14 @@
                     action.insertOne.document.roundId = -lastLog.roundId;
                 }
                 spinLogsExpirePipe.push(action);
-                Misc.log(`   ${expireSpins} spins in round [${lastLog.roundId || '_'}] are expired.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `I`);
+                Misc.log(`     ${lastLog.spinCnt} spins in round [${lastLog.roundId || lastLog.key}] are expired.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `I`);
 
                 // If there still are expired spins, check the next closed log in spin_logs, else we're done for this member.
                 expireSpins -= lastLog.spinCnt;
                 lastTime = lastLog.expiryDate;
             }
 
-            Misc.log(``, `${(" ").repeat(10)}`, `EXPIRE-SPINS`, `E`);
+            Misc.log(``, `${(" ").repeat(10)}`, `EXPIRE-SPINS`, `I`);
         });
 
         // All preparation are done, let's do it
@@ -574,7 +578,7 @@
                 Misc.log(`   ${_e.errmsg}`, `Insert Spin Logs`, `EXPIRE-SPINS`, `E`);
             });
         }
-        Misc.log(`${('=').repeat(100)}`, ``, `EXPIRE-SPINS`, `I`);
+        Misc.log(`${('=').repeat(50)}`, ``, `EXPIRE-SPINS`, `I`);
     };
 
     // Saba
@@ -590,7 +594,7 @@
             ,   expireSpins: ${expireSpinsFunc.toString()}
             }
         }`)
-    ,   version: 2.4
+    ,   version: 2.5
     ,   name: `SabaClub`
     });
 

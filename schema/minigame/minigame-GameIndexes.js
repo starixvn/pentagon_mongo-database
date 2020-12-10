@@ -278,6 +278,16 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_ones, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 2) > 0)
+    {   // 25 - Sic Bo
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.sicbo_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.sicbo_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.currency].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.sicbo_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
     if ((2 ** Saba.env() & 6) > 0)
     {   // 26 - Bau Cua VIP
         [idxs.TTL, idxs.time, idxs.id].
