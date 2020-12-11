@@ -267,4 +267,12 @@
         [idxs.time, idxs.phien, idxs.uid_phien_U].
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipfishprawncrab_cuocs_bk, idx.idxKeys, idx.idxOpts)});
     }
+
+    if ((2 ** Saba.env() & 2) > 0)
+    {   // 27 - Cào Baccarat VIP
+        [idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipbaccarat_phiens_bk, idx.idxKeys, idx.idxOpts)});
+        [idxs.time, idxs.phien, idxs.uid_phien_U].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipbaccarat_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+    }
 }
