@@ -308,4 +308,14 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipbaccarat_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 2) > 0)
+    {   // 28 - Xoc Dia Doi Khang
+        [idxs.TTL, idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.vipsediewar_phiens, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_thanhtoan__id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.vipsediewar_cuocs, idx.idxKeys, idx.idxOpts)});
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.currency].
+            forEach((idx) => {Maint.createIndex(dbs.minigame.vipsediewar_ones, idx.idxKeys, idx.idxOpts)});
+    }
+
 }

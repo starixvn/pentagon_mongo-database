@@ -723,6 +723,31 @@ dbs.summary_arc.game_summary_config.insertMany([
             hasCurrency: true
         }
     }
+
+,   {   gameId: 28
+    ,   owGameTypeId: 1639
+    ,   name: {
+            en: `Se Die War`
+        ,   vi: `Xóc Dĩa Đối Kháng`
+        ,   grp: `Se Die`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `vipsediewar`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_ones_bk`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$totalAmount`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
 ]
 ,   {ordered: false}
 );
