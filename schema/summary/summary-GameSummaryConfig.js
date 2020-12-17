@@ -698,6 +698,31 @@ dbs.summary.game_summary_config.insertMany([
             hasCurrency: false
         }
     }
+
+,   {   gameId: 27
+    ,   owGameTypeId: 1638
+    ,   name: {
+            en: `VIP Baccarat`
+        ,   vi: `Cào Baccarat VIP`
+        ,   grp: `Fish Prawn Crab`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `vipbaccarat`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$player`, `$banker`, `$tie`, `$big`, `$small`, `$playerPair`, `$bankerPair`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
 ]
 ,   {ordered: false}
 );
