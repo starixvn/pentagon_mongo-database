@@ -746,6 +746,37 @@ if ((2 ** Saba.env() & 6) > 0)
                 }
             ]
         }
+    ,   {   _id: 39028
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'vipsediewar_phiens'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'vipsediewar_phiens_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'vipsediewar_cuocs'
+                ,   to: 'vipsediewar_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ,   {   from: 'vipsediewar_ones'
+                ,   to: 'vipsediewar_ones_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ]
+        }
     ,   {   _id: 25001
         ,   from: {
                 db: 'minigame'
