@@ -278,7 +278,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.specialsedie_ones, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 25 - Sic Bo
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.sicbo_phiens, idx.idxKeys, idx.idxOpts)});
