@@ -777,6 +777,37 @@ if ((2 ** Saba.env() & 6) > 0)
                 }
             ]
         }
+    ,   {   _id: 39029
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'fourguardians_rounds'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'fourguardians_rounds_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'fourguardians_fames'
+                ,   to: 'fourguardians_fames_bk'
+                ,   join: 'roundId'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ,   {   from: 'fourguardians_freespins'
+                ,   to: 'fourguardians_freespins_bk'
+                ,   join: 'roundId'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ]
+        }
     ,   {   _id: 25001
         ,   from: {
                 db: 'minigame'

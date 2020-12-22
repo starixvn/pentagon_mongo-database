@@ -749,6 +749,33 @@ dbs.summary.game_summary_config.insertMany([
             hasCurrency: false
         }
     }
+
+,   {   gameId: 29
+    ,   owGameTypeId: 1640
+    ,   name: {
+            en: `Four Guardians`
+        ,   vi: `Long Lân Quy Phụng`
+        ,   grp: `Slots`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `fourguardians`
+        ,   round: `_rounds`
+        ,   postfix: `_rounds`
+        }
+    ,   fields: {
+            map: `id`
+        ,   time: `$time`
+        ,   settled: `$paid`
+        ,   stake: [
+                {$multiply: [`$totalAmount`, {$toInt: {$not: `$freeSpin`}}]}
+            ]
+        ,   payout: [`$betWin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
 ]
 ,   {ordered: false}
 );
