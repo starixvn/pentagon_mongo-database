@@ -653,7 +653,7 @@ dbs.summary.game_summary_config.insertMany([
         ,   group: `sicbo`
         ,   round: `_phiens`
         ,   postfix: (
-                (2 ** Saba.env() & 2) > 0 ? `_ones`
+                (2 ** Saba.env() & 6) > 0 ? `_ones`
             :   (2 ** Saba.env() & 8) > 0 ? `_cuocs`
             :   ``
             )
@@ -663,7 +663,7 @@ dbs.summary.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: (
-                (2 ** Saba.env() & 2) > 0 ? [`$totalAmount`]
+                (2 ** Saba.env() & 6) > 0 ? [`$totalAmount`]
             :   (2 ** Saba.env() & 8) > 0 ? [`$totalBet`]
             :   [``]
             )
