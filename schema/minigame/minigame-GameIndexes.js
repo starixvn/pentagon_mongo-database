@@ -298,7 +298,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipfishprawncrab_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 27 - Cào Baccarat VIP
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipbaccarat_phiens, idx.idxKeys, idx.idxOpts)});
@@ -308,7 +308,7 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipbaccarat_tmpcuocs, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 2) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // 28 - Xoc Dia Doi Khang
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.vipsediewar_phiens, idx.idxKeys, idx.idxOpts)});
