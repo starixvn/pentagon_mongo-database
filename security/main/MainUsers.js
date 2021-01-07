@@ -9,6 +9,12 @@
             ,   {role: `dbOwner`    , db: `config`}
             ]
         }
+    ,   {   name: `jason.ly`
+        ,   db: `admin`
+        ,   roles: [
+                {role: `root`       , db: `admin`}
+            ]
+        }
     ,   {   name: `lmn_archive`
         ,   db: `admin`
         ,   roles: [
