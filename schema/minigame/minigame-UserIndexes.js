@@ -4,6 +4,9 @@ if ((2 ** Saba.env() & 6) > 0)
         {   idxKeys : {'local.username': 1}
         ,   idxOpts : {unique: true}
         }
+    ,   {   idxKeys : {'local.memberId': 1}
+        ,   idxOpts : {}
+        }
     ].forEach((idx) => {
         Maint.createIndex(dbs.minigame.users, idx.idxKeys, idx.idxOpts);
     });
