@@ -18,9 +18,10 @@ BEGIN;
 
 	DECLARE	@Query		NVARCHAR(MAX)
 		,	@WaitFor	VARCHAR(16)		= '00:00:0'
-										+ CAST(ABS(CHECKSUM(NEWID())) % 1 AS CHAR(1))
+										+ CAST(ABS(CHECKSUM(NEWID())) % 3 AS CHAR(1))
 										+ '.'
 										+ CAST(ABS(CHECKSUM(NEWID())) % 1000 AS CHAR(3))
+		,	@Yesterday	DATETIME		= CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE)
 		;
 
 	DECLARE	@RoundDate AS TABLE (
@@ -32,6 +33,11 @@ BEGIN;
 				memberId		INT
 			,	spinCnt			INT
 			,	PRIMARY KEY CLUSTERED (memberId, spinCnt)
+			);
+
+	DECLARE	@Result AS TABLE (
+				metric			NVARCHAR(128)
+			,	value			SQL_VARIANT
 			);
 
 	WAITFOR DELAY @WaitFor;
@@ -220,13 +226,44 @@ INNER JOIN	minigame.users AS u
 		ON	b.memberId = u.`local.memberId`
 WHERE	b.freeBet = true
 	AND	b.memberId > 0
-	AND	b.time >= "' + CONVERT(NVARCHAR(MAX), fromDate, 121) + N'"
-	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), toDate, 121) + N'"
+	AND	b.time > "' + CONVERT(NVARCHAR(MAX), d.fromDate, 121) + N'"
+	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), d.toDate, 121) + N'"
 	AND	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 '
-		FROM	@RoundDate;
+		FROM	@RoundDate AS tmp
+		CROSS APPLY	(
+			SELECT	[fromDate]	= CASE WHEN tmp.fromDate < @Yesterday THEN @Yesterday ELSE tmp.fromDate END
+				,	[toDate]	= CASE WHEN tmp.toDate < @Yesterday THEN @Yesterday ELSE tmp.toDate END
+		) AS d;
 
+		INSERT INTO	@Result (metric, value)
 		EXECUTE	(@Query) AT L2_SABABI;
+
+		SELECT	@Query = N'';
+		SELECT	TOP(1)
+				@Query += N'\
+SELECT	"Company WinLoss" AS `metric`
+	,	SUM(-b.betwin) AS `value`
+FROM	minigame_arc.xocxoc_cuocs_bk AS b
+WHERE	b.freeBet = true
+	AND	b.memberId > 0
+	AND	b.time > "' + CONVERT(NVARCHAR(MAX), d.fromDate, 121) + N'"
+	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), d.toDate, 121) + N'"
+	AND	b.`__archive.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+'
+		FROM	@RoundDate AS tmp
+		CROSS APPLY	(
+			SELECT	[fromDate]	= CASE WHEN tmp.fromDate > @Yesterday THEN @Yesterday ELSE tmp.fromDate END
+				,	[toDate]	= CASE WHEN tmp.toDate > @Yesterday THEN @Yesterday ELSE tmp.toDate END
+		) AS d;
+
+		INSERT INTO	@Result (metric, value)
+		EXECUTE	(@Query) AT L2_SABAARCBI;
+
+		SELECT	[metric]	= metric
+			,	[value]		= SUM(CAST(value AS MONEY))
+		FROM	@Result
+		GROUP BY metric;
 	END;
 
 	-- Round Start
@@ -312,4 +349,4 @@ ORDER BY 2 DESC
 	END;
 END;
 GO
-EXECUTE	gfn.FreeSpinsPromotion_Agg 10, 6
+EXECUTE	gfn.FreeSpinsPromotion_Agg 6, 3, "INH,UUS"
