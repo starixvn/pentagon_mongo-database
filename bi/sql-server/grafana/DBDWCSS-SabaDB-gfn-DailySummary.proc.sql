@@ -12,20 +12,19 @@ ALTER PROCEDURE	gfn.DailySummary
 				,	@L					TINYINT			= NULL
 				,	@Field				NVARCHAR(128)	= NULL
 				,	@GroupBy			NVARCHAR(128)	= NULL
+				,	@Currency			NVARCHAR(128)	= NULL
 WITH ENCRYPTION
 AS
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
+	EXECUTE	base.WaitForRandom 3;
+
 	DECLARE	@Yesterday	DATETIME		= CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE)
 		;
 
 	DECLARE	@Query		NVARCHAR(MAX)
-		,	@WaitFor	VARCHAR(16)		= '00:00:0'
-										+ CAST(ABS(CHECKSUM(NEWID())) % 3 AS CHAR(1))
-										+ '.'
-										+ CAST(ABS(CHECKSUM(NEWID())) % 1000 AS CHAR(3))
 		,	@Value		NVARCHAR(256)
 		,	@Group		NVARCHAR(256)
 		,	@Filter		NVARCHAR(256)
@@ -45,8 +44,6 @@ BEGIN;
 			,	value		DECIMAL(19,4)
 			,	PRIMARY KEY CLUSTERED (metric, time)
 			);
-
-	WAITFOR DELAY @WaitFor;
 
 	SELECT	@Value	=	CASE @Field
 							WHEN N'Stake' THEN N'ds.`stake`'
@@ -90,7 +87,8 @@ FROM	(
 			ON	ds.gameId = cfg.gameId
 	WHERE	ds.currency <> "UUS"
 		AND	ds.time >= "' + CONVERT(NVARCHAR(MAX), @DateFrom, 121) + N'"
-		AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"
+		AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"' + ISNULL(N'
+		AND	ds.currency = "' + @Currency + N'"', N'') + N'
 	GROUP BY ds.`time`, ' + @Group + N'
 ) AS q
 ' + @Filter + N'
@@ -180,7 +178,8 @@ FROM	(
 	INNER JOIN	summary.daily_summaries AS ds
 			ON	ds.gameId = cfg.gameId
 	WHERE	ds.currency <> "UUS"
-		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"
+		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"' + ISNULL(N'
+		AND	ds.currency = "' + @Currency + N'"', N'') + N'
 	GROUP BY ds.`time`, ' + @Group + N'
 ) AS q
 ' + @Filter + N'

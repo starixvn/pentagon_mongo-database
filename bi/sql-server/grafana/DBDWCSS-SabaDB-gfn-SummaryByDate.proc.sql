@@ -11,6 +11,7 @@ ALTER PROCEDURE	gfn.SummaryByDate
 				,	@L					TINYINT			= NULL
 				,	@Field				NVARCHAR(128)	= NULL
 				,	@GroupBy			NVARCHAR(128)	= NULL
+				,	@Currency			NVARCHAR(128)	= NULL
 WITH ENCRYPTION
 AS
 BEGIN;
@@ -90,7 +91,8 @@ FROM	(
 	INNER JOIN	summary.daily_summaries AS ds
 			ON	ds.gameId = cfg.gameId
 	WHERE	ds.currency <> "UUS"
-		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 121) + N'"
+		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 121) + N'"' + ISNULL(N'
+		AND	ds.currency = "' + @Currency + N'"', N'') + N'
 	GROUP BY ds.`time`, ' + @Group + N'
 ) AS q
 ' + @Filter + N'
@@ -179,7 +181,8 @@ FROM	(
 	INNER JOIN	summary_arc.daily_summaries AS ds
 			ON	ds.gameId = cfg.gameId
 	WHERE	ds.currency <> "UUS"
-		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 121) + N'"
+		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 121) + N'"' + ISNULL(N'
+		AND	ds.currency = "' + @Currency + N'"', N'') + N'
 	GROUP BY ds.`time`, ' + @Group + N'
 ) AS q
 ' + @Filter + N'

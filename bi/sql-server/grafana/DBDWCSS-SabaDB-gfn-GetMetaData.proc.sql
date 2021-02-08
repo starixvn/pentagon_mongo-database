@@ -35,15 +35,7 @@ SELECT	'
 FROM	summary.game_summary_config;
 ';
 
-		IF	CAST(@Var1 AS INT) = 1
-			EXECUTE	(@Query) AT L1_SABABI;
-
-		IF	CAST(@Var1 AS INT) = 2
-			EXECUTE	(@Query) AT L2_SABABI;
-
-		IF	CAST(@Var1 AS INT) = 3
-			EXECUTE	(@Query) AT L3_SABABI;
-
+		EXECUTE	base.ExecuteSabaQuery @Query, @Var1, 0;
 		RETURN;
 	END;
 
@@ -56,17 +48,8 @@ SELECT	DISTINCT
 FROM	summary.daily_summaries;
 ';
 
-		IF	CAST(@Var1 AS INT) = 1
-			EXECUTE	(@Query) AT L1_SABABI;
-
-		IF	CAST(@Var1 AS INT) = 2
-			EXECUTE	(@Query) AT L2_SABABI;
-
-		IF	CAST(@Var1 AS INT) = 3
-			EXECUTE	(@Query) AT L3_SABABI;
-
+		EXECUTE	base.ExecuteSabaQuery @Query, @Var1, 0;
 		RETURN;
 	END;
 END;
 GO
-EXECUTE	gfn.GetMetaData ''
