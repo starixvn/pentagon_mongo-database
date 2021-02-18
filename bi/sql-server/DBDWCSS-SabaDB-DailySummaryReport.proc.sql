@@ -6,6 +6,7 @@ END;
 GO
 ALTER PROCEDURE	dbo.DailySummaryReport
 					@ReportDate		DATETIME		= NULL
+				,	@isTest			BIT				= 0
 WITH ENCRYPTION
 AS
 /*
@@ -14,7 +15,8 @@ AS
 	Database:	DBDWCSS.SabaDB
 
 	Revisions:
-		- 20201008@Billy:	Initial - [Gitlab: #000]
+		- 20201008@Billy:	Initial - [Gitlab: #058]
+		- 20210218@Billy:	Report by currency for SC3 - [Gitlab: #058]
 
 	Developer's Notes:
 		- @ReportDate:				[optional]		- The date of data that will be compared. The time is in UTC timezone.
@@ -25,8 +27,10 @@ BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
-	DECLARE	@VendorId		INT 		= 42
-		,	@_ReportDate	DATETIME	= ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE))
+	DECLARE	@VendorId		INT 			= 42
+		,	@_ReportDate	DATETIME		= ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE))
+		,	@Letstalk		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'' ELSE N'DBNotification' END
+		,	@Telegram		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'T-BILLY' ELSE N'T-SCNOTI' END
 		;
 
 	IF	NOT (DATEDIFF(DAY, @_ReportDate, GETUTCDATE()) BETWEEN 1 AND 7)
@@ -44,6 +48,13 @@ BEGIN;
 		,	@Message		NVARCHAR(MAX)
 		,	@Title			NVARCHAR(512)
 		;
+
+	DECLARE	@SCs AS TABLE (
+				SC				TINYINT
+			,	isExpanded		BIT
+			,	isDone			BIT
+			,	PRIMARY KEY CLUSTERED (SC)
+			);
 
 	DECLARE	@Tmp_DailySummary AS TABLE (
 				SC				TINYINT
@@ -81,6 +92,14 @@ BEGIN;
 					,	payOut			DECIMAL(19,4)
 					,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
 					);
+
+	-- List of SCs --
+	INSERT INTO	@SCs
+			(SC, isExpanded, isDone)
+	VALUES	( 1,          0,      0)
+		, 	( 2,          0,      0)
+		, 	( 3,          1,      0)
+		;
 
 	-- OW Query --
 	BEGIN;
@@ -135,15 +154,24 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 ';
 
 	BEGIN;
-		-- L1
+		UPDATE	@SCs
+		SET		isDone = 0;
+
+		WHILE	EXISTS (SELECT 1 FROM @SCs WHERE isDone = 0)
 		BEGIN;
+			UPDATE	TOP(1)
+					@SCs
+			SET		@SC = SC
+				,	isDone = 1
+			WHERE	isDone = 0;
+
 			DELETE	@Tmp_DailySummary;
 			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, payOut)
-			EXECUTE	(@DS_Query) AT L1_SABABI;
+			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0;
 
 			MERGE INTO	#DS_DailySummary AS ds
 			USING		@Tmp_DailySummary AS tmp
-					ON	ds.SC = 1
+					ON	ds.SC = @SC
 					AND	ds.gameTypeId = tmp.gameTypeId
 					AND	ds.currency = tmp.currency
 			WHEN MATCHED THEN
@@ -152,59 +180,14 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 				,	ds.stake += tmp.stake
 				,	ds.payOut += tmp.payOut
 			WHEN NOT MATCHED THEN
-				INSERT	(SC,     gameTypeId,     gameId,     gameType,     currency,     betCount,     stake,     payOut)
-				VALUES	( 1, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
+				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,     betCount,     stake,     payOut)
+				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
 			;
-			RAISERROR('', 0, 0) WITH NOWAIT;
-		END;
-
-		-- L2
-		BEGIN;
-			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, payOut)
-			EXECUTE	(@DS_Query) AT L2_SABABI;
-
-			MERGE INTO	#DS_DailySummary AS ds
-			USING		@Tmp_DailySummary AS tmp
-					ON	ds.SC = 2
-					AND	ds.gameTypeId = tmp.gameTypeId
-					AND	ds.currency = tmp.currency
-			WHEN MATCHED THEN
-				UPDATE
-				SET	ds.betCount += tmp.betCount
-				,	ds.stake += tmp.stake
-				,	ds.payOut += tmp.payOut
-			WHEN NOT MATCHED THEN
-				INSERT	(SC,     gameTypeId,     gameId,     gameType,     currency,     betCount,     stake,     payOut)
-				VALUES	( 2, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
-			;
-			RAISERROR('', 0, 0) WITH NOWAIT;
-		END;
-
-		-- L3
-		BEGIN;
-			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, payOut)
-			EXECUTE	(@DS_Query) AT L3_SABABI;
-
-			MERGE INTO	#DS_DailySummary AS ds
-			USING		@Tmp_DailySummary AS tmp
-					ON	ds.SC = 3
-					AND	ds.gameTypeId = tmp.gameTypeId
-					AND	ds.currency = tmp.currency
-			WHEN MATCHED THEN
-				UPDATE
-				SET	ds.betCount += tmp.betCount
-				,	ds.stake += tmp.stake
-				,	ds.payOut += tmp.payOut
-			WHEN NOT MATCHED THEN
-				INSERT	(SC,     gameTypeId,     gameId,     gameType,     currency,     betCount,     stake,     payOut)
-				VALUES	( 3, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
-			;
-			RAISERROR('', 0, 0) WITH NOWAIT;
+			RAISERROR('Executed on SC%d.', 0, 0, @SC) WITH NOWAIT;
 		END;
 	END;
 
+	-- Reuse @Tmp_DailySummary for checking mismatch --
 	DELETE	@Tmp_DailySummary;
 	INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, winLost)
 	SELECT	[SC]			= ISNULL(sb.SC, 0)
@@ -226,6 +209,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 			);
 
 	IF	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
+	-- TRUE - Has mismatch --
 	BEGIN;
 		WHILE	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
 		BEGIN;
@@ -257,7 +241,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 			) AS msg(str);
 
 			EXECUTE	DBNOTI.NotificationDB.dbo.Letstalk_SendMessage
-						@To			= N'DBNotification'
+						@To			= @Letstalk
 					,	@Title		= @Title
 					,	@Msg		= @Message
 					;
@@ -283,8 +267,9 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 			) AS msg(str);
 
 			EXECUTE	DBNOTI.NotificationDB.dbo.Skype_SendMessage
-						@To			= N'T-SCNOTI'
+						@To			= @Telegram
 					,	@Msg		= @Message
+					;
 					;
 
 			DELETE	@Tmp_DailySummary
@@ -293,20 +278,39 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 		END;
 	END;
 	ELSE
+	-- FALSE - Don't have mismatch - Data is OK --
 	BEGIN;
 		SELECT	@Title		= N'OK] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
 			,	@Message	= msg.str
 		FROM	(
 			SELECT	N'
-SC' + CONVERT(NVARCHAR(MAX), sb.SC) + N':
-    - BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'
-    - TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'
-    - WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1) + N'
-'
-			FROM	#DS_DailySummary AS sb
-			WHERE	currency <> 'UUS'
-			GROUP BY sb.SC
-			ORDER BY sb.SC
+
+SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+			FROM	(
+				SELECT	SC, isExpanded
+				FROM	@SCs
+			) AS dsb
+			CROSS APPLY	(
+				SELECT	N'
+    ' + grp.CurGrp + N'
+      - BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'
+      - TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'
+      - WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
+				FROM		#DS_DailySummary AS sb
+				CROSS APPLY	(
+					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
+				) AS grp
+				WHERE	sb.currency <> 'UUS'
+					AND	sb.SC = dsb.SC
+				GROUP BY grp.CurGrp
+				ORDER BY grp.CurGrp
+				FOR XML PATH ('')
+				,	TYPE
+			) AS xc(xml)
+			CROSS APPLY	(
+				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
+			) AS c(str)
+			ORDER BY dsb.SC
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
@@ -315,7 +319,7 @@ SC' + CONVERT(NVARCHAR(MAX), sb.SC) + N':
 		) AS msg(str);
 
 		EXECUTE	DBNOTI.NotificationDB.dbo.Letstalk_SendMessage
-					@To			= N'DBNotification'
+					@To			= @Letstalk
 				,	@Title		= @Title
 				,	@Msg		= @Message
 				;
@@ -323,15 +327,34 @@ SC' + CONVERT(NVARCHAR(MAX), sb.SC) + N':
 		SELECT	@Message	= N'\\\[OK\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]' + msg.str
 		FROM	(
 			SELECT	N'  
-SC' + CONVERT(NVARCHAR(MAX), sb.SC) + N':  
-    \- BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'  
-    \- TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'  
-    \- WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1) + N'  
-  '
-			FROM	#DS_DailySummary AS sb
-			WHERE	currency <> 'UUS'
-			GROUP BY sb.SC
-			ORDER BY sb.SC
+
+---
+SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+			FROM	(
+				SELECT	SC, isExpanded
+				FROM	@SCs
+			) AS dsb
+			CROSS APPLY	(
+				SELECT	N'  
+    `' + grp.CurGrp + N'`  
+      \- BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'  
+      \- TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'  
+      \- WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
+				FROM		#DS_DailySummary AS sb
+				CROSS APPLY	(
+					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
+				) AS grp
+				WHERE	sb.currency <> 'UUS'
+					AND	sb.SC = dsb.SC
+				GROUP BY grp.CurGrp
+				ORDER BY grp.CurGrp
+				FOR XML PATH ('')
+				,	TYPE
+			) AS xc(xml)
+			CROSS APPLY	(
+				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
+			) AS c(str)
+			ORDER BY dsb.SC
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
@@ -340,30 +363,11 @@ SC' + CONVERT(NVARCHAR(MAX), sb.SC) + N':
 		) AS msg(str);
 
 		EXECUTE	DBNOTI.NotificationDB.dbo.Skype_SendMessage
-					@To			= N'T-SCNOTI'
+					@To			= @Telegram
 				,	@Msg		= @Message
 				;
 	END;
-
-	--SELECT	[OW =>] = ''
-	--	,	ow.*
-	--	,	[||] = '||'
-	--	,	[Atv =>] = ''
-	--	,	atv.*
-	--	,	[||] = '||'
-	--	,	[bet]		= CASE	WHEN ow.betCount = atv.betCount THEN '   OK   '
-	--							ELSE '---NG---' END
-	--	,	[stake]		= CASE	WHEN ow.stake = atv.stake THEN '   OK   '
-	--							ELSE '---NG---' END
-	--	,	[payOut]	= CASE	WHEN ow.payOut = atv.payOut THEN '   OK   '
-	--							ELSE '---NG---' END
-	--FROM			#OW_DailySummary AS ow
-	--FULL OUTER JOIN	#DS_DailySummary AS atv
-	--			ON	ow.gameTypeId = atv.gameTypeId
-	--			AND	ow.currency = atv.currency
-	--WHERE	COALESCE(ow.currency, atv.currency) <> 'UUS'
-	--ORDER BY CASE WHEN COALESCE(ow.currency, atv.currency) = 'UUS' THEN 1 ELSE 0 END, ow.gameTypeId, atv.gameTypeId, ow.currency, atv.currency;
 END;
 GO
-EXECUTE	dbo.DailySummaryReport;
+EXECUTE	dbo.DailySummaryReport NULL, 1;
 GO
