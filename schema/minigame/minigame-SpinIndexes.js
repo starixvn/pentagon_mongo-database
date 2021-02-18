@@ -15,6 +15,12 @@ if ((2 ** Saba.env() & 4) > 0)
         {   idxKeys : {id: 1}
         ,   idxOpts : {unique: true}
         }
+    ,   {   idxKeys : {memberId: 1}
+        ,   idxOpts : {}
+        }
+    ,   {   idxKeys : {time: 1, memberId: 1}
+        ,   idxOpts : {}
+        }
     ].forEach(idx => {
         Maint.createIndex(dbs.minigame.spin_results, idx.idxKeys, idx.idxOpts);
     });
@@ -24,6 +30,9 @@ if ((2 ** Saba.env() & 4) > 0)
 {   // spin_logs
     [   {   idxKeys : {roundId: 1, memberId: 1}
         ,   idxOpts : {unique: true, partialFilterExpression: {roundId: {$type: `double`}}}
+        }
+    ,   {   idxKeys : {roundId: 1, memberId: 2}
+        ,   idxOpts : {}
         }
     ,   {   idxKeys : {memberId: 1, time: 1}
         ,   idxOpts : {}

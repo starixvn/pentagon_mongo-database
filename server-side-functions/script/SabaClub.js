@@ -425,6 +425,139 @@
         }
     };
 
+    // Saba.Spins.importSpinsNoRound()
+    const importSpinsNoRoundFunc = (mongo, file, schema, hasHeader = true, force = false) => {
+        if (!(mongo instanceof Mongo)) {
+            Misc.log(`Must be connected to Mongo instance to run this function.`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+            return;
+        }
+        if (typeof file != "string" && !pathExists(file)) {
+            Misc.log(`Filepath [${file}] does NOT exist.`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+            return;
+        }
+
+        const schemaSch = {
+            name: "string"
+        ,   type: {
+                class: "string"
+            ,   timezone: "string"
+            }
+        };
+        if (!schema || schema.length <= 0 || schema.some((col) => !Misc.auditSchema(col, schemaSch))) {
+            Misc.log(`CSV's schema does NOT have correct format.`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+            return;
+        }
+
+        // Generate key
+        const key = (new BinData(4, MD5(hex_md5(file)).base64())).toString().replace(/^UUID[(]"|"[)]$/g, ``);
+        const time = new Date();
+
+        // Read CSV file
+        const fileData = Misc.readCSV(file, schema, hasHeader);
+
+        // Variable
+        let res = {};
+
+        // Verify current data with database
+        {   let err = 0;
+
+            // If there are key in the database, the file may have been imported before, need to check manually
+            if (mongo.getDB(`minigame`).spin_logs.findOne({key: key})) {
+                Misc.log(`The file [${file}] may have been imported with key [${key}]`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+                err |= 1;
+            }
+
+            if (!force && err) {
+                return;
+            }
+        }
+
+        Misc.log(`The spins in file [${file}] will be imported with key [${key}]`, `Audit`, `IMPORT-SPINS-NR`, `I`);
+        const dataLength = fileData.length;
+
+        // Check and remove invalid data
+        fileData.forEach((data, indexD, objectD) => {
+            let ok = true;
+
+            schema.forEach((col) => {
+                switch (col.type.class) {
+                    case "Number":
+                    case "Date":
+                    case "ISODate":
+                        ok = ok && !isNaN(data[col.name]);
+                        break;
+                }
+            });
+
+            if (!ok) {
+                objectD[indexD] = null;
+                Misc.log(`${tojsononeline(data)}`, `Invalid Data`, `IMPORT-SPINS-NR`, `W`);
+            }
+        });
+        fileData.forEach((data, indexD, objectD) => {
+            while (!objectD[indexD] && indexD < objectD.length) {
+                objectD[indexD] = objectD[objectD.length - 1];
+                objectD.pop();
+            }
+        });
+
+        // Add fields to fileData
+        const bulkWritePipe = [];
+        fileData.forEach((doc) => {
+            // Add field for spin_logs
+            doc.time = time;
+            doc.key = key;
+            doc.source = `csv`;
+
+            // Prepare operation for spins
+            if (doc.expiryDate >= doc.time) {
+                bulkWritePipe.push({
+                    updateOne: {
+                        filter: {memberId: doc.memberId}
+                    ,   update: [
+                            {$set: {
+                                availSpins: {$add: [{$ifNull: [`$availSpins`, 0]}, doc.spinCnt]}
+                            ,   usedSpins: {$ifNull: [`$usedSpins`, 0]}
+                            ,   enabled: true
+                            }}
+                        ]
+                    ,   upsert: true
+                    }
+                });
+            } else {
+                Misc.log(`Spins for member [${doc.memberId}] are expired.`, `Add Spins`, `IMPORT-SPINS`, `W`);
+            }
+        });
+
+        // Rollback last import
+        const rollbackMembers = [];
+        if (force) {
+            mongo.getDB(`minigame`).spin_logs.find({key: key}, {_id: 0, memberId: 1, spinCnt: 1}).forEach((doc) => {
+                mongo.getDB(`minigame`).spins.updateOne({memberId: doc.memberId}, [{$set: {availSpins: {$subtract: [{$ifNull: [`$availSpins`, 0]}, doc.spinCnt]}}}]);
+                rollbackMembers.push({memberId: doc.memberId});
+                mongo.getDB(`minigame`).spin_logs.deleteOne({key: key, memberId: doc.memberId});
+            });
+            Misc.log(`Spins of ${rollbackMembers.length} members are rolled-back.`, `Add Spins`, `IMPORT-SPINS`, `W`);
+        }
+
+        // Add data to spin_logs
+        res = mongo.getDB(`minigame`).spin_logs.insertMany(fileData, {ordered: false});
+
+        // Update spins
+        try {
+            res = mongo.getDB(`minigame`).spins.bulkWrite(bulkWritePipe, {ordered: false});
+            Misc.log(`Successfully imported ${res.insertedCount + res.upsertedCount + res.matchedCount} / ${dataLength} spins.`, `Add Spins`, `IMPORT-SPINS`, `I`);
+        } catch (e) {
+            printjson(e);
+        }
+
+        // Correct if have rollback
+        if (force && rollbackMembers.length > 0) {
+            res = mongo.getDB(`minigame`).spins.updateMany({$or: rollbackMembers, availSpins: {$lt: 0}}, [{$set: {availSpins: 0}}]);
+            Misc.log(`${res.matchedCount} members have negative spins. Corrected ${res.modifiedCount} members.`, `Add Spins`, `IMPORT-SPINS`, `I`);
+        }
+    };
+
     // Saba.Spins.expireSpins()
     const expireSpinsFunc = (mongo) => {
         if (!(mongo instanceof Mongo)) {
@@ -591,6 +724,7 @@
         ,   env: ${envFunc.toString()}
         ,   Spins: {
                 importSpins: ${importSpinsFunc.toString()}
+            ,   importSpinsNoRound: ${importSpinsNoRoundFunc.toString()}
             ,   expireSpins: ${expireSpinsFunc.toString()}
             }
         }`)
