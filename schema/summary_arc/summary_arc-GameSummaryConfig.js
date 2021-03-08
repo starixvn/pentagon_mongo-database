@@ -795,7 +795,7 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalBet`]
-        ,   payout: [`$betWin`]
+        ,   payout: [`$betwin`]
         }
     ,   config: {
             hasCurrency: true
