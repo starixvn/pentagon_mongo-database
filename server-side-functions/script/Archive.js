@@ -24,6 +24,7 @@
         const arcOptsSchema = {
             timeField: "string"
         ,   cutOffTime: Date
+        ,   updateOnly: "boolean"
         ,   filter: "object"
         ,   exCols: Array
         };
@@ -108,7 +109,8 @@
         // • Server return the cursor, we will iterate through it to process data on the go.
         //   This will prevent data to be saved as a whole on local memory, therefore may
         //   lead to insuspicient memory.
-        const curSource = fromColl.find(filter);
+        // • noCursorTimeout() is used to ensure the cursor won't be closed by timeout.
+        const curSource = fromColl.find(filter).noCursorTimeout();
         curSource.forEach((doc) => {
             // Get extra columns - Duplicated field will be overrided
             arcOpts.exCols.forEach((exCol) => {
@@ -149,10 +151,12 @@
                     Archive.archiveByIds(child.fromColl, child.toColl, dataOpts, arcOpts);
                 });
 
-                try {
-                    toColl.bulkWrite(insPipe, {ordered: false});
-                } catch (e) {
-                    hanldeBulkWriteError(e, `Insert to ${toColl._shortName}`);
+                if (!arcOpts.updateOnly) {
+                    try {
+                        toColl.bulkWrite(insPipe, {ordered: false});
+                    } catch (e) {
+                        hanldeBulkWriteError(e, `Insert to ${toColl._shortName}`);
+                    }
                 }
 
                 try {
@@ -276,8 +280,9 @@
         // • Server return the cursor, we will iterate through it to process data on the go.
         //   This will prevent data to be saved as a whole on local memory, therefore may
         //   lead to insuspicient memory.
+        // • noCursorTimeout() is used to ensure the cursor won't be closed by timeout.
         if (!arcOpts.updateOnly) {
-            const curSource = fromColl.find(filter);
+            const curSource = fromColl.find(filter).noCursorTimeout();
             curSource.forEach((doc) => {
                 // Get extra columns - Duplicated field will be overrided
                 arcOpts.exCols.forEach((exCol) => {
@@ -295,7 +300,7 @@
                     document: doc
                 }});
 
-                // Execute the operation pipes every 1000 iterations
+                // Execute the operation pipes every 10000 iterations
                 if ((insPipe.length - 1) % 10000 === 9999 || !curSource.hasNext()) {
                     try {
                         toColl.bulkWrite(insPipe, {ordered: false});

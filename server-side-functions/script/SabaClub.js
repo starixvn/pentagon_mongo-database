@@ -168,7 +168,7 @@
         const configSchema = {
             from: {db: "string", coll: "string"}
         ,   to: {db: "string", coll: "string"}
-        ,   config: {timeField: "string", cutOffsetHours: "number", join: "string"}
+        ,   config: {timeField: "string", cutOffsetHours: "number", join: "string", filter: "object"}
         ,   childs: Array
         };
 
@@ -186,6 +186,7 @@
             const arcOpts = {
                 timeField: item.config.timeField
             ,   cutOffTime: new Date((Math.floor(Date.now() / 3600000) + item.config.cutOffsetHours) * 3600000)
+            ,   filter: item.config.filter
             };
             const childOpts = [];
             item.childs.forEach((child) => {
@@ -728,7 +729,7 @@
             ,   expireSpins: ${expireSpinsFunc.toString()}
             }
         }`)
-    ,   version: 2.5
+    ,   version: 2.6
     ,   name: `SabaClub`
     });
 

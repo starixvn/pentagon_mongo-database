@@ -31,6 +31,7 @@ BEGIN;
 		,	@_ReportDate	DATETIME		= ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE))
 		,	@Letstalk		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'' ELSE N'DBNotification' END
 		,	@Telegram		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'T-BILLY' ELSE N'T-SCNOTI' END
+		,	@Status			NVARCHAR(128)	= N'OK'
 		;
 
 	IF	NOT (DATEDIFF(DAY, @_ReportDate, GETUTCDATE()) BETWEEN 1 AND 7)
@@ -211,6 +212,8 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 	IF	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
 	-- TRUE - Has mismatch --
 	BEGIN;
+		SELECT	@Status = N'MISMATCH';
+
 		WHILE	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
 		BEGIN;
 			SELECT	TOP(1)
@@ -221,7 +224,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 			FROM	@Tmp_DailySummary
 			ORDER BY SC, gameId;
 
-			SELECT	@Title		= N'MISMATCH] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
+			SELECT	@Title		= @Status + N'] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
 				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
 			FROM	(
 				SELECT	N'
@@ -246,7 +249,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 					,	@Msg		= @Message
 					;
 
-			SELECT	@Message = N'\\\[MISMATCH\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]  
+			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]  
 \\\[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(BC\|TO\|WL\)'
 							 + msg.str
 			FROM	(
@@ -277,10 +280,10 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 				AND	gameId = @GameId;
 		END;
 	END;
-	ELSE
-	-- FALSE - Don't have mismatch - Data is OK --
+
+
 	BEGIN;
-		SELECT	@Title		= N'OK] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
+		SELECT	@Title		= @Status + N'] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
 			,	@Message	= msg.str
 		FROM	(
 			SELECT	N'
@@ -324,7 +327,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 				,	@Msg		= @Message
 				;
 
-		SELECT	@Message	= N'\\\[OK\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]' + msg.str
+		SELECT	@Message	= N'\\\[' + @Status + N'\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]' + msg.str
 		FROM	(
 			SELECT	N'  
 
