@@ -34,13 +34,13 @@
         }
     };
 
-    if ((2 ** Saba.env() & 4) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // Jackpot
         [idxs.game_pool_createdAt].
             forEach((idx) => {Maint.createIndex(dbs.minigame.jackpots, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 4) > 0)
+    if ((2 ** Saba.env() & 6) > 0)
     {   // Four Guardians
         [idxs.TTL, idxs.time, idxs.id, idxs.uid_paid__id, idxs.currency].
             forEach((idx) => {Maint.createIndex(dbs.minigame.fourguardians_rounds, idx.idxKeys, idx.idxOpts)});
