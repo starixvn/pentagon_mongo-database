@@ -808,6 +808,23 @@ if ((2 ** Saba.env() & 6) > 0)
                 }
             ]
         }
+    ,   {   _id: 39029.1
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'fourguardians_fames'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'fourguardians_fames_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24 * 8
+            ,   join: 'roundId'
+            ,   updateOnly: true
+            }
+        ,   childs: []
+        }
     ,   {   _id: 25001
         ,   from: {
                 db: 'minigame'

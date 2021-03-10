@@ -187,6 +187,7 @@
                 timeField: item.config.timeField
             ,   cutOffTime: new Date((Math.floor(Date.now() / 3600000) + item.config.cutOffsetHours) * 3600000)
             ,   filter: item.config.filter
+            ,   updateOnly: !!item.config.updateOnly
             };
             const childOpts = [];
             item.childs.forEach((child) => {

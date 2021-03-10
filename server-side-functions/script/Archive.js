@@ -16,7 +16,7 @@
         // Copy object based params
         // • This is to prevent the changes in this function affect the variable outside
         //   due to referencing object.
-        const arcOpts = Object.extend({cutOffTime: ISODate(), filter: {}, exCols: []}, _arcOpts);
+        const arcOpts = Object.extend({cutOffTime: ISODate(), filter: {}, exCols: [], updateOnly: false}, _arcOpts);
         const childOpts = Object.extend([], _childOpts);
 
         // Param verification
