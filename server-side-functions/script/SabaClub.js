@@ -1,12 +1,14 @@
 {
     // Saba.summarizeDaily()
     const summarizeDailyFunc = (mongo, summaryDay, bypassExpired = false, summaryDB = `summary`) => {
+        const logger = new Shell.Log(`SUMMARY`);
+
         if (!mongo) {
-            Misc.log(`Must be connected to Mongo instance to run this function.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `Must be connected to Mongo instance to run this function.`);
             return;
         }
         if (!summaryDB) {
-            Misc.log(`Must specify the summary DB.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `Must specify the summary DB.`);
             return;
         }
 
@@ -15,26 +17,26 @@
 
         // Parameters' type verification
         if (!(mongo instanceof Mongo)) {
-            Misc.log(`[mongo] must be a MongoDB connection.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `[mongo] must be a MongoDB connection.`);
             return;
         }
         if (!isNaN(Date.parse(summaryDay))) {
             summaryDay = new Date(Date.parse(summaryDay));
         }
         if (!(summaryDay instanceof Date)) {
-            Misc.log(`Summary day [${tojsononeline(summaryDay)}] must be a date.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `Summary day [${tojsononeline(summaryDay)}] must be a date.`);
             return;
         }
         if (typeof summaryDB != "string") {
-            Misc.log(`Summary DB [${tojsononeline(summaryDB)}] must be a string.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `Summary DB [${tojsononeline(summaryDB)}] must be a string.`);
             return;
         }
         if (!bypassExpired && (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() > 7 * dayLen)) {
-            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is expired. Cannot run data summary for this day.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `The summary day [${summaryDay.toISOString().substr(0,10)}] is expired. Cannot run data summary for this day.`);
             return;
         }
         if (Math.floor(Date.now() / dayLen) * dayLen - summaryDay.valueOf() <= 0) {
-            Misc.log(`The summary day [${summaryDay.toISOString().substr(0,10)}] is not finished. Cannot run data summary for this day.`, `Audit`, `SUMMARY`, `E`);
+            logger.err(`Audit`, `The summary day [${summaryDay.toISOString().substr(0,10)}] is not finished. Cannot run data summary for this day.`);
             return;
         }
 
@@ -43,7 +45,7 @@
         const timeTo = new Date(timeFrom.valueOf() + dayLen);
 
         // Run summary from config
-        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} started.`, summaryDB, `SUMMARY`, `I`);
+        logger.info(summaryDB, `Data summary for ${timeFrom.toISOString().substr(0,10)} started.`);
 
         mongo.getDB(summaryDB).game_summary_config.find().forEach((game) => {
             const agg = [];
@@ -82,8 +84,8 @@
                 const res = mongo.getDB(game.coll.db)[game.coll.group + game.coll.postfix].bulkWrite(updCurrencyPipe, {ordered: false});
 
                 if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
-                    Misc.log(`Added into [${game.coll.group + game.coll.postfix}] collection.`, game.name.en, `SUMMARY`, `I`);
-                    Misc.log(` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`, game.name.en, `SUMMARY`, `I`);
+                    logger.info(game.name.en, `Added into [${game.coll.group + game.coll.postfix}] collection.`);
+                    logger.info(game.name.en, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
                 }
             }
 
@@ -113,9 +115,9 @@
             summaries.forEach((doc) => {
                 const res = mongo.getDB(summaryDB).daily_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
                 if (res.upsertedId) {
-                    Misc.log(`- Inserted new summary record for ${doc.key.currency}`, game.name.en, `SUMMARY`, `I`);
+                    logger.info(game.name.en, `- Inserted new summary record for ${doc.key.currency}`);
                 } else if (res.modifiedCount > 0) {
-                    Misc.log(`- Modified summary record for ${doc.key.currency}`, game.name.en, `SUMMARY`, `I`);
+                    logger.info(game.name.en, `- Modified summary record for ${doc.key.currency}`);
                 }
 
                 const _doc = {};
@@ -136,31 +138,33 @@
                     }
                     const res = mongo.getDB(summaryDB).daily_summaries.deleteOne(_doc);
                     if (res.deletedCount > 0) {
-                        Misc.log(`- Deleted summary record for ${_doc.currency}`, game.name.en, `SUMMARY`, `I`);
+                        logger.info(game.name.en, `- Deleted summary record for ${_doc.currency}`);
                     } else {
-                        Misc.log(`- No summary record deleted for ${_doc.currency}`, game.name.en, `SUMMARY`, `W`);
+                        logger.warn(game.name.en, `- No summary record deleted for ${_doc.currency}`);
                     }
                 } catch (e) {
-                    Misc.log(`- Something is WRONG while deleting summary record for ${doc}`, game.name.en, `SUMMARY`, `W`);
+                    logger.warn(game.name.en, `- Something is WRONG while deleting summary record for ${doc}`);
                 }
             })
-            Misc.log(`Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`, game.name.en, `SUMMARY`, `I`);
+            logger.info(game.name.en, `Done summarize data in ${(new Date()).valueOf() - time.valueOf()} ms`);
         });
-        Misc.log(`Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`, summaryDB, `SUMMARY`, `I`);
+        logger.info(summaryDB, `Data summary for ${timeFrom.toISOString().substr(0,10)} finished.`);
     };
 
     // Saba.runArchive()
     const runArchiveFunc = (mongoFrom, mongoTo, config) => {
+        const logger = new Shell.Log(`ARCHIVE`);
+
         if (!(mongoFrom instanceof Mongo)) {
-            Misc.log(`[mongoFrom] must be a MongoDB connection.`, `Audit`, `ARCHIVE`, `E`);
+            logger.err(`Audit`, `[mongoFrom] must be a MongoDB connection.`);
             return;
         }
         if (!(mongoTo instanceof Mongo)) {
-            Misc.log(`[mongoTo] must be a MongoDB connection.`, `Audit`, `ARCHIVE`, `E`);
+            logger.err(`Audit`, `[mongoTo] must be a MongoDB connection.`);
             return;
         }
         if (!(config instanceof DBCollection)) {
-            Misc.log(`[config] must be a collection.`, `Audit`, `ARCHIVE`, `E`);
+            logger.err(`Audit`, `[config] must be a collection.`);
             return;
         }
 
@@ -209,21 +213,23 @@
 
     // Saba.removeData()
     const removeDataFunc = (fromDB, toDB, collName, filter, debug = 1) => {
+        const logger = new Shell.Log(`REMOVE`);
+
         // Parameters' type verification
         if (!(fromDB instanceof DB)) {
-            Misc.log(`[fromDB] must be a database`, `Audit`, `REMOVE`, `E`);
+            logger.err(`Audit`, `[fromDB] must be a database`);
             return;
         }
         if (!(toDB instanceof DB)) {
-            Misc.log(`[toDB] must be a database`, `Audit`, `REMOVE`, `E`);
+            logger.err(`Audit`, `[toDB] must be a database`);
             return;
         }
         if (typeof collName != "string") {
-            Misc.log(`[group] must be a string`, `Audit`, `REMOVE`, `E`);
+            logger.err(`Audit`, `[group] must be a string`);
             return;
         }
         if (typeof filter != "object") {
-            Misc.log(`[filter] must be a object`, `Audit`, `REMOVE`, `E`);
+            logger.err(`Audit`, `[filter] must be a object`);
             return;
         }
 
@@ -237,7 +243,7 @@
 
         // Group must have collection
         if (fromDB.getCollectionInfos({name: coll.name}).length !== 1) {
-            Misc.log(`Cannot remove data because [${fromDB._name}.${coll.name}] does NOT exist`, collName, `REMOVE`, `E`);
+            logger.err(collName, `Cannot remove data because [${fromDB._name}.${coll.name}] does NOT exist`);
             return;
         }
 
@@ -250,15 +256,15 @@
         });
 
         if (!docs || docs.length === 0) {
-            Misc.log(`Cannot remove data because [${fromDB._name}.${coll.name}] has NO documents matching with the filter`, collName, `REMOVE`, `E`);
+            logger.err(collName, `Cannot remove data because [${fromDB._name}.${coll.name}] has NO documents matching with the filter`);
         } else {
             if (debug === 0) {
                 try {
                     toDB[collRM.name].insertMany(docs, {ordered: false});
                     fromDB[coll.name].bulkWrite(bulkUpdatePipe, {ordered : false});
-                    Misc.log(`Removed ${docs.length} documents`, collName, `REMOVE`, `I`);
+                    logger.info(collName, `Removed ${docs.length} documents`);
                 } catch (e) {
-                    Misc.log(e.message, collName, e.name, `E`);
+                    logger.err(collName, e.message);
                     return;
                 }
             } else {
@@ -274,16 +280,18 @@
 
     // Saba.Spins.importSpins()
     const importSpinsFunc = (mongo, file, schema, hasHeader = true, force = false, roundField = `roundId`) => {
+        const logger = new Shell.Log(`IMPORT-SPINS`);
+
         if (!(mongo instanceof Mongo)) {
-            Misc.log(`Must be connected to Mongo instance to run this function.`, `Audit`, `IMPORT-SPINS`, `E`);
+            logger.err(`Audit`, `Must be connected to Mongo instance to run this function.`);
             return;
         }
         if (typeof file != "string" && !pathExists(file)) {
-            Misc.log(`Filepath [${file}] does NOT exist.`, `Audit`, `IMPORT-SPINS`, `E`);
+            logger.err(`Audit`, `Filepath [${file}] does NOT exist.`);
             return;
         }
         if (typeof roundField != "string") {
-            Misc.log(`Round field's name [${roundField}] MUST be a string.`, `Audit`, `IMPORT-SPINS`, `E`);
+            logger.err(`Audit`, `Round field's name [${roundField}] MUST be a string.`);
             return;
         }
 
@@ -295,7 +303,7 @@
             }
         };
         if (!schema || schema.length <= 0 || schema.some((col) => !Misc.auditSchema(col, schemaSch))) {
-            Misc.log(`CSV's schema does NOT have correct format.`, `Audit`, `IMPORT-SPINS`, `E`);
+            logger.err(`Audit`, `CSV's schema does NOT have correct format.`);
             return;
         }
 
@@ -314,7 +322,7 @@
             }
         });
         if (round.length !== 1) {
-            Misc.log(`The file [${file}] contains incorrect number of rounds = [${round.length}]. Must have only 1.`, `Audit`, `IMPORT-SPINS`, `E`);
+            logger.err(`Audit`, `The file [${file}] contains incorrect number of rounds = [${round.length}]. Must have only 1.`);
             return;
         }
 
@@ -326,13 +334,13 @@
 
             // If there are key in the database, the file may have been imported before, need to check manually
             if (mongo.getDB(`minigame`).spin_logs.findOne({key: key})) {
-                Misc.log(`The file [${file}] may have been imported with key [${key}]`, `Audit`, `IMPORT-SPINS`, `E`);
+                logger.err(`Audit`, `The file [${file}] may have been imported with key [${key}]`);
                 err |= 1;
             }
 
             // If there are roundId in the database, the round has been imported before, need to check manually
             if (mongo.getDB(`minigame`).spin_logs.findOne({roundId: round[0]})) {
-                Misc.log(`The round [${round[0]}] has already been imported`, `Audit`, `IMPORT-SPINS`, `E`);
+                logger.err(`Audit`, `The round [${round[0]}] has already been imported`);
                 err |= 2;
             }
 
@@ -341,7 +349,7 @@
             }
         }
 
-        Misc.log(`The round [${round[0]}] in file [${file}] will be imported with key [${key}]`, `Audit`, `IMPORT-SPINS`, `I`);
+        logger.info(`Audit`, `The round [${round[0]}] in file [${file}] will be imported with key [${key}]`);
         const dataLength = fileData.length;
 
         // Check and remove invalid data
@@ -360,7 +368,7 @@
 
             if (!ok) {
                 objectD[indexD] = null;
-                Misc.log(`${tojsononeline(data)}`, `Invalid Data`, `IMPORT-SPINS`, `W`);
+                logger.warn(`Invalid Data`, `${tojsononeline(data)}`);
             }
         });
         fileData.forEach((data, indexD, objectD) => {
@@ -394,7 +402,7 @@
                     }
                 });
             } else {
-                Misc.log(`Spins for member [${doc.memberId}] are expired.`, `Add Spins`, `IMPORT-SPINS`, `W`);
+                logger.warn(`Add Spins`, `Spins for member [${doc.memberId}] are expired.`);
             }
         });
 
@@ -406,7 +414,7 @@
                 rollbackMembers.push({memberId: doc.memberId});
                 mongo.getDB(`minigame`).spin_logs.deleteOne({roundId: round[0], memberId: doc.memberId});
             });
-            Misc.log(`Spins of ${rollbackMembers.length} members are rolled-back.`, `Add Spins`, `IMPORT-SPINS`, `W`);
+            logger.warn(`Add Spins`, `Spins of ${rollbackMembers.length} members are rolled-back.`);
         }
 
         // Add data to spin_logs
@@ -415,7 +423,7 @@
         // Update spins
         try {
             res = mongo.getDB(`minigame`).spins.bulkWrite(bulkWritePipe, {ordered: false});
-            Misc.log(`Successfully imported ${res.insertedCount + res.upsertedCount + res.matchedCount} / ${dataLength} spins.`, `Add Spins`, `IMPORT-SPINS`, `I`);
+            logger.info(`Add Spins`, `Successfully imported ${res.insertedCount + res.upsertedCount + res.matchedCount} / ${dataLength} spins.`);
         } catch (e) {
             printjson(e);
         }
@@ -423,18 +431,20 @@
         // Correct if have rollback
         if (force && rollbackMembers.length > 0) {
             res = mongo.getDB(`minigame`).spins.updateMany({$or: rollbackMembers, availSpins: {$lt: 0}}, [{$set: {availSpins: 0}}]);
-            Misc.log(`${res.matchedCount} members have negative spins. Corrected ${res.modifiedCount} members.`, `Add Spins`, `IMPORT-SPINS`, `I`);
+            logger.info(`Add Spins`, `${res.matchedCount} members have negative spins. Corrected ${res.modifiedCount} members.`);
         }
     };
 
     // Saba.Spins.importSpinsNoRound()
     const importSpinsNoRoundFunc = (mongo, file, schema, hasHeader = true, force = false) => {
+        const logger = new Shell.Log(`IMPORT-SPINS-NR`);
+
         if (!(mongo instanceof Mongo)) {
-            Misc.log(`Must be connected to Mongo instance to run this function.`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+            logger.err(`Audit`, `Must be connected to Mongo instance to run this function.`);
             return;
         }
         if (typeof file != "string" && !pathExists(file)) {
-            Misc.log(`Filepath [${file}] does NOT exist.`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+            logger.err(`Audit`, `Filepath [${file}] does NOT exist.`);
             return;
         }
 
@@ -446,7 +456,7 @@
             }
         };
         if (!schema || schema.length <= 0 || schema.some((col) => !Misc.auditSchema(col, schemaSch))) {
-            Misc.log(`CSV's schema does NOT have correct format.`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+            logger.err(`Audit`, `CSV's schema does NOT have correct format.`);
             return;
         }
 
@@ -465,7 +475,7 @@
 
             // If there are key in the database, the file may have been imported before, need to check manually
             if (mongo.getDB(`minigame`).spin_logs.findOne({key: key})) {
-                Misc.log(`The file [${file}] may have been imported with key [${key}]`, `Audit`, `IMPORT-SPINS-NR`, `E`);
+                logger.err(`Audit`, `The file [${file}] may have been imported with key [${key}]`);
                 err |= 1;
             }
 
@@ -474,7 +484,7 @@
             }
         }
 
-        Misc.log(`The spins in file [${file}] will be imported with key [${key}]`, `Audit`, `IMPORT-SPINS-NR`, `I`);
+        logger.info(`Audit`, `The spins in file [${file}] will be imported with key [${key}]`);
         const dataLength = fileData.length;
 
         // Check and remove invalid data
@@ -493,7 +503,7 @@
 
             if (!ok) {
                 objectD[indexD] = null;
-                Misc.log(`${tojsononeline(data)}`, `Invalid Data`, `IMPORT-SPINS-NR`, `W`);
+                logger.warn(`Invalid Data`, `${tojsononeline(data)}`);
             }
         });
         fileData.forEach((data, indexD, objectD) => {
@@ -527,7 +537,7 @@
                     }
                 });
             } else {
-                Misc.log(`Spins for member [${doc.memberId}] are expired.`, `Add Spins`, `IMPORT-SPINS`, `W`);
+                logger.warn(`Add Spins`, `Spins for member [${doc.memberId}] are expired.`);
             }
         });
 
@@ -539,7 +549,7 @@
                 rollbackMembers.push({memberId: doc.memberId});
                 mongo.getDB(`minigame`).spin_logs.deleteOne({key: key, memberId: doc.memberId});
             });
-            Misc.log(`Spins of ${rollbackMembers.length} members are rolled-back.`, `Add Spins`, `IMPORT-SPINS`, `W`);
+            logger.warn(`Add Spins`, `Spins of ${rollbackMembers.length} members are rolled-back.`);
         }
 
         // Add data to spin_logs
@@ -548,7 +558,7 @@
         // Update spins
         try {
             res = mongo.getDB(`minigame`).spins.bulkWrite(bulkWritePipe, {ordered: false});
-            Misc.log(`Successfully imported ${res.insertedCount + res.upsertedCount + res.matchedCount} / ${dataLength} spins.`, `Add Spins`, `IMPORT-SPINS`, `I`);
+            logger.info(`Add Spins`, `Successfully imported ${res.insertedCount + res.upsertedCount + res.matchedCount} / ${dataLength} spins.`);
         } catch (e) {
             printjson(e);
         }
@@ -556,14 +566,16 @@
         // Correct if have rollback
         if (force && rollbackMembers.length > 0) {
             res = mongo.getDB(`minigame`).spins.updateMany({$or: rollbackMembers, availSpins: {$lt: 0}}, [{$set: {availSpins: 0}}]);
-            Misc.log(`${res.matchedCount} members have negative spins. Corrected ${res.modifiedCount} members.`, `Add Spins`, `IMPORT-SPINS`, `I`);
+            logger.info(`Add Spins`, `${res.matchedCount} members have negative spins. Corrected ${res.modifiedCount} members.`);
         }
     };
 
     // Saba.Spins.expireSpins()
     const expireSpinsFunc = (mongo) => {
+        const logger = new Shell.Log(`EXPIRE-SPINS`);
+
         if (!(mongo instanceof Mongo)) {
-            Misc.log(`Must be connected to Mongo instance to run this function.`, `Audit`, `EXPIRE-SPINS`, `E`);
+            logger.err(`Audit`, `Must be connected to Mongo instance to run this function.`);
             return;
         }
 
@@ -610,19 +622,19 @@
     
         const expiredMembers = mongo.getDB(`minigame`).spins.aggregate(aggGetSpinMembers).toArray();
         if (expiredMembers.length === 0) {
-            Misc.log(`No members have expired spins.`, `${checkTime.toISOString()}`, `EXPIRE-SPINS`, `I`);
+            logger.info(`${checkTime.toISOString()}`, `No members have expired spins.`);
             return;
         }
-        Misc.log(`${checkTime.toISOString()}`, `Check Time`, `EXPIRE-SPINS`, `I`);
-        Misc.log(`${expiredMembers.length} members have expired spins`, `Check Spins`, `EXPIRE-SPINS`, `I`);
+        logger.info(`Check Time`, `${checkTime.toISOString()}`);
+        logger.info(`Check Spins`, `${expiredMembers.length} members have expired spins`);
 
         // Check for expired spins and take action
         const spinsUpdatePipe = [];
         const spinLogsExpirePipe = [];
         const rankLen = String(expiredMembers.length).length;
         expiredMembers.forEach((doc, indexD) => {
-            Misc.log(` • ${((" ").repeat(rankLen) + (indexD + 1)).slice(-rankLen)}/${expiredMembers.length}`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `I`);
-            Misc.log(`   Spins will be corrected [${doc.availSpins}] => [${doc.currentSpins}]`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `I`);
+            logger.info(`${((" ").repeat(10) + doc._id).slice(-10)}`, ` • ${((" ").repeat(rankLen) + (indexD + 1)).slice(-rankLen)}/${expiredMembers.length}`);
+            logger.info(`${((" ").repeat(10) + doc._id).slice(-10)}`, `   Spins will be corrected [${doc.availSpins}] => [${doc.currentSpins}]`);
             spinsUpdatePipe.push({updateOne: {
                 filter: {memberId: doc._id}
             ,   update: [{$set: {availSpins: doc.currentSpins}}]
@@ -650,8 +662,8 @@
                 // A round cannot be expired twice, or a spin cannot missing associated log.
                 // So if these cases happen, we need to revoke the invalid spins.
                 if (!lastLog || lastLogExpiry) {
-                    Misc.log(`     Cannot find any spin logs that match this expiration. Spins contamination suspected.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `W`);
-                    Misc.log(`     ${expireSpins} spins will be discarded.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `W`);
+                    logger.warn(`${((" ").repeat(10) + doc._id).slice(-10)}`, `     Cannot find any spin logs that match this expiration. Spins contamination suspected.`);
+                    logger.warn(`${((" ").repeat(10) + doc._id).slice(-10)}`, `     ${expireSpins} spins will be discarded.`);
                     spinLogsExpirePipe.push({updateOne: {
                         filter: {
                             key: `${lastLog ? lastLog.key : `EmptyID`}_${doc._id}_${Date.now()}`
@@ -684,14 +696,14 @@
                     action.insertOne.document.roundId = -lastLog.roundId;
                 }
                 spinLogsExpirePipe.push(action);
-                Misc.log(`     ${lastLog.spinCnt} spins in round [${lastLog.roundId || lastLog.key}] are expired.`, `${((" ").repeat(10) + doc._id).slice(-10)}`, `EXPIRE-SPINS`, `I`);
+                logger.info(`${((" ").repeat(10) + doc._id).slice(-10)}`, `     ${lastLog.spinCnt} spins in round [${lastLog.roundId || lastLog.key}] are expired.`);
 
                 // If there still are expired spins, check the next closed log in spin_logs, else we're done for this member.
                 expireSpins -= lastLog.spinCnt;
                 lastTime = lastLog.expiryDate;
             }
 
-            Misc.log(``, `${(" ").repeat(10)}`, `EXPIRE-SPINS`, `I`);
+            logger.info(`${(" ").repeat(10)}`, ``);
         });
 
         // All preparation are done, let's do it
@@ -701,7 +713,7 @@
         } catch (e) {
             const err = e.getWriteErrors();
             err.forEach((_e) => {
-                Misc.log(`   ${_e.errmsg}`, `Update Spins`, `EXPIRE-SPINS`, `E`);
+                logger.err(`Update Spins`, `   ${_e.errmsg}`);
             });
         }
         try {
@@ -710,10 +722,10 @@
         } catch (e) {
             const err = e.getWriteErrors();
             err.forEach((_e) => {
-                Misc.log(`   ${_e.errmsg}`, `Insert Spin Logs`, `EXPIRE-SPINS`, `E`);
+                logger.err(`Insert Spin Logs`, `   ${_e.errmsg}`);
             });
         }
-        Misc.log(`${('=').repeat(50)}`, ``, `EXPIRE-SPINS`, `I`);
+        logger.info(``, `${('=').repeat(50)}`);
     };
 
     // Saba
