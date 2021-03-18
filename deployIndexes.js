@@ -4,6 +4,7 @@
 ,   'schema/member/member-member_auths.js'
 ,   'schema/minigame/minigame-AdminUserIndexes.js'
 ,   'schema/minigame/minigame-GameIndexes.js'
+,   'schema/minigame/minigame-GameSlotIndexes.js'
 ,   'schema/minigame/minigame-SmartBotIndexes.js'
 ,   'schema/minigame/minigame-SpinIndexes.js'
 ,   'schema/minigame/minigame-UserIndexes.js'

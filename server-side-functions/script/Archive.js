@@ -1,22 +1,24 @@
 {
     // Archive.archiveByTimes()
     const archiveByTimesFunc = (fromColl, toColl, _arcOpts, _childOpts) => {
+        const logger = new Shell.Log(`ARC-BY-TIME`);
+
         // Param validation
         // • We will work directly on the DBCollection objects that refer directly
         //   to the source and destination collection
         if (!(fromColl instanceof DBCollection)) {
-            Misc.log(`Source collection MUST be a collection.`, `Audit`, `ARC-BY-TIME`, `E`);
+            logger.err(`Audit`, `Source collection MUST be a collection.`);
             return;
         }
         if (!(toColl instanceof DBCollection)) {
-            Misc.log(`Destination collection MUST be a collection.`, `Audit`, `ARC-BY-TIME`, `E`);
+            logger.err(`Audit`, `Destination collection MUST be a collection.`);
             return;
         }
 
         // Copy object based params
         // • This is to prevent the changes in this function affect the variable outside
         //   due to referencing object.
-        const arcOpts = Object.extend({cutOffTime: ISODate(), filter: {}, exCols: []}, _arcOpts);
+        const arcOpts = Object.extend({cutOffTime: ISODate(), filter: {}, exCols: [], updateOnly: false}, _arcOpts);
         const childOpts = Object.extend([], _childOpts);
 
         // Param verification
@@ -24,11 +26,12 @@
         const arcOptsSchema = {
             timeField: "string"
         ,   cutOffTime: Date
+        ,   updateOnly: "boolean"
         ,   filter: "object"
         ,   exCols: Array
         };
         if (!Misc.auditSchema(arcOpts, arcOptsSchema)) {
-            Misc.log(`timeOpts' schema is NOT correct.`, `Audit`, `ARC-BY-TIME`, `E`);
+            logger.err(`Audit`, `timeOpts' schema is NOT correct.`);
             return;
         }
         const exColsSchema = {
@@ -38,7 +41,7 @@
         ,   fields: Array
         };
         if (arcOpts.exCols.length > 0 && arcOpts.exCols.some((exCol) => !Misc.auditSchema(exCol, exColsSchema))) {
-            Misc.log(`timeOpts' schema is NOT correct.`, `Audit`, `ARC-BY-TIME`, `E`);
+            logger.err(`Audit`, `timeOpts' schema is NOT correct.`);
             return;
         }
         const childCollSchema = {
@@ -51,11 +54,11 @@
         ,   exCols: Array
         };
         if (childOpts.some((coll) => !Misc.auditSchema(coll, childCollSchema))) {
-            Misc.log(`childOpts' schema is NOT correct.`, `Audit`, `ARC-BY-TIME`, `E`);
+            logger.err(`Audit`, `childOpts' schema is NOT correct.`);
             return;
         }
 
-        Misc.log(`${arcOpts.cutOffTime.toISOString()}`, `CutOffTime`, `ARC-BY-TIME`, `I`);
+        logger.info(`CutOffTime`, `${arcOpts.cutOffTime.toISOString()}`);
 
         // Insert pipe
         // • The list of operation that will insert the documents into destination colection
@@ -97,10 +100,10 @@
                     return acc;
                 }, {});
                 for (const key in err) {
-                    Misc.log(`- ${msg}: ${key} - ${err[key]} ops`, `${fromColl._shortName}`, `ARC-BY-TIME`, `E`);
+                    logger.err(`${fromColl._shortName}`, `- ${msg}: ${key} - ${err[key]} ops`);
                 }
             } else {
-                Misc.log(`- ${msg}: ${tojson(e)}`, `${fromColl._shortName}`, `ARC-BY-TIME`, `E`);
+                logger.err(`${fromColl._shortName}`, `- ${msg}: ${tojson(e)}`);
             }
         };
 
@@ -108,7 +111,8 @@
         // • Server return the cursor, we will iterate through it to process data on the go.
         //   This will prevent data to be saved as a whole on local memory, therefore may
         //   lead to insuspicient memory.
-        const curSource = fromColl.find(filter);
+        // • noCursorTimeout() is used to ensure the cursor won't be closed by timeout.
+        const curSource = fromColl.find(filter).noCursorTimeout();
         curSource.forEach((doc) => {
             // Get extra columns - Duplicated field will be overrided
             arcOpts.exCols.forEach((exCol) => {
@@ -149,10 +153,12 @@
                     Archive.archiveByIds(child.fromColl, child.toColl, dataOpts, arcOpts);
                 });
 
-                try {
-                    toColl.bulkWrite(insPipe, {ordered: false});
-                } catch (e) {
-                    hanldeBulkWriteError(e, `Insert to ${toColl._shortName}`);
+                if (!arcOpts.updateOnly) {
+                    try {
+                        toColl.bulkWrite(insPipe, {ordered: false});
+                    } catch (e) {
+                        hanldeBulkWriteError(e, `Insert to ${toColl._shortName}`);
+                    }
                 }
 
                 try {
@@ -161,7 +167,7 @@
                     hanldeBulkWriteError(e, `Update to ${fromColl._shortName}`);
                 }
 
-                Misc.log(`- Archiving ${insPipe.length} documents.`, `${fromColl._shortName}`, `ARC-BY-TIME`, `I`);
+                logger.info(`${fromColl._shortName}`, `- Archiving ${insPipe.length} documents.`);
 
                 // Reset all pipes
                 insPipe = [];
@@ -171,19 +177,21 @@
                 }
             }
         });
-        Misc.log(`Finished.`, `${fromColl._shortName}`, `ARC-BY-TIME`, `I`);
+        logger.info(`${fromColl._shortName}`, `Finished.`);
     };
 
     const archiveByIdsFunc = (fromColl, toColl, _dataOpts, _arcOpts) => {
+        const logger = new Shell.Log(`ARC-BY-ID`);
+
         // Param validation
         // • We will work directly on the DBCollection objects that refer directly
         //   to the source and destination collection
         if (!(fromColl instanceof DBCollection)) {
-            Misc.log(`Source collection MUST be a collection.`, `Audit`, `ARC-BY-ID  `, `E`);
+            logger.err(`Audit`, `Source collection MUST be a collection.`);
             return;
         }
         if (!(toColl instanceof DBCollection)) {
-            Misc.log(`Destination collection MUST be a collection.`, `Audit`, `ARC-BY-ID  `, `E`);
+            logger.err(`Audit`, `Destination collection MUST be a collection.`);
             return;
         }
 
@@ -201,7 +209,7 @@
         ,   time: Date
         };
         if (dataOpts.some((data) => !Misc.auditSchema(data, dataValSchema))) {
-            Misc.log(`dataOpts' schema is NOT correct.`, `Audit`, `ARC-BY-ID  `, `E`);
+            logger.err(`Audit`, `dataOpts' schema is NOT correct.`);
             return;
         }
         const arcOptsSchema = {
@@ -212,7 +220,7 @@
         ,   exCols: Array
         };
         if (!Misc.auditSchema(arcOpts, arcOptsSchema)) {
-            Misc.log(`arcOpts' schema is NOT correct.`, `Audit`, `ARC-BY-ID  `, `E`);
+            logger.err(`Audit`, `arcOpts' schema is NOT correct.`);
             return;
         }
         const exColsSchema = {
@@ -222,7 +230,7 @@
         ,   fields: Array
         };
         if (arcOpts.exCols.length > 0 && arcOpts.exCols.some((exCol) => !Misc.auditSchema(exCol, exColsSchema))) {
-            Misc.log(`timeOpts' schema is NOT correct.`, `Audit`, `ARC-BY-ID`, `E`);
+            logger.err(`Audit`, `timeOpts' schema is NOT correct.`);
             return;
         }
 
@@ -265,10 +273,10 @@
                     return acc;
                 }, {});
                 for (const key in err) {
-                    Misc.log(`- ${msg}: ${key} - ${err[key]} ops`, `${fromColl._shortName}`, `ARC-BY-ID  `, `E`);
+                    logger.err(`${fromColl._shortName}`, `- ${msg}: ${key} - ${err[key]} ops`);
                 }
             } else {
-                Misc.log(`- ${msg}: ${tojson(e)}`, `${fromColl._shortName}`, `ARC-BY-ID  `, `E`);
+                logger.err(`${fromColl._shortName}`, `- ${msg}: ${tojson(e)}`);
             }
         };
 
@@ -276,8 +284,9 @@
         // • Server return the cursor, we will iterate through it to process data on the go.
         //   This will prevent data to be saved as a whole on local memory, therefore may
         //   lead to insuspicient memory.
+        // • noCursorTimeout() is used to ensure the cursor won't be closed by timeout.
         if (!arcOpts.updateOnly) {
-            const curSource = fromColl.find(filter);
+            const curSource = fromColl.find(filter).noCursorTimeout();
             curSource.forEach((doc) => {
                 // Get extra columns - Duplicated field will be overrided
                 arcOpts.exCols.forEach((exCol) => {
@@ -295,7 +304,7 @@
                     document: doc
                 }});
 
-                // Execute the operation pipes every 1000 iterations
+                // Execute the operation pipes every 10000 iterations
                 if ((insPipe.length - 1) % 10000 === 9999 || !curSource.hasNext()) {
                     try {
                         toColl.bulkWrite(insPipe, {ordered: false});
@@ -303,7 +312,7 @@
                         hanldeBulkWriteError(e, `Insert to ${toColl._shortName}`);
                     }
 
-                    Misc.log(`- Archiving ${insPipe.length} documents.`, `${fromColl._shortName}`, `ARC-BY-ID  `, `I`);
+                    logger.info(`${fromColl._shortName}`, `- Archiving ${insPipe.length} documents.`);
 
                     insPipe = [];
                 }

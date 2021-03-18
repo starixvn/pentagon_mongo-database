@@ -749,6 +749,58 @@ dbs.summary.game_summary_config.insertMany([
             hasCurrency: false
         }
     }
+
+,   {   gameId: 29
+    ,   owGameTypeId: 1640
+    ,   name: {
+            en: `Four Guardians`
+        ,   vi: `Long Lân Quy Phụng`
+        ,   grp: `Slots`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `fourguardians`
+        ,   round: `_rounds`
+        ,   postfix: `_rounds`
+        }
+    ,   fields: {
+            map: `id`
+        ,   time: `$time`
+        ,   settled: `$paid`
+        ,   stake: [
+                {$multiply: [`$totalAmount`, {$toInt: {$not: `$freeSpin`}}]}
+            ]
+        ,   payout: [`$betWin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 30
+    ,   owGameTypeId: 1641
+    ,   name: {
+            en: `Fish Prawn Crab Pro`
+        ,   vi: `Bầu Cua Pro`
+        ,   grp: `Fish Prawn Crab`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `fishprawncrabpro`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$totalBet`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
 ]
 ,   {ordered: false}
 );
