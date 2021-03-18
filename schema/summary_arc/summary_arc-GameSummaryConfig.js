@@ -785,7 +785,7 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   grp: `Fish Prawn Crab`
         }
     ,   coll: {
-            db: `minigame`
+            db: `minigame_arc`
         ,   group: `fishprawncrabpro`
         ,   round: `_phiens_bk`
         ,   postfix: `_cuocs_bk`
