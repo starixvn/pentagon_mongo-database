@@ -57,9 +57,12 @@
 
     const FileReader = class {
         constructor (fileName) {
-            if (!fileExists(fileName)) {
-                throw `Cannot read non-existent file: ${fileName}`;
-            }
+            this.logger = new Shell.Log(`FILE-READER`);
+            this.assert = new Shell.Assert();
+            this.assert.setLogger(this.logger);
+
+            this.assert.setTitle(`Audit`);
+            this.assert.do(`Cannot read non-existent file: ${fileName}`, !fileExists(fileName));
 
             const _toString = () => {
                 return `[FileReader] Reading file: ${this.file}`;
@@ -97,7 +100,6 @@
             ,   getContent      : {value: function () { return _getContent() }}
             });
 
-            this.logger = new Shell.Log(`FILE-READER`);
             this.file = fileName;
         }
     };
