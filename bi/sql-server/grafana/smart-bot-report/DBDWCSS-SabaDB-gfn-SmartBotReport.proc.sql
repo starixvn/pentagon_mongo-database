@@ -8,8 +8,8 @@ END;
 GO
 ALTER PROCEDURE	gfn.SmartBotReport
 					@Type			NVARCHAR(128)	= NULL
-				,	@Var1			SQL_VARIANT		= NULL
-				,	@Var2			SQL_VARIANT		= NULL
+				,	@Var1			SQL_VARIANT		= NULL		-- SC
+				,	@Var2			SQL_VARIANT		= NULL		-- GameId
 WITH ENCRYPTION
 AS
 BEGIN;

@@ -29,12 +29,21 @@ BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
-	DECLARE	@VendorId		INT = 42;
+	DECLARE	@_ReportDate	DATETIME		= CAST(@ReportDate AS DATE)
+		,	@VendorId		INT				= 42
+		,	@L				SMALLINT
+		;
 
 	DECLARE	@OW_Query		NVARCHAR(MAX)
 		,	@OW_Param		NVARCHAR(MAX)
 		,	@DS_Query		NVARCHAR(MAX)
 		;
+
+	DECLARE	@Ls AS TABLE (
+				L				SMALLINT
+			,	isDone			BIT
+			,	PRIMARY KEY CLUSTERED (L)
+			);
 
 	DECLARE	@Tmp_DailySummary AS TABLE (
 				gameTypeId		INT
@@ -68,7 +77,8 @@ BEGIN;
 					,	PRIMARY KEY CLUSTERED (gameTypeId, currency)
 					);
 
-	DECLARE	@_ReportDate		DATETIME		= CAST(@ReportDate AS DATE);
+	INSERT INTO	@Ls (L)
+	VALUES (1), (2), (3);
 
 	-- OW Query --
 	BEGIN;
@@ -89,6 +99,7 @@ FROM		dbo.bettransRnG AS b WITH (NOLOCK)
 INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 		ON	b.gameId = g.typeid
 WHERE	b.vendorID = @VendorId
+	AND	b.gameID BETWEEN 1611 AND 1697
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
 	AND	b.statusID NOT IN (101, 102, 0) -- Reject, Void, running
@@ -119,72 +130,38 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 	AND	ds.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'''
 ';
 
+	UPDATE	@Ls
+	SET		isDone = 0;
+
+	WHILE	0 = 0
 	BEGIN;
-		-- L1
-		BEGIN;
-			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (gameTypeId, currency, betCount, stake, payOut)
-			EXECUTE	(@DS_Query) AT L1_SABABI;
+		UPDATE	TOP(1)
+				@Ls
+		SET		@L = L
+			,	isDone = 1
+		WHERE	isDone = 0;
 
-			MERGE INTO	@DS_DailySummary AS ds
-			USING		@Tmp_DailySummary AS tmp
-					ON	ds.gameTypeId = tmp.gameTypeId
-					AND	ds.currency = tmp.currency
-			WHEN MATCHED THEN
-				UPDATE
-				SET	ds.betCount += tmp.betCount
-				,	ds.stake += tmp.stake
-				,	ds.payOut += tmp.payOut
-			WHEN NOT MATCHED THEN
-				INSERT	(    gameTypeId,     currency,     betCount,     stake,     payOut)
-				VALUES	(tmp.gameTypeId, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
-			;
-			RAISERROR('', 0, 0) WITH NOWAIT;
-		END;
+		IF	@@ROWCOUNT = 0
+			BREAK;
 
-		-- L2
-		BEGIN;
-			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (gameTypeId, currency, betCount, stake, payOut)
-			EXECUTE	(@DS_Query) AT L2_SABABI;
+		DELETE	@Tmp_DailySummary;
+		INSERT INTO	@Tmp_DailySummary (gameTypeId, currency, betCount, stake, payOut)
+		EXECUTE	base.ExecuteSabaQuery @DS_Query, @L, 0;
 
-			MERGE INTO	@DS_DailySummary AS ds
-			USING		@Tmp_DailySummary AS tmp
-					ON	ds.gameTypeId = tmp.gameTypeId
-					AND	ds.currency = tmp.currency
-			WHEN MATCHED THEN
-				UPDATE
-				SET	ds.betCount += tmp.betCount
-				,	ds.stake += tmp.stake
-				,	ds.payOut += tmp.payOut
-			WHEN NOT MATCHED THEN
-				INSERT	(    gameTypeId,     currency,     betCount,     stake,     payOut)
-				VALUES	(tmp.gameTypeId, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
-			;
-			RAISERROR('', 0, 0) WITH NOWAIT;
-		END;
-
-		-- L3
-		BEGIN;
-			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (gameTypeId, currency, betCount, stake, payOut)
-			EXECUTE	(@DS_Query) AT L3_SABABI;
-
-			MERGE INTO	@DS_DailySummary AS ds
-			USING		@Tmp_DailySummary AS tmp
-					ON	ds.gameTypeId = tmp.gameTypeId
-					AND	ds.currency = tmp.currency
-			WHEN MATCHED THEN
-				UPDATE
-				SET	ds.betCount += tmp.betCount
-				,	ds.stake += tmp.stake
-				,	ds.payOut += tmp.payOut
-			WHEN NOT MATCHED THEN
-				INSERT	(    gameTypeId,     currency,     betCount,     stake,     payOut)
-				VALUES	(tmp.gameTypeId, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
-			;
-			RAISERROR('', 0, 0) WITH NOWAIT;
-		END;
+		MERGE INTO	@DS_DailySummary AS ds
+		USING		@Tmp_DailySummary AS tmp
+				ON	ds.gameTypeId = tmp.gameTypeId
+				AND	ds.currency = tmp.currency
+		WHEN MATCHED THEN
+			UPDATE
+			SET	ds.betCount += tmp.betCount
+			,	ds.stake += tmp.stake
+			,	ds.payOut += tmp.payOut
+		WHEN NOT MATCHED THEN
+			INSERT	(    gameTypeId,     currency,     betCount,     stake,     payOut)
+			VALUES	(tmp.gameTypeId, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
+		;
+		RAISERROR(N'SC%d', 0, 0, @L) WITH NOWAIT;
 	END;
 
 	IF	@Panel = 1

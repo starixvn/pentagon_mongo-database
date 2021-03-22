@@ -7,7 +7,7 @@ BEGIN;
 END;
 GO
 ALTER PROCEDURE	base.WaitForRandom
-					@Var1			SQL_VARIANT		= NULL
+					@Var1			SQL_VARIANT		= NULL		-- Sec
 WITH ENCRYPTION
 AS
 BEGIN;

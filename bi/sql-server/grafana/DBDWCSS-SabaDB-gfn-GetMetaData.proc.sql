@@ -8,8 +8,8 @@ END;
 GO
 ALTER PROCEDURE	gfn.GetMetaData
 					@Type			NVARCHAR(128)	= NULL
-				,	@Var1			SQL_VARIANT		= NULL
-				,	@Var2			SQL_VARIANT		= NULL
+				,	@Var1			SQL_VARIANT		= NULL		-- SC
+				,	@Var2			SQL_VARIANT		= NULL		-- Option
 WITH ENCRYPTION
 AS
 BEGIN;

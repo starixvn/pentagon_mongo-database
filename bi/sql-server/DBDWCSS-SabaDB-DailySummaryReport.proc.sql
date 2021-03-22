@@ -120,6 +120,7 @@ FROM		dbo.bettransRnG AS b WITH (NOLOCK)
 INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 		ON	b.gameId = g.typeid
 WHERE	b.vendorID = @VendorId
+	AND	b.gameID BETWEEN 1611 AND 1697
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
 	AND	b.statusID NOT IN (101, 102, 0) -- Reject, Void, running

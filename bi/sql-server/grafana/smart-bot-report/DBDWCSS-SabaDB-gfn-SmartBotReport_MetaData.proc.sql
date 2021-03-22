@@ -8,10 +8,10 @@ END;
 GO
 ALTER PROCEDURE	gfn.SmartBotReport_MetaData
 					@Type			NVARCHAR(128)	= NULL
-				,	@Var1			SQL_VARIANT		= NULL
-				,	@Var2			SQL_VARIANT		= NULL
-				,	@Var3			SQL_VARIANT		= NULL
-				,	@Var4			SQL_VARIANT		= NULL
+				,	@Var1			SQL_VARIANT		= NULL		-- SC
+				,	@Var2			SQL_VARIANT		= NULL		-- GameId
+				,	@Var3			SQL_VARIANT		= NULL		-- Limit
+				,	@Var4			SQL_VARIANT		= NULL		-- Day
 WITH ENCRYPTION
 AS
 BEGIN;
