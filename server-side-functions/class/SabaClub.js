@@ -198,10 +198,10 @@
                 timer.register(`agg`);
                 const oldSums = _getOldSummary(_time, round, conf);
                 timer.register(`oldSums`);
-                this.logger.info(conf.name.en, `Got old summaries in ${timer.getDifferent(`agg`, `oldSums`)} ms.`);
+                // this.logger.info(conf.name.en, `Got old summaries in ${timer.getDifferent(`agg`, `oldSums`)} ms.`);
                 const summaries = mongo.getDB(conf.coll.db)[conf.coll.group + conf.coll.round].aggregate(agg).toArray();
                 timer.register(`summaries`);
-                this.logger.info(conf.name.en, `Calculated summaries in ${timer.getDifferent(`oldSums`, `summaries`)} ms.`);
+                // this.logger.info(conf.name.en, `Calculated summaries in ${timer.getDifferent(`oldSums`, `summaries`)} ms.`);
 
                 summaries.forEach(doc => {
                     const res = mongo.getDB(summaryDB)[coll].updateOne(doc.key, {$set: doc.value}, {upsert: true});
