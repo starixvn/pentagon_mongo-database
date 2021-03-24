@@ -1,5 +1,5 @@
 {
-    const logger = new Shell.Logger(`DEPLOY-SCRIPT`);
+    const logger = new Shell.Log(`DEPLOY-SCRIPT`);
 
     [   'server-side-functions/script/Maintenance.js'
     ,   'server-side-functions/script/Miscellaneous.js'

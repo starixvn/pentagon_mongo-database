@@ -1,5 +1,5 @@
 {
-    const logger = new Shell.Logger(`DEPLOY-SECURITY`);
+    const logger = new Shell.Log(`DEPLOY-SECURITY`);
 
     [   'security/Roles.js'
     ,   'security/main/MainUsers.js'

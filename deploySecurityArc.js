@@ -1,5 +1,5 @@
 {
-    const logger = new Shell.Logger(`DEPLOY-SECURITY-ARC`);
+    const logger = new Shell.Log(`DEPLOY-SECURITY-ARC`);
 
     [   'security/Roles.js'
     ,   'security/arc/ArchiveUsers.js'

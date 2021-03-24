@@ -1,14 +1,15 @@
 {
+    const global = Function('return this;')();
     const login = {user: 'billy.bui', pwd: passwordPrompt()};
     const readonly = pro_readonly;
 
     pro.forEach(instance => {
-        const oldDB = db;
-        db = instance;
+        const oldDB = global.db;
+        global.db = instance;
         db.getSiblingDB('admin').auth(login);
         load(`server-side-functions/class/Shell.js`);
 
-        const logger = new Shell.Logger(`DEPLOY-PRO`);
+        const logger = new Shell.Log(`DEPLOY-PRO`);
 
         [   'deployClasses.js'
         ,   'deployScripts.js'
@@ -23,7 +24,7 @@
         });
 
         db.getSiblingDB('admin').auth(readonly);
-        db = oldDB;
+        global.db = oldDB;
     });
 
     pro_arc.forEach(instance => {
@@ -32,7 +33,7 @@
         db.getSiblingDB('admin').auth(login);
         load(`server-side-functions/class/Shell.js`);
 
-        const logger = new Shell.Logger(`DEPLOY-PRO-ARC`);
+        const logger = new Shell.Log(`DEPLOY-PRO-ARC`);
 
         [   'deployClasses.js'
         ,   'deployScripts.js'

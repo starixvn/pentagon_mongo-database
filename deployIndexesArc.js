@@ -1,5 +1,5 @@
 {
-    const logger = new Shell.Logger(`DEPLOY-INDEX-ARC`);
+    const logger = new Shell.Log(`DEPLOY-INDEX-ARC`);
 
     [   'schema/admin/admin-env.js'
     ,   'schema/log_arc/log_arc-LogIndexes.js'

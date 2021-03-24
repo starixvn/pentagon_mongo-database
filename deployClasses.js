@@ -1,5 +1,5 @@
 {
-    const logger = new Shell.Logger(`DEPLOY-CLASS`);
+    const logger = new Shell.Log(`DEPLOY-CLASS`);
 
     [   'server-side-functions/class/SabaClub.js'
     ,   'server-side-functions/class/Shell.js'

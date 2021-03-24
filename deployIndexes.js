@@ -1,5 +1,5 @@
 {
-    const logger = new Shell.Logger(`DEPLOY-INDEX`);
+    const logger = new Shell.Log(`DEPLOY-INDEX`);
 
     [   'schema/admin/admin-env.js'
     ,   'schema/archive/archive-ArchiveConfig.js'

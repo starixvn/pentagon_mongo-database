@@ -1,14 +1,15 @@
 {
+    const global = Function('return this;')();
     const login = {user: 'billy.bui', pwd: passwordPrompt()};
     const readonly = sit_readonly;
 
     sit.forEach(instance => {
-        const oldDB = db;
-        db = instance;
+        const oldDB = global.db;
+        global.db = instance;
         db.getSiblingDB('admin').auth(login);
         load(`server-side-functions/class/Shell.js`);
 
-        const logger = new Shell.Logger(`DEPLOY-SIT`);
+        const logger = new Shell.Log(`DEPLOY-SIT`);
 
         [   'deployClasses.js'
         ,   'deployScripts.js'
@@ -24,6 +25,6 @@
         });
 
         db.getSiblingDB('admin').auth(readonly);
-        db = oldDB;
+        global.db = oldDB;
     });
 }
