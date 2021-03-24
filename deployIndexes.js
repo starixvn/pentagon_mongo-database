@@ -16,9 +16,9 @@
     ].forEach((path) => {
         try {
             load(path);
-            logger.info(`${db._mongo.host}`, `Deployed [${path}]`);
+            logger.info(`Success`, `Deployed [${path}]`);
         } catch (e) {
-            logger.err(`${db._mongo.host}`, `${e}`);
+            logger.err(`Failure`, `${e}`);
         }
     });
 }
