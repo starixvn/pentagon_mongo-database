@@ -1,22 +1,21 @@
 USE	SabaDB;
-IF	OBJECT_ID('dbo.DailySummaryReport') IS NULL
+IF	OBJECT_ID('Noti.JackpotContributionReport') IS NULL
 BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE dbo.DailySummaryReport AS';
+	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE Noti.JackpotContributionReport AS';
 END;
 GO
-ALTER PROCEDURE	dbo.DailySummaryReport
+ALTER PROCEDURE	Noti.JackpotContributionReport
 					@ReportDate		DATETIME		= NULL
 				,	@isTest			BIT				= 0
 WITH ENCRYPTION
 AS
 /*
-	Creator:	20201008@Billy
-	Task:		Compare Daily Summary result between OW and SB then send result via Notification Channel - [Gitlab: #000]
+	Creator:	20210324@Billy
+	Task:		Compare Jackpot related result between OW and SB then send result via Notification Channel - [Gitlab: #059]
 	Database:	DBDWCSS.SabaDB
 
 	Revisions:
-		- 20201008@Billy:	Initial - [Gitlab: #058]
-		- 20210218@Billy:	Report by currency for SC3 - [Gitlab: #058]
+		- 20210324@Billy:	Initial - [Gitlab: #059]
 
 	Developer's Notes:
 		- @ReportDate:				[optional]		- The date of data that will be compared. The time is in UTC timezone.
@@ -57,49 +56,39 @@ BEGIN;
 			,	PRIMARY KEY CLUSTERED (SC)
 			);
 
-	DECLARE	@Tmp_DailySummary AS TABLE (
+	DECLARE	@Tmp_JPContribution AS TABLE (
 				SC				TINYINT
 			,	gameTypeId		INT
 			,	gameId			INT
 			,	gameType		NVARCHAR(128)
 			,	currency		VARCHAR(10)
-			,	phienCount		INT
-			,	betCount		INT
-			,	stake			DECIMAL(19,4)
-			,	winLost			DECIMAL(19,4)
-			,	payOut			DECIMAL(19,4)
+			,	JPCont			DECIMAL(19,4)
 			,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
 			);
 
-	CREATE TABLE	#OW_DailySummary (
+	CREATE TABLE	#OW_JPContribution (
 						gameTypeId		INT
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
-					,	phienCount		INT
-					,	betCount		INT
-					,	stake			DECIMAL(19,4)
-					,	payOut			DECIMAL(19,4)
+					,	custCount		INT
+					,	JPCont			DECIMAL(19,4)
 					,	PRIMARY KEY CLUSTERED (gameTypeId, currency)
 					);
 
-	CREATE TABLE	#DS_DailySummary (
+	CREATE TABLE	#DS_JPContribution (
 						SC				TINYINT
 					,	gameId			INT
 					,	gameTypeId		INT
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
-					,	betCount		INT
-					,	stake			DECIMAL(19,4)
-					,	payOut			DECIMAL(19,4)
+					,	JPCont			DECIMAL(19,4)
 					,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
 					);
 
 	-- List of SCs --
 	INSERT INTO	@SCs
 			(SC, isExpanded, isDone)
-	VALUES	( 1,          0,      0)
-		, 	( 2,          0,      0)
-		, 	( 3,          1,      0)
+	VALUES	( 2,          0,      0)
 		;
 
 	-- OW Query --
@@ -112,15 +101,12 @@ SET NOCOUNT ON;
 SELECT	[gameTypeId]	= b.gameId
 	,	[gameType]		= g.typenamee
 	,	[currency]		= b.CurrencyName
-	,	[phienCount]	= COUNT(DISTINCT b.GameId3rd)
-	,	[betCount]		= COUNT(1)
-	,	[stake]			= SUM(b.stake)
-	,	[payOut]		= SUM(b.winlost)
+	,	[JPCont]		= SUM(-b.awinlost)
 FROM		dbo.bettransRnG AS b WITH (NOLOCK)
 INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 		ON	b.gameId = g.typeid
 WHERE	b.vendorID = @VendorId
-	AND	b.gameID BETWEEN 1611 AND 1697
+	AND	b.gameID = 1698
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
 	AND	b.statusID NOT IN (101, 102, 0) -- Reject, Void, running
@@ -132,7 +118,7 @@ OPTION (RECOMPILE);
 		SELECT	@OW_Param = N'';
 		SELECT	@OW_Param += N'@VendorId INT, @ReportDate DATETIME';
 
-		INSERT INTO	#OW_DailySummary (gameTypeId, gameType, currency, phienCount, betCount, stake, payOut)
+		INSERT INTO	#OW_JPContribution (gameTypeId, gameType, currency, JPCont)
 		EXECUTE	DB061KBT.bodb02.sys.sp_executesql @OW_Query, @OW_Param, @VendorId, @_ReportDate;
 
 		RAISERROR('', 0, 0) WITH NOWAIT;
@@ -141,18 +127,17 @@ OPTION (RECOMPILE);
 	SELECT	@DS_Query = N'';
 	SELECT	@DS_Query += N'\
 SELECT	0 AS SC
-	,	cfg.owGameTypeId AS gameTypeId
+	,	1698 AS gameTypeId
 	,	cfg.gameId AS gameId
 	,	cfg.`name.en` AS gameType
 	,	IFNULL(ds.currency, "null") AS currency
-	,	ds.tickets AS betCount
-	,	ds.stake AS stake
-	,	ds.payOut AS payOut
+	,	ds.stake * 0.025 AS JPCont
 FROM		summary.daily_summaries AS ds
 INNER JOIN	summary.game_summary_config AS cfg
 		ON	ds.gameId = cfg.gameId
-WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
-	AND	ds.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'''
+WHERE	cfg.`name.grp` = "Slots"
+	AND	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
+	AND	ds.time < "' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'"
 ';
 
 	BEGIN;
@@ -167,73 +152,65 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 				,	isDone = 1
 			WHERE	isDone = 0;
 
-			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, payOut)
+			DELETE	@Tmp_JPContribution;
+			INSERT INTO	@Tmp_JPContribution (SC, gameTypeId, gameId, gameType, currency, JPCont)
 			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0;
 
-			MERGE INTO	#DS_DailySummary AS ds
-			USING		@Tmp_DailySummary AS tmp
+			MERGE INTO	#DS_JPContribution AS ds
+			USING		@Tmp_JPContribution AS tmp
 					ON	ds.SC = @SC
 					AND	ds.gameTypeId = tmp.gameTypeId
 					AND	ds.currency = tmp.currency
 			WHEN MATCHED THEN
 				UPDATE
-				SET	ds.betCount += tmp.betCount
-				,	ds.stake += tmp.stake
-				,	ds.payOut += tmp.payOut
+				SET	ds.JPCont += tmp.JPCont
 			WHEN NOT MATCHED THEN
-				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,     betCount,     stake,     payOut)
-				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
+				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,     JPCont)
+				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.JPCont)
 			;
 			RAISERROR('Executed on SC%d.', 0, 0, @SC) WITH NOWAIT;
 		END;
 	END;
 
-	-- Reuse @Tmp_DailySummary for checking mismatch --
-	DELETE	@Tmp_DailySummary;
-	INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, winLost)
+	-- Reuse @Tmp_JPContribution for checking mismatch --
+	DELETE	@Tmp_JPContribution;
+	INSERT INTO	@Tmp_JPContribution (SC, gameTypeId, gameId, gameType, currency, JPCont)
 	SELECT	[SC]			= ISNULL(sb.SC, 0)
 		,	[gameTypeId]	= ISNULL(ow.gameTypeId, sb.gameTypeId)
 		,	[gameId]		= ISNULL(sb.gameId, 0)
 		,	[gameType]		= ISNULL(ow.gameType, sb.gameType)
 		,	[currency]		= ISNULL(ow.currency, sb.currency)
-		,	[betCount]		= ISNULL(ow.betCount, 0) - ISNULL(sb.betCount, 0)
-		,	[stake]			= ISNULL(ow.stake, 0) -ISNULL(sb.stake, 0)
-		,	[winLost]		= ISNULL(ow.stake - ow.payOut, 0) - ISNULL(sb.stake - sb.payOut, 0)
-	FROM			#OW_DailySummary AS ow
-	FULL OUTER JOIN	#DS_DailySummary AS sb
+		,	[JPCont]		= ISNULL(ow.JPCont, 0) -ISNULL(sb.JPCont, 0)
+	FROM			#OW_JPContribution AS ow
+	FULL OUTER JOIN	#DS_JPContribution AS sb
 				ON	ow.gameTypeId = sb.gameTypeId
 				AND	ow.currency = sb.currency
 	WHERE	COALESCE(ow.currency, sb.currency) <> 'UUS'
-		AND	(	ISNULL(ow.betCount, 0) <> ISNULL(sb.betCount, 0)
-			OR	ISNULL(ow.stake, 0) <> ISNULL(sb.stake, 0)
-			OR	ISNULL(ow.payOut, 0) <> ISNULL(sb.payOut, 0)
+		AND	(	ISNULL(ow.JPCont, 0) <> ISNULL(sb.JPCont, 0)
 			);
 
-	IF	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
+	IF	EXISTS (SELECT 1 FROM @Tmp_JPContribution)
 	-- TRUE - Has mismatch --
 	BEGIN;
 		SELECT	@Status = N'MISMATCH';
 
-		WHILE	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
+		WHILE	EXISTS (SELECT 1 FROM @Tmp_JPContribution)
 		BEGIN;
 			SELECT	TOP(1)
 					@SC			= SC
 				,	@GameId		= gameId
 				,	@GameType	= gameType
 				,	@GameTypeId	= gameTypeId
-			FROM	@Tmp_DailySummary
+			FROM	@Tmp_JPContribution
 			ORDER BY SC, gameId;
 
-			SELECT	@Title		= @Status + N'] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
-				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
+			SELECT	@Title		= @Status + N'] [Jackpot Contribution ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
+				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (JC)' + msg.str
 			FROM	(
 				SELECT	N'
 [' + currency + N']'
-+ N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(betCount AS MONEY), 1), '.00', '')
-+ N'|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
-+ N'|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
-				FROM	@Tmp_DailySummary
++ N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(JPCont AS MONEY), 1), '.00', '')
+				FROM	@Tmp_JPContribution
 				WHERE	SC = @SC
 					AND	gameId = @GameId
 				ORDER BY currency
@@ -250,16 +227,14 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 					,	@Msg		= @Message
 					;
 
-			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]  
-\\\[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(BC\|TO\|WL\)'
+			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[Jackpot Contribution ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]  
+\\\[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(JC\)'
 							 + msg.str
 			FROM	(
 				SELECT	N'  
 \\\[' + currency + N'\]'
-+ N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(betCount AS MONEY), 1), '.00', '')
-+ N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
-+ N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
-				FROM	@Tmp_DailySummary
++ N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(JPCont AS MONEY), 1), '.00', '')
+				FROM	@Tmp_JPContribution
 				WHERE	SC = @SC
 					AND	gameId = @GameId
 				ORDER BY currency
@@ -276,7 +251,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 					;
 					;
 
-			DELETE	@Tmp_DailySummary
+			DELETE	@Tmp_JPContribution
 			WHERE	SC = @SC
 				AND	gameId = @GameId;
 		END;
@@ -284,7 +259,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 
 
 	BEGIN;
-		SELECT	@Title		= @Status + N'] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
+		SELECT	@Title		= @Status + N'] [Jackpot Contribution ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
 			,	@Message	= msg.str
 		FROM	(
 			SELECT	N'
@@ -297,10 +272,8 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			CROSS APPLY	(
 				SELECT	N'
     ' + grp.CurGrp + N'
-      - BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'
-      - TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'
-      - WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
-				FROM		#DS_DailySummary AS sb
+      - JC: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.JPCont AS MONEY)), 1)
+				FROM		#DS_JPContribution AS sb
 				CROSS APPLY	(
 					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
 				) AS grp
@@ -328,7 +301,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 				,	@Msg		= @Message
 				;
 
-		SELECT	@Message	= N'\\\[' + @Status + N'\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]' + msg.str
+		SELECT	@Message	= N'\\\[' + @Status + N'\] \\\[Jackpot Contribution ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]' + msg.str
 		FROM	(
 			SELECT	N'  
 
@@ -341,10 +314,8 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			CROSS APPLY	(
 				SELECT	N'  
     `' + grp.CurGrp + N'`  
-      \- BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'  
-      \- TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'  
-      \- WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
-				FROM		#DS_DailySummary AS sb
+      \- JC: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.JPCont AS MONEY)), 1)
+				FROM		#DS_JPContribution AS sb
 				CROSS APPLY	(
 					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
 				) AS grp
@@ -373,5 +344,5 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 	END;
 END;
 GO
-EXECUTE	dbo.DailySummaryReport NULL, 1;
+EXECUTE	Noti.JackpotContributionReport NULL, 1;
 GO
