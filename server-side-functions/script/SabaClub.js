@@ -657,7 +657,9 @@
                 let lastLogExpiry = lastLog ? mongo.getDB(`minigame`).spin_logs.findOne({roundId: -lastLog.roundId, memberId: doc._id}) : null;
                 // If the last log don't have roundId, it may been added by admin
                 //   we will check the key for this type of log
-                lastLogExpiry = !lastLogExpiry ? mongo.getDB(`minigame`).spin_logs.findOne({key: `${lastLog.key}_expired`, memberId: doc._id}) : null;
+                if (!!lastLog) {
+                    lastLogExpiry = !lastLogExpiry ? mongo.getDB(`minigame`).spin_logs.findOne({key: `${lastLog.key}_expired`, memberId: doc._id}) : null;
+                }
 
                 // A round cannot be expired twice, or a spin cannot missing associated log.
                 // So if these cases happen, we need to revoke the invalid spins.
