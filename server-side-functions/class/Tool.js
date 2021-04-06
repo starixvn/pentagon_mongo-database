@@ -31,18 +31,23 @@
             const _getTimerDuration = () => {
                 return _getTimer(Tool.Timer.CONST.FINISH) ? _getDuration(Tool.Timer.CONST.FINISH) : _getElapsedDuration(Tool.Timer.CONST.START);
             };
+
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             Object.defineProperties(this, {
-                toString            : {value: function () { return _toString() }}
-            ,   tojson              : {value: function () { return _toString() }}
-            ,   register            : {value: function (label) { return _register(label) }}
-            ,   startTimer          : {value: function () { return _startTimer() }}
-            ,   stopTimer           : {value: function () { return _stopTimer() }}
-            ,   getTimer            : {value: function (label) { return _getTimer(label) }}
-            ,   getISOTimer         : {value: function (label) { return _getISOTimer(label) }}
-            ,   getElapsedDuration  : {value: function (label) { return _getElapsedDuration(label) }}
-            ,   getDifferent        : {value: function (fromLabel, toLabel) { return _getDifferent(fromLabel, toLabel) }}
-            ,   getDuration         : {value: function (label) { return _getDuration(label) }}
-            ,   getTimerDuration    : {value: function () { return _getTimerDuration() }}
+                toString            : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson              : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   register            : Object.extend({value: function (label) { return _register(label) }}, _descriptor)
+            ,   startTimer          : Object.extend({value: function () { return _startTimer() }}, _descriptor)
+            ,   stopTimer           : Object.extend({value: function () { return _stopTimer() }}, _descriptor)
+            ,   getTimer            : Object.extend({value: function (label) { return _getTimer(label) }}, _descriptor)
+            ,   getISOTimer         : Object.extend({value: function (label) { return _getISOTimer(label) }}, _descriptor)
+            ,   getElapsedDuration  : Object.extend({value: function (label) { return _getElapsedDuration(label) }}, _descriptor)
+            ,   getDifferent        : Object.extend({value: function (fromLabel, toLabel) { return _getDifferent(fromLabel, toLabel) }}, _descriptor)
+            ,   getDuration         : Object.extend({value: function (label) { return _getDuration(label) }}, _descriptor)
+            ,   getTimerDuration    : Object.extend({value: function () { return _getTimerDuration() }}, _descriptor)
             });
 
             this.startTimer();
@@ -57,50 +62,56 @@
 
     const FileReader = class {
         constructor (fileName) {
-            this.logger = new Shell.Log(`FILE-READER`);
-            this.assert = new Shell.Assert();
-            this.assert.setLogger(this.logger);
+            const _logger = new Shell.Log(`FILE-READER`);
+            const _assert = new Shell.Assert();
+            _assert.setLogger(_logger);
 
-            this.assert.setTitle(`Audit`);
-            this.assert.do(`Cannot read non-existent file: ${fileName}`, !fileExists(fileName));
+            const _file = fileName;
+            let _content = [];
+
+            _assert.setTitle(`Audit`);
+            _assert.do(`Cannot read non-existent file: ${_file}`, !fileExists(_file));
 
             const _toString = () => {
-                return `[FileReader] Reading file: ${this.file}`;
+                return `[FileReader] Reading file: ${_file}`;
             };
             const _loadContent = (reload = false, csv = false) => {
                 const _title = `Load Content`;
                 const _timer = new Tool.Timer();
                 if (reload) {
-                    this.logger.warn(_title, `Reload mode, existing content will be overriden.`);
+                    _logger.warn(_title, `Reload mode, existing content will be overriden.`);
                 }
-                if (!this.content || reload) {
-                    this.logger.info(_title, `Reading from file [${this.file}]...`);
-                    this.content = [];
-                    cat(this.file).split(/\r\n|\n/).forEach(line => {
+                if (!_content || reload) {
+                    _logger.info(_title, `Reading from file [${_file}]...`);
+                    _content = [];
+                    cat(_file).split(/\r\n|\n/).forEach(line => {
                         if (line) {
-                            this.content.push(csv ? line.split(/,/) : line);
+                            _content.push(csv ? line.split(/,/) : line);
                         }
                     });
-                    this.logger.info(_title, `Finish reading ${(this.content || []).length} lines in ${_timer.getTimerDuration()} ms.`);
+                    _logger.info(_title, `Finish reading ${(_content || []).length} lines in ${_timer.getTimerDuration()} ms.`);
                     return;
                 }
-                this.logger.warn(_title, `The content has been loaded and has ${this.content.length} lines.`);
+                _logger.warn(_title, `The content has been loaded and has ${_content.length} lines.`);
             };
             const _loadCSVContent = (reload = false) => {
                 return _loadContent(reload, true);
             };
             const _getContent = () => {
-                return this.content;
+                return _content;
+            };
+
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
             };
             Object.defineProperties(this, {
-                toString        : {value: function () { return _toString() }}
-            ,   tojson          : {value: function () { return _toString() }}
-            ,   loadContent     : {value: function (reload = false, csv = false) { return _loadContent(reload, csv) }}
-            ,   loadCSVContent  : {value: function (reload = false) { return _loadCSVContent(reload) }}
-            ,   getContent      : {value: function () { return _getContent() }}
+                toString        : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson          : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   loadContent     : Object.extend({value: function (reload = false, csv = false) { return _loadContent(reload, csv) }}, _descriptor)
+            ,   loadCSVContent  : Object.extend({value: function (reload = false) { return _loadCSVContent(reload) }}, _descriptor)
+            ,   getContent      : Object.extend({value: function () { return _getContent() }}, _descriptor)
             });
-
-            this.file = fileName;
         }
     };
     const FileReaderExt = {}
@@ -119,6 +130,16 @@
             }
         })()`)
     ,   version: `1.0.1`
+    ,   changelog: {
+            '1.0.1': [
+                `Hide internal variables & constants`
+            ,   `Add method descriptor for enumerability`
+            ]
+        ,   '1.0.0': [
+                `Release [Tool.Timer]`
+            ,   `Release [Tool.FileReader]`
+            ]
+        }
     });
 
     // Reload library

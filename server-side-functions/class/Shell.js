@@ -1,11 +1,16 @@
 {
     const Format = class {
         constructor () {
+            const _compatibility = !_isWindows();
+
             const _toString = () => {
-                return `[Shell.Format] Compatibility: ${this.isCompatible}`;
+                return `[Shell.Format] Compatibility: ${_compatibility}`;
+            };
+            const _isCompatible = () => {
+                return _compatibility;
             };
             const _isApllying = (color) => {
-                return this.isCompatible && Shell.Format.CONST[color.toUpperCase()];
+                return _compatibility && Shell.Format.CONST[color.toUpperCase()];
             };
             const _end = (color) => {
                 if (_isApllying(color)) {
@@ -22,13 +27,17 @@
             const _format = (text, color) => {
                 return `${_code(color)}${text || ''}${_end(color)}`;
             };
-            Object.defineProperties(this, {
-                toString    : {value: function () { return _toString() }}
-            ,   tojson      : {value: function () { return _toString() }}
-            ,   format      : {value: function (text, color) { return _format(text, color) }}
-            });
 
-            this.isCompatible = !_isWindows();
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
+            Object.defineProperties(this, {
+                toString    : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson      : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   isCompatible: Object.extend({value: function () { return _isCompatible() }}, _descriptor)
+            ,   format      : Object.extend({value: function (text, color) { return _format(text, color) }}, _descriptor)
+            });
         }
     };
     const FormatExt = {
@@ -56,10 +65,17 @@
 
     const Log = class {
         constructor (label) {
-            this.formatter = new Shell.Format();
+            const _formatter = new Shell.Format();
+            let _label = 'VERBOSE ';
 
             const _toString = () => {
-                return `[Shell.Log] Print log for (${this.label})`;
+                return `[Shell.Log] Print log for (${_label})`;
+            };
+            const _getLabel = () => {
+                return _label;
+            };
+            const _setLabel = (label) => {
+                _label = (typeof label != "string") ? _label : label.toUpperCase().pad(8,1);
             };
             const _now = () => {
                 return ISODate().toISOString().pad(29,1);
@@ -70,8 +86,8 @@
                 const tt = (typeof title != "string") ? ' ' : title;
                 const m  = (typeof message != "string") ? tojson(message) : message;
     
-                const msg = `${d}${t}${this.label} [${tt}] • ${m}`;
-                print(this.formatter.format(msg, color));
+                const msg = `${d}${t}${_label} [${tt}] • ${m}`;
+                print(_formatter.format(msg, color));
             };
             const _verbose = (title, message) => {
                 const type = 'VERBOSE';
@@ -89,16 +105,23 @@
                 const type = 'ERR';
                 _paint(title, message, type, Shell.Log.CONST[type]);
             };
+
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             Object.defineProperties(this, {
-                toString    : {value: function () { return _toString() }}
-            ,   tojson      : {value: function () { return _toString() }}
-            ,   verbose     : {value: function (title, message) { return _verbose(title, message) }}
-            ,   info        : {value: function (title, message) { return _info(title, message) }}
-            ,   warn        : {value: function (title, message) { return _warn(title, message) }}
-            ,   err         : {value: function (title, message) { return _err(title, message) }}
+                toString    : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson      : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   getLabel    : Object.extend({value: function () { return _getLabel() }}, _descriptor)
+            ,   setLabel    : Object.extend({value: function (label) { return _setLabel(label) }}, _descriptor)
+            ,   verbose     : Object.extend({value: function (title, message) { return _verbose(title, message) }}, _descriptor)
+            ,   info        : Object.extend({value: function (title, message) { return _info(title, message) }}, _descriptor)
+            ,   warn        : Object.extend({value: function (title, message) { return _warn(title, message) }}, _descriptor)
+            ,   err         : Object.extend({value: function (title, message) { return _err(title, message) }}, _descriptor)
             });
 
-            this.label = (typeof label != "string") ? 'VERBOSE ' : label.toUpperCase().pad(8,1);
+            this.setLabel(label);
         }
     };
     const LogExt = {
@@ -112,21 +135,25 @@
 
     const Assert =  class {
         constructor (title) {
-            this.logger = new Shell.Log(`ASSERT`);
+            let _logger = new Shell.Log(`ASSERT`);
+            let _title = '';
 
             const _toString = () => {
-                return `[Shell.Assert] ${this.logger.label}`;
+                return `[Shell.Assert] ${_logger.getLabel()} - ${_title}`;
             };
-            const _setLogger = (_logger) => {
-                this.logger = _logger || this.logger;
+            const _setLogger = (logger) => {
+                _logger = (logger instanceof Shell.Log) ? logger : _logger;
             };
-            const _setTitle = (_title) => {
-                this.title = _title;
+            const _getTitle = () => {
+                return _title;
+            };
+            const _setTitle = (title) => {
+                _title = (typeof title != "string") ? _title : title;
                 _resetHistory();
             };
             const _try = (msg, ...conds) => {
                 if (!conds.every(eval)) {
-                    this.logger.err(this.title, msg);
+                    _logger.err(_title, msg);
                     const err = Error(msg);
                     this.history.push(err);
                     return err;
@@ -147,69 +174,27 @@
             const _resetHistory = () => {
                 this.history = [];
             };
+
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             Object.defineProperties(this, {
-                toString    : {value: function () { return _toString() }}
-            ,   tojson      : {value: function () { return _toString() }}
-            ,   setLogger   : {value: function (logger) {return _setLogger(logger)}}
-            ,   setTitle    : {value: function (title) {return _setTitle(title)}}
-            ,   try         : {value: function (msg, ...conds) {return _try(msg, ...conds)}}
-            ,   do          : {value: function (msg, ...conds) {return _do(msg, ...conds)}}
-            ,   hasError    : {value: function () {return _hasError()}}
-            ,   resetHistory: {value: function () {return _resetHistory()}}
+                toString    : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson      : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   setLogger   : Object.extend({value: function (logger) {return _setLogger(logger)}}, _descriptor)
+            ,   getTitle    : Object.extend({value: function () { return _getTitle() }}, _descriptor)
+            ,   setTitle    : Object.extend({value: function (title) {return _setTitle(title)}}, _descriptor)
+            ,   try         : Object.extend({value: function (msg, ...conds) {return _try(msg, ...conds)}}, _descriptor)
+            ,   do          : Object.extend({value: function (msg, ...conds) {return _do(msg, ...conds)}}, _descriptor)
+            ,   hasError    : Object.extend({value: function () {return _hasError()}}, _descriptor)
+            ,   resetHistory: Object.extend({value: function () {return _resetHistory()}}, _descriptor)
             });
 
-            _setTitle(title || ``);
+            this.setTitle(title || ``);
         }
     };
     const AssertExt = {};
-
-    const RunProgram = class {
-        // TODO
-        constructor (label) {
-            const _toString = () => {
-                return `[Shell.Log] Print log for (${this.label})`;
-            };
-            const _now = () => {
-                return ISODate().toISOString().pad(29,1);
-            };
-            const _paint = (title, message, type, color) => {
-                const d  = _now();
-                const t  = ((typeof type != "string") ? 'V' : type.ltrim().substr(0,1)).toUpperCase().pad(3,1);
-                const tt = (typeof title != "string") ? ' ' : title;
-                const m  = (typeof message != "string") ? tojson(message) : message;
-    
-                const msg = `${d}${t}${this.label} [${tt}] • ${m}`;
-                print(this.formatter.format(msg, color));
-            };
-            const _verbose = (title, message) => {
-                const type = 'VERBOSE';
-                _paint(title, message, type, Shell.Log.CONST[type]);
-            };
-            const _info = (title, message) => {
-                const type = 'INFO';
-                _paint(title, message, type, Shell.Log.CONST[type]);
-            };
-            const _warn = (title, message) => {
-                const type = 'WARN';
-                _paint(title, message, type, Shell.Log.CONST[type]);
-            };
-            const _err = (title, message) => {
-                const type = 'ERR';
-                _paint(title, message, type, Shell.Log.CONST[type]);
-            };
-            Object.defineProperties(this, {
-                toString    : {value: function () { return _toString() }}
-            ,   tojson      : {value: function () { return _toString() }}
-            ,   verbose     : {value: function (title, message) { return _verbose(title, message) }}
-            ,   info        : {value: function (title, message) { return _info(title, message) }}
-            ,   warn        : {value: function (title, message) { return _warn(title, message) }}
-            ,   err         : {value: function (title, message) { return _err(title, message) }}
-            });
-
-            this.formatter = new Shell.Format();
-            this.label = (typeof label != "string") ? 'VERBOSE ' : label.toUpperCase().pad(8,1);
-        }
-    }
 
     // Shell class
     db.getSiblingDB('script').system.js.save({
@@ -227,6 +212,17 @@
             }
         })()`)
     ,   version: `1.0.1`
+    ,   changelog: {
+            '1.0.1': [
+                `Hide internal variables & constants`
+            ,   `Add method descriptor for enumerability`
+            ]
+        ,   '1.0.0': [
+                `Release [Shell.Format]`
+            ,   `Release [Shell.Log]`
+            ,   `Release [Shell.Assert]`
+            ]
+        }
     });
 
     // Reload library

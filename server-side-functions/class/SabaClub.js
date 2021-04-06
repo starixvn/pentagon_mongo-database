@@ -1,20 +1,20 @@
 {
     const Summary = class {
         constructor (mongo, summaryDB) {
-            this.logger = new Shell.Log(`SUMMARY`);
-            this.assert = new Shell.Assert();
-            this.assert.setLogger(this.logger);
+            const _logger = new Shell.Log(`SUMMARY`);
+            const _assert = new Shell.Assert();
+            _assert.setLogger(_logger);
 
-            this.assert.setTitle(`Audit`);
-            this.assert.try(
+            _assert.setTitle(`Audit`);
+            _assert.try(
                 `[mongo] must be a MongoDB connection.`
             ,   mongo instanceof Mongo
             );
-            this.assert.try(
+            _assert.try(
                 `[summaryDB] must be a string.`
             ,   typeof summaryDB == "string"
             );
-            if (this.assert.hasError()) {
+            if (_assert.hasError()) {
                 return;
             }
 
@@ -71,19 +71,19 @@
             };
             const _checkSummaryTime = (time, round) => {
                 const _time = _getTime(time, round);
-                this.assert.setTitle(`Summary Time`);
-                if (this.assert.try(
+                _assert.setTitle(`Summary Time`);
+                if (_assert.try(
                     `[${tojsononeline(time)}] is not a valid time.`
                 ,   _time instanceof Date
                 )) {
                     return false;
                 }
-                this.assert.try(
+                _assert.try(
                     `[${_getTimeStr(time, round)}] is not valid. It's either expired or not finished.`
                 ,   _getTime(time, round).valueOf() >= _getTime(Date.now(), 'DAY').valueOf() - 7 * _getRoundDuration('DAY')
                 ,   _getTime(time, round).valueOf() <  _getTime(Date.now(), round).valueOf()
                 );
-                return !this.assert.hasError();
+                return !_assert.hasError();
             };
             const _buildSummaryAgg = (time, round, conf) => {
                 const _roundDuration = _getRoundDuration(round);
@@ -159,8 +159,8 @@
                 const res = mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].bulkWrite(updCurrencyPipe, {ordered: false});
 
                 if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
-                    this.logger.info(`${conf.name.en} Insert Currency`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
-                    this.logger.info(`${conf.name.en} Insert Currency`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
+                    _logger.info(`${conf.name.en} Insert Currency`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
+                    _logger.info(`${conf.name.en} Insert Currency`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
                 }
             };
             const _getOldSummary = (time, round, conf) => {
@@ -198,17 +198,17 @@
                 timer.register(`agg`);
                 const oldSums = _getOldSummary(_time, round, conf);
                 timer.register(`oldSums`);
-                // this.logger.info(conf.name.en, `Got old summaries in ${timer.getDifferent(`agg`, `oldSums`)} ms.`);
+                // _logger.info(conf.name.en, `Got old summaries in ${timer.getDifferent(`agg`, `oldSums`)} ms.`);
                 const summaries = mongo.getDB(conf.coll.db)[conf.coll.group + conf.coll.round].aggregate(agg).toArray();
                 timer.register(`summaries`);
-                // this.logger.info(conf.name.en, `Calculated summaries in ${timer.getDifferent(`oldSums`, `summaries`)} ms.`);
+                // _logger.info(conf.name.en, `Calculated summaries in ${timer.getDifferent(`oldSums`, `summaries`)} ms.`);
 
                 summaries.forEach(doc => {
                     const res = mongo.getDB(summaryDB)[coll].updateOne(doc.key, {$set: doc.value}, {upsert: true});
                     if (res.upsertedId) {
-                        this.logger.info(conf.name.en, `- Inserted new summary record for ${doc.key.currency}`);
+                        _logger.info(conf.name.en, `- Inserted new summary record for ${doc.key.currency}`);
                     } else if (res.modifiedCount > 0) {
-                        this.logger.info(conf.name.en, `- Modified summary record for ${doc.key.currency}`);
+                        _logger.info(conf.name.en, `- Modified summary record for ${doc.key.currency}`);
                     }
 
                     const _doc = {};
@@ -230,21 +230,21 @@
                         }
                         const res = mongo.getDB(summaryDB)[coll].deleteOne(_doc);
                         if (res.deletedCount > 0) {
-                            this.logger.warn(conf.name.en, `- Deleted summary record for ${_doc.currency}`);
+                            _logger.warn(conf.name.en, `- Deleted summary record for ${_doc.currency}`);
                         } else {
-                            this.logger.info(conf.name.en, `- No summary record deleted for ${_doc.currency}`);
+                            _logger.info(conf.name.en, `- No summary record deleted for ${_doc.currency}`);
                         }
                     } catch (e) {
-                        this.logger.err(conf.name.en, `- Something is WRONG while deleting summary record for ${doc}`);
+                        _logger.err(conf.name.en, `- Something is WRONG while deleting summary record for ${doc}`);
                     }
                 })
-                this.logger.info(conf.name.en, `Done summarize data in ${timer.getTimerDuration()} ms`);
+                _logger.info(conf.name.en, `Done summarize data in ${timer.getTimerDuration()} ms`);
             };
             const _runSummary = (time, round) => {
-                const _time = _getTime(time, round);
-                this.logger.info(summaryDB, `Summary for ${_getTimeStr(time, round)} started.`);
+                const _time = _getTime((time || Date.now()) - _getRoundDuration(round), round);
+                _logger.info(summaryDB, `Summary for ${_getTimeStr(_time, round)} started.`);
                 mongo.getDB(summaryDB).game_summary_config.find().forEach(conf => _runConfSummary(_time, round, conf));
-                this.logger.info(summaryDB, `Data summary for ${_getTimeStr(time, round)} finished.`);
+                _logger.info(summaryDB, `Data summary for ${_getTimeStr(_time, round)} finished.`);
             };
             const _runDailySummary = (time) => {
                 return _runSummary(time, 'DAY');
@@ -253,28 +253,268 @@
                 return _runSummary(time, 'HOUR');
             };
 
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             Object.defineProperties(this, {
-                toString        : {value: function () { return _toString() }}
-            ,   tojson          : {value: function () { return _toString() }}
-            ,   runDailySummary : {value: function (time) { return _runDailySummary(time) }}
-            ,   runHourlySummary: {value: function (time) { return _runHourlySummary(time) }}
+                toString        : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson          : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   runDailySummary : Object.extend({value: function (time) { return _runDailySummary(time) }}, _descriptor)
+            ,   runHourlySummary: Object.extend({value: function (time) { return _runHourlySummary(time) }}, _descriptor)
             });
         }
     };
     const SummaryExt = {};
+
+    const SmartBot = class {
+        constructor (source, destination) {
+            const _logger = new Shell.Log(`iBOT`);
+            const _assert = new Shell.Assert();``
+            _assert.setLogger(_logger);
+
+            let _gameIds = [];
+            let _games = [];
+            let _data = [];
+
+            _assert.setTitle(`Audit`);
+            _assert.try(
+                `[source] must be a MongoDB connection.`
+            ,   source instanceof Mongo
+            );
+            _assert.try(
+                `[destination] must be a MongoDB connection.`
+            ,   destination instanceof Mongo
+            );
+            if (_assert.hasError()) {
+                return;
+            }
+
+            const _toString = () => {
+                return `[SabaClub.SmartBot]`;
+            };
+            const _printConfigs = (gameId) => {
+                _games.forEach((item, pos, arr) => {
+                    if ((gameId || pos) != pos) {
+                        return;
+                    }
+                    print(`[${pos.toString().pad(arr.length.toString().length)}] - {`);
+                    let l = 0;
+                    Object.keys(item).forEach(field => {l = field.length > l ? field.length : l});
+                    Object.keys(item).forEach(field => {
+                        print(`    "${field.pad(l,1)}" : ${tojsononeline(item[field])}`);
+                    });
+                    print(`}`);
+                });
+            };
+            const _printData = (gameId) => {
+                _data.forEach((item, pos, arr) => {
+                    if ((gameId || pos) != pos) {
+                        return;
+                    }
+                    print(`[${pos.toString().pad(arr.length.toString().length)}]\n${tojson(item)}`);
+                });
+            };
+            const _loadGameConfigs = (...gameIds) => {
+                const ids = (gameIds[0] instanceof Array) ? gameIds[0] : gameIds;
+                _gameIds = [];
+                _games = [];
+                const timer = new Tool.Timer();
+                source.getDB('summary_arc').game_summary_config.find(
+                    {gameId: {$in: ids}}
+                ,   {_id: 0, gameId: 1, coll: 1, 'fields.stake': 1}
+                ).forEach(conf => {
+                    _gameIds.push(conf.gameId);
+                    _games[conf.gameId] = conf;
+                });
+                _assert.setTitle(`Load Configs`);
+                _assert.try(
+                    `No configs were loaded`
+                ,   _gameIds.length > 0
+                ,   _games.every(eval)
+                );
+                _logger.info(`Load Configs`, `${_gameIds.length} configs loaded in ${timer.getTimerDuration()} ms`);
+            };
+            const _loadTopDay = (numDay) => {
+                _assert.setTitle(`Audit`);
+                _assert.try(
+                    `[numDay] must be a number.`
+                ,   typeof numDay == "number"
+                );
+                if (_assert.hasError()) {
+                    return;
+                }
+
+                const timer = new Tool.Timer();
+                _gameIds.forEach(gameId => {
+                    timer.register(`start_${gameId}`);
+                    _data[gameId] = source.getDB(`summary_arc`).daily_summaries.aggregate([
+                        {$match: {gameId: gameId, currency: {$ne: `UUS`}}}
+                    ,   {$group: {_id: `$time`, stake: {$sum: `$stake`}}}
+                    ,   {$project: {_id: 0, time: `$_id`, stake: `$stake`}}
+                    ,   {$sort: {stake: -1}}
+                    ,   {$limit: numDay}
+                    ]).toArray();
+                    _logger.info(`Top TO`, `Done loading game #${gameId} in ${timer.getElapsedDuration(`start_${gameId}`)} ms`);
+                });
+            };
+            const _loadTopMem = (numMem) => {
+                _assert.setTitle(`Audit`);
+                _assert.try(
+                    `[numMem] must be a number.`
+                ,   typeof numMem == "number"
+                );
+                if (_assert.hasError()) {
+                    return;
+                }
+
+                const timer = new Tool.Timer();
+                _data.forEach((item, pos) => {
+                    const conf = _games[pos];
+                    timer.register(`start_${pos}`);
+                    item.forEach(day => {
+                        day.topMem = source.getDB(`minigame_arc`)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
+                            {$match: {$and: [
+                                {time: {$gte: day.time}}
+                            ,   {time: {$lt: new Date(day.time.valueOf() + 24 * 3600 * 1000)}}
+                            ,   {'__archive.currency': {$ne: `UUS`}}
+                            ]}}
+                        ,   {$group: {
+                                _id: {memberId: `$memberId`, day: day.time}
+                            ,   stake: {$sum: {$add: conf.fields.stake}}
+                            }}
+                        ,   {$project: {_id: 0, memberId: `$_id.memberId`, stake: `$stake`}}
+                        ,   {$sort: {stake: -1}}
+                        ,   {$limit: numMem}
+                        ]).toArray();
+                    });
+                    _logger.info(`Top Mem`, `Done loading game #${pos} in ${timer.getElapsedDuration(`start_${pos}`)} ms`);
+                });
+            };
+            const _loadTop = (numDay, numMem) => {
+                _loadTopDay(numDay);
+                _loadTopMem(numMem);
+            };
+            const _generateData = () => {
+                _assert.setTitle(`Audit`);
+                _assert.try(
+                    `Data is not loaded properly`
+                ,   _data.every(data => data instanceof Array)
+                ,   _data.every(data => data.every(obj => typeof obj == "object"))
+                ,   _data.every(data => data.every(obj => obj.hasOwnProperty(`topMem`)))
+                );
+                if (_assert.hasError()) {
+                    return;
+                }
+
+                const timer = new Tool.Timer();
+                _data.forEach((item, pos) => {
+                    const conf = _games[pos];
+                    let patId = 1;
+
+                    const patterns = [];
+                    const bets = [];
+
+                    timer.register(`start_${pos}`);
+
+                    item.forEach(day => {
+                        // Get first round of day
+                        const rounds = {};
+                        source.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.round}`].find(
+                            {$and: [
+                                {time: {$gte: day.time}}
+                            ,   {time: {$lt: new Date(day.time.valueOf() + 25*3600*1000)}}
+                            ]}
+                        ,   {_id: 0, id: 1, time: 1}
+                        ).forEach(round => {
+                            rounds[`${round.id}`] = round.time;
+                        });
+                        const fstRound = Math.min(...Object.keys(rounds).map(_ => Number(_)));
+
+                        day.topMem.forEach(mem => {
+                            // Get member name, fallback to member id if not exists
+                            const memberName = (destination.getDB(`minigame`).users.findOne(
+                                {'local.memberId': mem.memberId}
+                            ,   {_id: 0, 'local.memberName': 1}
+                            ) || {local: {memberName: mem.memberId.toString()}}).local.memberName;
+
+                            source.getDB(`log_arc`).bets_bk.find(
+                                {$and: [
+                                    {requestTimeStamp: {$gte: day.time.toISOString()}}
+                                ,   {requestTimeStamp: {$lt: (new Date(day.time.valueOf() + 24 * 3600 * 1000)).toISOString()}}
+                                ,   {'call.gameTypeId': pos}
+                                ,   {'call.obCustId': mem.memberId}
+                                ]}
+                            ,   {_id: 0, requestTimeStamp: 1, 'call.gameRoundId': 1, 'call.choiceId': 1, 'call.amount': 1}
+                            ).forEach(bet => {
+                                bets.push({
+                                    patId: patId
+                                ,   time: rounds[`${bet.call.gameRoundId}`].valueOf() % (24*3600*1000)
+                                ,   round: bet.call.gameRoundId - fstRound
+                                ,   second: Math.round((rounds[`${bet.call.gameRoundId}`].valueOf() - ISODate(bet.requestTimeStamp).valueOf()) / 1000)
+                                ,   choiceId: bet.call.choiceId
+                                ,   amount: Number(bet.call.amount)
+                                });
+                            });
+
+                            patterns.push({
+                                _id: patId++
+                            ,   memberId: mem.memberId
+                            ,   time: day.time
+                            ,   group: String.substr(memberName, 0, 3).toUpperCase()
+                            ,   stake: mem.stake
+                            });
+                        });
+                    });
+                    printjsononeline(bets);
+                    printjson(patterns);
+                    _logger.info(`Generate Data`, `Done generating data for game #${pos} in ${timer.getElapsedDuration(`start_${pos}`)} ms`);
+                });
+            }
+
+            let _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
+            Object.defineProperties(this, {
+                toString        : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   tojson          : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   printConfigs    : Object.extend({value: function (gameId) { return _printConfigs(gameId) }}, _descriptor)
+            ,   printData       : Object.extend({value: function (gameId) { return _printData(gameId) }}, _descriptor)
+            ,   loadGameConfigs : Object.extend({value: function (...gameIds) { return _loadGameConfigs(...gameIds) }}, _descriptor)
+            ,   loadTopDay      : Object.extend({value: function (numDay) { return _loadTopDay(numDay) }}, _descriptor)
+            ,   loadTopMem      : Object.extend({value: function (numMem) { return _loadTopMem(numMem) }}, _descriptor)
+            ,   loadTop         : Object.extend({value: function (numDay, numMem) { return _loadTop(numDay, numMem) }}, _descriptor)
+            ,   generateData    : Object.extend({value: function () { return _generateData() }}, _descriptor)
+            });
+        }
+    };
+    const SmartBotExt = {};
 
     // SabaClub class
     db.getSiblingDB('script').system.js.save({
         _id: `SabaClub`
     ,   value: new Code(`(() => {
             const cSummary = Object.extend(${tojson(Summary)}, ${tojson(SummaryExt)});
+            const cSmartBot = Object.extend(${tojson(SmartBot)}, ${tojson(SmartBotExt)});
             const _toStr = function () {return this.constructor.name};
 
             return {
                 Summary: Object.defineProperties(cSummary, {toString: {value: _toStr}, tojson: {value: _toStr}})
+            ,   SmartBot: Object.defineProperties(cSmartBot, {toString: {value: _toStr}, tojson: {value: _toStr}})
             }
         })()`)
-    ,   version: `1.0.0`
+    ,   version: `1.0.1`
+    ,   changelog: {
+            '1.0.1': [
+                `Hide internal variables & constants`
+            ,   `Add method descriptor for enumerability`
+            ,   `[SabaClub.Summary] Set last day/hour as default time`
+            ]
+        ,   '1.0.0': [
+                `Release [SabaClub.Summary]`
+            ]
+        }
     });
 
     // Reload library
