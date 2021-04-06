@@ -31,11 +31,11 @@ dbs.summary.game_summary_config.insertMany([
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$bet`]
+        ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: [
                 {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$bet`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}
+            ,   {$multiply: [{$ifNull: [`$totalAmount`,`$bet`]}, {$toInt: `$win`}]}
+            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
             ]
         }
     ,   config: {
@@ -62,10 +62,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   settled: `$thanhtoan`
         ,   stake: [{$multiply: [
                 {$add: [
-                    {$ifNull: [`$chan`, 0]}, {$ifNull: [`$le`, 0]}
+                    {$ifNull: [`$even`, `$chan`]}
+                ,   {$ifNull: [`$odd`, `$le`]}
                 ,   {$ifNull: [`$red2`, 0]}
                 ,   `$red3`, `$red4`, `$white3`, `$white4`
-                ,   {$ifNull: [`$odd`, 0]}, {$ifNull: [`$even`, 0]}
                 ]}
             ,   {$toInt: {$not: `$freeBet`}}
             ]}]
@@ -93,7 +93,14 @@ dbs.summary.game_summary_config.insertMany([
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$0`, `$1`, `$2`, `$3`, `$4`, `$5`]
+        ,   stake: [
+                {$ifNull: [`$stag`      , `$0`]}
+            ,   {$ifNull: [`$gourd`     , `$1`]}
+            ,   {$ifNull: [`$rooster`   , `$2`]}
+            ,   {$ifNull: [`$fish`      , `$3`]}
+            ,   {$ifNull: [`$crab`      , `$4`]}
+            ,   {$ifNull: [`$prawn`     , `$5`]}
+            ]
         ,   payout: [`$betwin`]
         }
     ,   config: {
@@ -118,11 +125,11 @@ dbs.summary.game_summary_config.insertMany([
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$bet`]
+        ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: [
                 {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$bet`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}
+            ,   {$multiply: [{$ifNull: [`$totalAmount`,`$bet`]}, {$toInt: `$win`}]}
+            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
             ]
         }
     ,   config: {
