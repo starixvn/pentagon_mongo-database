@@ -151,6 +151,11 @@
                 _title = (typeof title != "string") ? _title : title;
                 _resetHistory();
             };
+            const _test = (msg, ...conds) => {
+                if (!conds.every(eval)) {
+                    _logger.warn(_title, msg);
+                }
+            };
             const _try = (msg, ...conds) => {
                 if (!conds.every(eval)) {
                     _logger.err(_title, msg);
@@ -185,6 +190,7 @@
             ,   setLogger   : Object.extend({value: function (logger) {return _setLogger(logger)}}, _descriptor)
             ,   getTitle    : Object.extend({value: function () { return _getTitle() }}, _descriptor)
             ,   setTitle    : Object.extend({value: function (title) {return _setTitle(title)}}, _descriptor)
+            ,   test        : Object.extend({value: function (msg, ...conds) {return _test(msg, ...conds)}}, _descriptor)
             ,   try         : Object.extend({value: function (msg, ...conds) {return _try(msg, ...conds)}}, _descriptor)
             ,   do          : Object.extend({value: function (msg, ...conds) {return _do(msg, ...conds)}}, _descriptor)
             ,   hasError    : Object.extend({value: function () {return _hasError()}}, _descriptor)
@@ -216,6 +222,7 @@
             '1.0.1': [
                 `Hide internal variables & constants`
             ,   `Add method descriptor for enumerability`
+            ,   `[Shell.Assert] Add test() method`
             ]
         ,   '1.0.0': [
                 `Release [Shell.Format]`
