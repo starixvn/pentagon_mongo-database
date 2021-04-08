@@ -54,11 +54,12 @@
                 return _time ? new Date(Math.floor(_time / _roundDuration) * _roundDuration) : null;
             };
             const _getTimeStr = (time, round) => {
+                const _time = _getTime(time);
                 if (String.toLowerCase(round) == 'day') {
-                    return time.toISOString().substr(0,10);
+                    return _time.toISOString().substr(0,10);
                 };
                 if (String.toLowerCase(round) == 'hour') {
-                    return `${time.toISOString().substr(0,10)} ${time.toISOString().substr(11,8)}`;
+                    return `${_time.toISOString().substr(0,10)} ${_time.toISOString().substr(11,8)}`;
                 };
             };
             const _getSummaryColl = (round) => {
@@ -245,7 +246,7 @@
                 _logger.info(conf.name.en, `Done summarize data in ${timer.getTimerDuration()} ms`);
             };
             const _runSummary = (time, round) => {
-                const _time = _getTime((time || Date.now()) - _getRoundDuration(round), round);
+                const _time = _getTime(time || (Date.now() - _getRoundDuration(round)), round);
                 _logger.info(summaryDB, `Summary for ${_getTimeStr(_time, round)} started.`);
                 mongo.getDB(summaryDB).game_summary_config.find().forEach(conf => _runConfSummary(_time, round, conf));
                 _logger.info(summaryDB, `Data summary for ${_getTimeStr(_time, round)} finished.`);
@@ -289,6 +290,13 @@
             _assert.try(
                 `[destination] must be a MongoDB connection.`
             ,   destination instanceof Mongo
+            );
+            if (_assert.hasError()) {
+                return;
+            }
+            _assert.try(
+                `[source] must have [summary_arc] database`
+            ,   source.getDBs(undefined, {name: `summary_arc`}).databases.length == 1
             );
             if (_assert.hasError()) {
                 return;
@@ -538,11 +546,65 @@
 
                 const timer = new Tool.Timer();
                 _data.forEach((item, gameId) => {
-                    _logger.info(_title, `-------------------- Game #${gameId} --------------------`);
+                    _logger.info(_title, `-------------------- Game #${gameId} - ${_games[gameId].coll.group} --------------------`);
                     timer.register(`start_${gameId}`);
                     item.forEach(day => _updateDataBank_GameDay(gameId, day));
-                    _logger.info(_title, `DataBank for game #${gameId} updated in ${timer.getElapsedDuration(`start_${gameId}`)} ms.`);
-                    _logger.info(_title, `-------------------- Game #${gameId} --------------------\n`);
+                    _logger.info(_title, `Finished update DataBank for game #${gameId} in ${timer.getElapsedDuration(`start_${gameId}`)} ms.`);
+                    _logger.info(_title, `-------------------- Game #${gameId} - ${_games[gameId].coll.group} --------------------`);
+                });
+
+                // Re-check DataBank
+                _checkDayBank();
+            }
+            const _downloadData_GameDay = (gameId, day) => {
+                const _title = `Download Data`;
+                const _conf = _games[gameId];
+
+                let _res = {};
+                const timer = new Tool.Timer();
+                _logger.info(_title, `[${_getDayName(day.time)}]`);
+
+                // Download data from DataBank
+                const _pQuery = {gameId: gameId, time: day.time, memberId: {$in: day.topMem.map(_ => _.memberId)}};
+                const _patterns = source.getDB(`summary_arc`).smartbot_databank_patterns.find(_pQuery).toArray();
+
+                const _bQuery = {patId: {$in: _patterns.map(_ => _._id)}};
+                const _bets = source.getDB(`summary_arc`).smartbot_databank_bets.find(_bQuery, {_id: 0}).toArray();
+
+                timer.register(`patterns`);
+                _res = destination.getDB(`minigame`)[`smartbot_${_conf.coll.group}_patterns`].insertMany(_patterns, {ordered: false});
+                _logger.info(_title, `  - Inserted ${_res.insertedIds.length}/${_patterns.length} patterns in ${timer.getElapsedDuration(`patterns`)} ms.`);
+
+                timer.register(`bets`);
+                _res = destination.getDB(`minigame`)[`smartbot_${_conf.coll.group}_bets`].insertMany(_bets, {ordered: false});
+                _logger.info(_title, `  - Inserted ${_res.insertedIds.length}/${_bets.length} bets in ${timer.getElapsedDuration(`bets`)} ms.`);
+            };
+            const _downloadData = () => {
+                // Update DataBank first
+                _updateDataBank();
+
+                const _title = `Download Data`;
+
+                const timer = new Tool.Timer();
+                _data.forEach((item, gameId) => {
+                    const _conf = _games[gameId];
+                    _logger.info(_title, `-------------------- Game #${gameId} - ${_games[gameId].coll.group} --------------------`);
+                    timer.register(`start_${gameId}`);
+
+                    try {
+                        destination._defaultSession.startTransaction();
+                        destination.getDB(`minigame`)[`smartbot_${_conf.coll.group}_patterns`].deleteMany({});
+                        destination.getDB(`minigame`)[`smartbot_${_conf.coll.group}_bets`].deleteMany({});
+                        item.forEach(day => _downloadData_GameDay(gameId, day));
+                        destination._defaultSession.commitTransaction();
+                    } catch (e) {
+                        destination._defaultSession.abortTransaction();
+                        _logger.err(_title, `${e.toString()}`);
+                        return;
+                    }
+
+                    _logger.info(_title, `Finished download data for game #${gameId} in ${timer.getElapsedDuration(`start_${gameId}`)} ms.`);
+                    _logger.info(_title, `-------------------- Game #${gameId} - ${_games[gameId].coll.group} --------------------`);
                 });
             }
 
@@ -560,6 +622,7 @@
             ,   loadTopMem      : Object.extend({value: function (numMem) { return _loadTopMem(numMem) }}, _descriptor)
             ,   loadTop         : Object.extend({value: function (numDay, numMem) { return _loadTop(numDay, numMem) }}, _descriptor)
             ,   updateDataBank  : Object.extend({value: function () { return _updateDataBank() }}, _descriptor)
+            ,   downloadData    : Object.extend({value: function () { return _downloadData() }}, _descriptor)
             });
         }
     };
@@ -588,6 +651,8 @@
                 `Hide internal variables & constants`
             ,   `Add method descriptor for enumerability`
             ,   `[SabaClub.Summary] Set last day/hour as default time`
+            ,   `[SabaClub.Summary] Fix getTimeStr() error when input is not Date`
+            ,   `[SabaClub.Summary] Fix input time being moved to 1 day prior`
             ,   `Release [SabaClub.SmartBot]`
             ,   `Add descriptor to class' universal methods`
             ]
