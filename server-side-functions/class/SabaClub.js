@@ -1,3 +1,7 @@
+/*  =============================================================================
+ *  class/SabaClub.js v1.0.1
+ *  =============================================================================
+ */
 {
     const Summary = class {
         constructor (mongo, summaryDB) {
@@ -253,7 +257,7 @@
                 return _runSummary(time, 'HOUR');
             };
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -338,7 +342,9 @@
             const _checkDayBank = () => {
                 _gameIds.forEach(gameId => {
                     _data[gameId].forEach(day => {
-                        day.bankMem = source.getDB(`summary_arc`).smartbot_databank_patterns.count({gameId: gameId, time: day.time});
+                        const bankMems = source.getDB(`summary_arc`).smartbot_databank_patterns.find({gameId: gameId, time: day.time}, {_id: 0, memberId: 1}).toArray().map(_ => _.memberId);
+                        const topMems = day.topMem.map(_ => _.memberId);
+                        day.missingBankMems = topMems.filter(_ => !bankMems.includes(_));
                     });
                 });
             };
@@ -364,8 +370,6 @@
                     ]).toArray();
                     _logger.info(`Top TO`, `Done loading game #${gameId} in ${timer.getElapsedDuration(`start_${gameId}`)} ms`);
                 });
-
-                _checkDayBank();
             };
             const _loadTopMem = (numMem) => {
                 _assert.setTitle(`Audit`);
@@ -399,133 +403,150 @@
                     });
                     _logger.info(`Top Mem`, `Done loading game #${pos} in ${timer.getElapsedDuration(`start_${pos}`)} ms`);
                 });
+
+                _checkDayBank();
             };
             const _loadTop = (numDay, numMem) => {
                 _loadTopDay(numDay);
                 _loadTopMem(numMem);
             };
+            const _getDayName = (day) => {
+                return `${day.getFullYear()}${day.getMonth().toString().padStart(2,'0')}${day.getDate().toString().padStart(2,'0')}`;
+            };
+            const _updateDataBank_GameDayMember = (gameId, day, mem, roundData) => {
+                const _title = `Update DataBank GDM`;
+
+                // Only update DataBank for missing memberId
+                if (!day.missingBankMems.includes(mem.memberId)) {
+                    return;
+                }
+
+                const bets = [];
+                const patId = (source.getDB(`summary_arc`).smartbot_databank_patterns.find({}, {_id: 1}, 1).sort({_id: -1}).toArray()[0] || {_id: 0})._id + 1;
+                let res = {};
+
+                // Get member name, fallback to member id if not exists
+                const memberName = (destination.getDB(`minigame`).users.findOne(
+                    {'local.memberId': mem.memberId}
+                ,   {_id: 0, 'local.memberName': 1}
+                ) || {local: {memberName: mem.memberId.toString()}}).local.memberName;
+
+                const key = {
+                    gameId: gameId
+                ,   memberId: mem.memberId
+                ,   time: day.time
+                };
+                res = source.getDB(`summary_arc`).smartbot_databank_patterns.updateOne(
+                    key
+                ,   {   $set: {
+                            group: String.substr(memberName, 0, 3).toUpperCase()
+                        ,   stake: mem.stake
+                        }
+                    ,   $setOnInsert: {
+                            _id: patId
+                        }
+                    }
+                ,   {upsert: true}
+                );
+                const _patId = (source.getDB(`summary_arc`).smartbot_databank_patterns.findOne(key, {_id: 1}) || {_id: null})._id;
+                const _patName = `${gameId}-${_getDayName(day.time)}-${mem.memberId}`;
+
+                _assert.resetHistory();
+                _assert.try(
+                    `  Pattern #${_patId} ${_patName} unchanged.`
+                ,   ! (res.matchedCount == 1 && res.modifiedCount == 0)
+                );
+                if (_assert.hasError()) {
+                    return;
+                }
+                _assert.test(
+                    `  Inserting new pattern #${_patId} ${_patName}`
+                ,   !res.upsertedId
+                );
+                _assert.test(
+                    `  Pattern #${_patId} ${_patName} updated.`
+                ,   (res.matchedCount == 1 && res.modifiedCount == 0) || res.upsertedId
+                );
+
+                source.getDB(`summary_arc`).smartbot_databank_bets.deleteMany({patId: _patId});
+                source.getDB(`log_arc`).bets_bk.find(
+                    {$and: [
+                        {requestTimeStamp: {$gte: day.time.toISOString()}}
+                    ,   {requestTimeStamp: {$lt: (new Date(day.time.valueOf() + 24 * 3600 * 1000)).toISOString()}}
+                    ,   {'call.gameTypeId': gameId}
+                    ,   {'call.obCustId': mem.memberId}
+                    ]}
+                ,   {_id: 0, requestTimeStamp: 1, 'call.gameRoundId': 1, 'call.choiceId': 1, 'call.amount': 1}
+                ).forEach(bet => {
+                    bets.push({
+                        patId: _patId
+                    ,   time: roundData.rounds[`${bet.call.gameRoundId}`].valueOf() % (24*3600*1000)
+                    ,   round: bet.call.gameRoundId - roundData.fstRound
+                    ,   second: Math.round((roundData.rounds[`${bet.call.gameRoundId}`].valueOf() - ISODate(bet.requestTimeStamp).valueOf()) / 1000)
+                    ,   choiceId: bet.call.choiceId
+                    ,   amount: Number(bet.call.amount)
+                    });
+                });
+                res = source.getDB(`summary_arc`).smartbot_databank_bets.insertMany(bets, {ordered: false});
+                _logger.info(_title, `- (${_patId}) ${res.insertedIds.length} bets inserted`);
+            };
+            const _updateDataBank_GameDay = (gameId, day) => {
+                const _title = `Update DataBank`;
+
+                // If data bank already have enough data for the day, skip it
+                if (day.missingBankMems.length == 0) {
+                    return;
+                }
+
+                const _conf = _games[gameId];
+                const _dayName = `${gameId}-${_getDayName(day.time)}`;
+                _logger.warn(_title, `Updating for game-day ${_dayName} ...`);
+
+                // Get first round of day
+                const roundData = {
+                    rounds  : {}
+                ,   fstRound: 0
+                };
+                source.getDB(_conf.coll.db)[`${_conf.coll.group}${_conf.coll.round}`].find(
+                    {$and: [
+                        {time: {$gte: day.time}}
+                    ,   {time: {$lt: new Date(day.time.valueOf() + 25*3600*1000)}}
+                    ]}
+                ,   {_id: 0, id: 1, time: 1}
+                ).forEach(round => {
+                    roundData.rounds[`${round.id}`] = round.time;
+                });
+                roundData.fstRound = Math.min(...Object.keys(roundData.rounds).map(_ => Number(_)));
+
+                day.topMem.forEach(mem => _updateDataBank_GameDayMember(gameId, day, mem, roundData));
+            };
             const _updateDataBank = () => {
-                _assert.setTitle(`Audit`);
+                // Re-check DataBank first
+                _checkDayBank();
+
+                const _title = `Update DataBank`;
+                _assert.setTitle(_title);
                 _assert.try(
                     `Data is not loaded properly`
                 ,   _data.every(data => data instanceof Array)
                 ,   _data.every(data => data.every(obj => typeof obj == "object"))
-                ,   _data.every(data => data.every(obj => obj.hasOwnProperty(`topMem`)))
+                ,   _data.every(data => data.every(obj => obj.hasOwnProperty(`missingBankMems`)))
                 );
                 if (_assert.hasError()) {
                     return;
                 }
 
-                _checkDayBank();
-                _assert.setTitle(`Update DataBank`);
-
                 const timer = new Tool.Timer();
                 _data.forEach((item, gameId) => {
-                    const conf = _games[gameId];
+                    _logger.info(_title, `-------------------- Game #${gameId} --------------------`);
                     timer.register(`start_${gameId}`);
-
-                    item.forEach(day => {
-                        // If data bank already have enough data for the day, skip it
-                        _assert.resetHistory();
-                        _assert.try(
-                            `Data bank has already had enough data for ${day.time.toISOString()}`
-                        ,   day.bankMem < day.topMem.length
-                        );
-                        if (_assert.hasError()) {
-                            return;
-                        }
-
-                        let res = {};
-
-                        // Get first round of day
-                        const rounds = {};
-                        source.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.round}`].find(
-                            {$and: [
-                                {time: {$gte: day.time}}
-                            ,   {time: {$lt: new Date(day.time.valueOf() + 25*3600*1000)}}
-                            ]}
-                        ,   {_id: 0, id: 1, time: 1}
-                        ).forEach(round => {
-                            rounds[`${round.id}`] = round.time;
-                        });
-                        const fstRound = Math.min(...Object.keys(rounds).map(_ => Number(_)));
-
-                        day.topMem.forEach(mem => {
-                            const bets = [];
-                            const patId = (source.getDB(`summary_arc`).smartbot_databank_patterns.find({}, {_id: 1}, 1).sort({_id: -1}).toArray()[0] || {_id: 0})._id + 1;
-
-                            // Get member name, fallback to member id if not exists
-                            const memberName = (destination.getDB(`minigame`).users.findOne(
-                                {'local.memberId': mem.memberId}
-                            ,   {_id: 0, 'local.memberName': 1}
-                            ) || {local: {memberName: mem.memberId.toString()}}).local.memberName;
-
-                            const key = {
-                                gameId: gameId
-                            ,   memberId: mem.memberId
-                            ,   time: day.time
-                            };
-                            res = source.getDB(`summary_arc`).smartbot_databank_patterns.updateOne(
-                                key
-                            ,   {   $set: {
-                                        group: String.substr(memberName, 0, 3).toUpperCase()
-                                    ,   stake: mem.stake
-                                    }
-                                ,   $setOnInsert: {
-                                        _id: patId
-                                    }
-                                }
-                            ,   {upsert: true}
-                            );
-                            const _patId = (source.getDB(`summary_arc`).smartbot_databank_patterns.findOne(key, {_id: 1}) || {_id: null})._id;
-                            const _padName = `${gameId}-${day.time.getFullYear()}${day.time.getMonth().toString().padStart(2,'0')}${day.time.getDate().toString().padStart(2,'0')}-${mem.memberId}`;
-
-                            _assert.setTitle(`Update DataBank`);
-                            _assert.try(
-                                `Pattern #${_patId} ${_padName} unchanged.`
-                            ,   ! (res.matchedCount == 1 && res.modifiedCount == 0)
-                            );
-                            if (_assert.hasError()) {
-                                return;
-                            }
-
-                            _assert.test(
-                                `Inserting new pattern #${_patId} ${_padName}`
-                            ,   !res.upsertedId
-                            );
-                            _assert.test(
-                                `Pattern #${_patId} ${_padName} updated.`
-                            ,   (res.matchedCount == 1 && res.modifiedCount == 0) || res.upsertedId
-                            );
-
-                            source.getDB(`summary_arc`).smartbot_databank_bets.deleteMany({patId: _patId});
-                            source.getDB(`log_arc`).bets_bk.find(
-                                {$and: [
-                                    {requestTimeStamp: {$gte: day.time.toISOString()}}
-                                ,   {requestTimeStamp: {$lt: (new Date(day.time.valueOf() + 24 * 3600 * 1000)).toISOString()}}
-                                ,   {'call.gameTypeId': gameId}
-                                ,   {'call.obCustId': mem.memberId}
-                                ]}
-                            ,   {_id: 0, requestTimeStamp: 1, 'call.gameRoundId': 1, 'call.choiceId': 1, 'call.amount': 1}
-                            ).forEach(bet => {
-                                bets.push({
-                                    patId: _patId
-                                ,   time: rounds[`${bet.call.gameRoundId}`].valueOf() % (24*3600*1000)
-                                ,   round: bet.call.gameRoundId - fstRound
-                                ,   second: Math.round((rounds[`${bet.call.gameRoundId}`].valueOf() - ISODate(bet.requestTimeStamp).valueOf()) / 1000)
-                                ,   choiceId: bet.call.choiceId
-                                ,   amount: Number(bet.call.amount)
-                                });
-                            });
-                            res = source.getDB(`summary_arc`).smartbot_databank_bets.insertMany(bets, {ordered: false});
-                            _assert.test(`  - (${_patId}) ${res.insertedIds.length} bets inserted`, false);
-                        });
-                    });
-                    _logger.info(`Generate Data`, `Done generating data for game #${gameId} in ${timer.getElapsedDuration(`start_${gameId}`)} ms`);
+                    item.forEach(day => _updateDataBank_GameDay(gameId, day));
+                    _logger.info(_title, `DataBank for game #${gameId} updated in ${timer.getElapsedDuration(`start_${gameId}`)} ms.`);
+                    _logger.info(_title, `-------------------- Game #${gameId} --------------------\n`);
                 });
             }
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -552,9 +573,13 @@
             const cSmartBot = Object.extend(${tojson(SmartBot)}, ${tojson(SmartBotExt)});
             const _toStr = function () {return this.constructor.name};
 
+            const _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             return {
-                Summary: Object.defineProperties(cSummary, {toString: {value: _toStr}, tojson: {value: _toStr}})
-            ,   SmartBot: Object.defineProperties(cSmartBot, {toString: {value: _toStr}, tojson: {value: _toStr}})
+                Summary: Object.defineProperties(cSummary, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+            ,   SmartBot: Object.defineProperties(cSmartBot, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
     ,   version: `1.0.1`
@@ -564,6 +589,7 @@
             ,   `Add method descriptor for enumerability`
             ,   `[SabaClub.Summary] Set last day/hour as default time`
             ,   `Release [SabaClub.SmartBot]`
+            ,   `Add descriptor to class' universal methods`
             ]
         ,   '1.0.0': [
                 `Release [SabaClub.Summary]`

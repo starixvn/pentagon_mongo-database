@@ -1,3 +1,7 @@
+/*  =============================================================================
+ *  class/Tool.js v1.0.1
+ *  =============================================================================
+ */
 {
     const Timer = class {
         constructor () {
@@ -32,7 +36,7 @@
                 return _getTimer(Tool.Timer.CONST.FINISH) ? _getDuration(Tool.Timer.CONST.FINISH) : _getElapsedDuration(Tool.Timer.CONST.START);
             };
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -101,7 +105,7 @@
                 return _content;
             };
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -124,9 +128,13 @@
             const cFileReader = Object.extend(${tojson(FileReader)}, ${tojson(FileReaderExt)});
             const _toStr = function () {return this.constructor.name};
 
+            const _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             return {
-                Timer: Object.defineProperties(cTimer, {toString: {value: _toStr}, tojson: {value: _toStr}})
-            ,   FileReader: Object.defineProperties(cFileReader, {toString: {value: _toStr}, tojson: {value: _toStr}})
+                Timer: Object.defineProperties(cTimer, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+            ,   FileReader: Object.defineProperties(cFileReader, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
     ,   version: `1.0.1`
@@ -134,6 +142,7 @@
             '1.0.1': [
                 `Hide internal variables & constants`
             ,   `Add method descriptor for enumerability`
+            ,   `Add descriptor to class' universal methods`
             ]
         ,   '1.0.0': [
                 `Release [Tool.Timer]`

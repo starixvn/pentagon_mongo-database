@@ -1,3 +1,7 @@
+/*  =============================================================================
+ *  class/Shell.js v1.0.1
+ *  =============================================================================
+ */
 {
     const Format = class {
         constructor () {
@@ -28,7 +32,7 @@
                 return `${_code(color)}${text || ''}${_end(color)}`;
             };
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -106,7 +110,7 @@
                 _paint(title, message, type, Shell.Log.CONST[type]);
             };
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -180,7 +184,7 @@
                 this.history = [];
             };
 
-            let _descriptor = {
+            const _descriptor = {
                 writable: false
             ,   enumerable: true
             };
@@ -211,10 +215,14 @@
             const cAssert = Object.extend(${tojson(Assert)}, ${tojson(AssertExt)});
             const _toStr = function () {return this.constructor.name};
 
+            const _descriptor = {
+                writable: false
+            ,   enumerable: true
+            };
             return {
-                Format: Object.defineProperties(cFormat, {toString: {value: _toStr}, tojson: {value: _toStr}})
-            ,   Log: Object.defineProperties(cLog, {toString: {value: _toStr}, tojson: {value: _toStr}})
-            ,   Assert: Object.defineProperties(cAssert, {toString: {value: _toStr}, tojson: {value: _toStr}})
+                Format: Object.defineProperties(cFormat, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+            ,   Log: Object.defineProperties(cLog, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+            ,   Assert: Object.defineProperties(cAssert, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
     ,   version: `1.0.1`
@@ -223,6 +231,7 @@
                 `Hide internal variables & constants`
             ,   `Add method descriptor for enumerability`
             ,   `[Shell.Assert] Add test() method`
+            ,   `Add descriptor to class' universal methods`
             ]
         ,   '1.0.0': [
                 `Release [Shell.Format]`
