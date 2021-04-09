@@ -8,11 +8,11 @@ END;
 GO
 ALTER PROCEDURE	gfn.SmartBotReport_Pattern
 					@Type			NVARCHAR(128)	= NULL
-				,	@Var1			SQL_VARIANT		= NULL
-				,	@Var2			SQL_VARIANT		= NULL
-				,	@Var3			SQL_VARIANT		= NULL
-				,	@Var4			SQL_VARIANT		= NULL
-				,	@Var5			SQL_VARIANT		= NULL
+				,	@Var1			SQL_VARIANT		= NULL		-- SC
+				,	@Var2			SQL_VARIANT		= NULL		-- GameId
+				,	@Var3			SQL_VARIANT		= NULL		-- Limit
+				,	@Var4			SQL_VARIANT		= NULL		-- Day
+				,	@Var5			SQL_VARIANT		= NULL		-- Group
 WITH ENCRYPTION
 AS
 BEGIN;

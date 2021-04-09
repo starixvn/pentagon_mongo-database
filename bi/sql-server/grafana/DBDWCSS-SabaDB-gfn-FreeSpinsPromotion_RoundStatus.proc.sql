@@ -91,7 +91,7 @@ LEFT JOIN	minigame.userinfos AS ui
 ';
 
 	INSERT INTO	@SpinLogs (roundId, memberId, username, regDate, currency, spinCnt, exSpinCnt, availSpin, importDate, expiryDate, sCoinWin, sCoinSpin, joinDate)
-	EXECUTE	(@Query) AT L2_SABABI;
+	EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 
 	SELECT	[Status]			= CASE	WHEN spinCnt > 0 AND exSpinCnt IS NOT NULL
 											THEN N'Expired'

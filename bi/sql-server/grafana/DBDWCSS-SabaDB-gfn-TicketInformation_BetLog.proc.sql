@@ -90,13 +90,13 @@ WHERE	`result.obTransId` = ' + CAST(@obTransId AS NVARCHAR(MAX)) + N'
 ';
 
 		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
-		EXECUTE	(@Query) AT L1_SABABI;
+		EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
 
 		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
-		EXECUTE	(@Query) AT L2_SABABI;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 
 		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
-		EXECUTE	(@Query) AT L3_SABABI;
+		EXECUTE	base.ExecuteSabaQuery @Query, 3, 0;
 
 		SELECT	[API]			= bc.callAPI
 			,	[GameId]		= LTRIM(g.owGameTypeId) + N'.' + LTRIM(bc.gameTypeId)
@@ -136,13 +136,13 @@ WHERE	`local.memberName` = "' + @username + N'"
 ';
 
 			INSERT INTO	@Users (obCustId, username)
-			EXECUTE	(@Query) AT L1_SABABI;
+			EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
 
 			INSERT INTO	@Users (obCustId, username)
-			EXECUTE	(@Query) AT L2_SABABI;
+			EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 
 			INSERT INTO	@Users (obCustId, username)
-			EXECUTE	(@Query) AT L3_SABABI;
+			EXECUTE	base.ExecuteSabaQuery @Query, 3, 0;
 
 			SELECT	@obCustId = obCustId
 			FROM	@Users;
@@ -191,13 +191,13 @@ WHERE	`call._t` = "PlaceBetCall"
 ';
 
 		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
-		EXECUTE	(@Query) AT L1_SABABI;
+		EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
 
 		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
-		EXECUTE	(@Query) AT L2_SABABI;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 
 		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
-		EXECUTE	(@Query) AT L3_SABABI;
+		EXECUTE	base.ExecuteSabaQuery @Query, 3, 0;
 
 		SELECT	[API]			= bc.callAPI
 			,	[GameId]		= LTRIM(g.owGameTypeId) + N'.' + LTRIM(bc.gameTypeId)

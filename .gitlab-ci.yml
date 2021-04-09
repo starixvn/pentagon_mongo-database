@@ -1,4 +1,0 @@
-include:
-  - project: 'lumi-ops/ci-scripts'
-    ref: master
-    file: 'sonarqube/sonarqube.gitlab-ci.yml'

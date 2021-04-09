@@ -2,7 +2,7 @@ if ((2 ** Saba.env() & 6) > 0)
 {   // users
     [
         {   idxKeys : {'local.username': 1}
-        ,   idxOpts : {unique: true}
+        ,   idxOpts : {unique: true, collation: {locale: 'en', strength: 2}}
         }
     ,   {   idxKeys : {'local.memberId': 1}
         ,   idxOpts : {}

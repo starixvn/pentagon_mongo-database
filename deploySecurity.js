@@ -1,10 +1,14 @@
-[   'security/Roles.js'
-,   'security/main/MainUsers.js'
-].forEach((path) => {
-    try {
-        load(path);
-        Misc.log(`Deployed [${path}]`, `Success`, `DEPLOY`, `I`);
-    } catch (e) {
-        Misc.log(`${e}`, `Failure`, `DEPLOY`, `E`);
-    }
-});
+{
+    const logger = new Shell.Log(`DEPLOY-SECURITY`);
+
+    [   'security/Roles.js'
+    ,   'security/main/MainUsers.js'
+    ].forEach((path) => {
+        try {
+            load(path);
+            logger.info(`Success`, `Deployed [${path}]`);
+        } catch (e) {
+            logger.err(`Failure`, `${e}`);
+        }
+    });
+}

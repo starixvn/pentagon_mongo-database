@@ -99,11 +99,10 @@ FROM	(
 ORDER BY q.time, q.value DESC;
 	';
 
-		IF	@L = 1
 		BEGIN TRY;
 			DELETE	@Temporary;
 			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	(@Query) AT L1_SABABI;
+			EXECUTE	base.ExecuteSabaQuery @Query, @L, 0;
 			MERGE INTO	@Return AS r
 			USING	@Temporary AS t
 				ON	r.time = t.time
@@ -117,53 +116,7 @@ ORDER BY q.time, q.value DESC;
 		END TRY
 		BEGIN CATCH
 			SELECT	@ErrMsg = N'\
-Query from L1_SABABI
-	- ' + ERROR_MESSAGE()
-			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
-		END CATCH;
-
-		IF	@L = 2
-		BEGIN TRY;
-			DELETE	@Temporary;
-			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	(@Query) AT L2_SABABI;
-			MERGE INTO	@Return AS r
-			USING	@Temporary AS t
-				ON	r.time = t.time
-				AND	r.metric = t.metric
-			WHEN MATCHED THEN
-				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
-			WHEN NOT MATCHED THEN
-				INSERT	(time, metric, value)
-				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
-			;
-		END TRY
-		BEGIN CATCH
-			SELECT	@ErrMsg = N'\
-Query from L2_SABABI
-	- ' + ERROR_MESSAGE()
-			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
-		END CATCH;
-
-		IF	@L = 3
-		BEGIN TRY;
-			DELETE	@Temporary;
-			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	(@Query) AT L3_SABABI;
-			MERGE INTO	@Return AS r
-			USING	@Temporary AS t
-				ON	r.time = t.time
-				AND	r.metric = t.metric
-			WHEN MATCHED THEN
-				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
-			WHEN NOT MATCHED THEN
-				INSERT	(time, metric, value)
-				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
-			;
-		END TRY
-		BEGIN CATCH
-			SELECT	@ErrMsg = N'\
-Query from L3_SABABI
+Query from L' + @L + N'_SABABI
 	- ' + ERROR_MESSAGE()
 			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
 		END CATCH;
@@ -189,11 +142,10 @@ FROM	(
 ORDER BY q.time, q.value DESC;
 	';
 
-		IF	@L = 1
 		BEGIN TRY;
 			DELETE	@Temporary;
 			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	(@Query) AT L1_SABAARCBI;
+			EXECUTE	base.ExecuteSabaQuery @Query, @L, 1;
 			MERGE INTO	@Return AS r
 			USING	@Temporary AS t
 				ON	r.time = t.time
@@ -207,53 +159,7 @@ ORDER BY q.time, q.value DESC;
 		END TRY
 		BEGIN CATCH
 			SELECT	@ErrMsg = N'\
-Query from L1_SABAARCBI
-	- ' + ERROR_MESSAGE()
-			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
-		END CATCH;
-
-		IF	@L = 2
-		BEGIN TRY;
-			DELETE	@Temporary;
-			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	(@Query) AT L2_SABAARCBI;
-			MERGE INTO	@Return AS r
-			USING	@Temporary AS t
-				ON	r.time = t.time
-				AND	r.metric = t.metric
-			WHEN MATCHED THEN
-				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
-			WHEN NOT MATCHED THEN
-				INSERT	(time, metric, value)
-				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
-			;
-		END TRY
-		BEGIN CATCH
-			SELECT	@ErrMsg = N'\
-Query from L2_SABAARCBI
-	- ' + ERROR_MESSAGE()
-			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
-		END CATCH;
-
-		IF	@L = 3
-		BEGIN TRY;
-			DELETE	@Temporary;
-			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	(@Query) AT L3_SABAARCBI;
-			MERGE INTO	@Return AS r
-			USING	@Temporary AS t
-				ON	r.time = t.time
-				AND	r.metric = t.metric
-			WHEN MATCHED THEN
-				UPDATE SET	r.value = r.value + ISNULL(t.value, 0)
-			WHEN NOT MATCHED THEN
-				INSERT	(time, metric, value)
-				VALUES	(t.time, t.metric, ISNULL(t.value, 0))
-			;
-		END TRY
-		BEGIN CATCH
-			SELECT	@ErrMsg = N'\
-Query from L3_SABAARCBI
+Query from L' + @L + N'_SABAARCBI
 	- ' + ERROR_MESSAGE()
 			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
 		END CATCH;

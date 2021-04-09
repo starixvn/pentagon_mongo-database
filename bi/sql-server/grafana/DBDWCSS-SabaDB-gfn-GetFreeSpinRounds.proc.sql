@@ -26,9 +26,10 @@ FROM	minigame.spin_logs
 WHERE	roundId > 0
 	AND	time >= "' + CONVERT(NVARCHAR(MAX), ISNULL(@fromDate, 0), 120) + N'"
 	AND	time <= "' + CONVERT(NVARCHAR(MAX), ISNULL(@toDate, GETUTCDATE()), 120) + N'"
+ORDER BY roundId DESC
 ';
 
-	EXECUTE	(@Query) AT L2_SABABI;
+	EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 END;
 GO
 EXECUTE	gfn.GetFreeSpinRounds
