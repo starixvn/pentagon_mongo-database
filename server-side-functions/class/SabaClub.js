@@ -54,7 +54,7 @@
                 return _time ? new Date(Math.floor(_time / _roundDuration) * _roundDuration) : null;
             };
             const _getTimeStr = (time, round) => {
-                const _time = _getTime(time);
+                const _time = _getTime(time, round);
                 if (String.toLowerCase(round) == 'day') {
                     return _time.toISOString().substr(0,10);
                 };
