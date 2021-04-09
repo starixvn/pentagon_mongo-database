@@ -154,11 +154,11 @@ dbs.summary.game_summary_config.insertMany([
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$bet`]
+        ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: [
                 {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$bet`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}
+            ,   {$multiply: [{$ifNull: [`$totalAmount`, `$bet`]}, {$toInt: `$win`}]}
+            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
             ]
         }
     ,   config: {
@@ -183,11 +183,11 @@ dbs.summary.game_summary_config.insertMany([
             map: `phien`
         ,   time: `$time`
         ,   settled: `$thanhtoan`
-        ,   stake: [`$bet`]
+        ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: [
                 {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$bet`, {$toInt: `$win`}]}
-            ,   {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}
+            ,   {$multiply: [{$ifNull: [`$totalAmount`, `$bet`]}, {$toInt: `$win`}]}
+            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
             ]
         }
     ,   config: {
