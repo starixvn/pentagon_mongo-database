@@ -1,5 +1,5 @@
 /*  =============================================================================
- *  class/SabaClub.js v1.0.1
+ *  class/SabaClub.js v1.0.2
  *  =============================================================================
  */
 {
@@ -178,7 +178,7 @@
                     updCurrencyPipe.push({updateMany: {
                         filter: {uid: doc.id, '__archive.isCash': {$exists: false}}
                     ,   update: [
-                            {$set: {'__archive.isCash': {$literal: doc.isCash ? doc.isCash : null}}}
+                            {$set: {'__archive.isCash': {$literal: doc.isCash == null ? null : doc.isCash}}}
                         ]
                     }});
                 });
@@ -232,9 +232,9 @@
                 summaries.forEach(doc => {
                     const res = mongo.getDB(summaryDB)[coll].updateOne(doc.key, {$set: doc.value}, {upsert: true});
                     if (res.upsertedId) {
-                        _logger.info(conf.name.en, `- Inserted new summary record for ${doc.key.currency}`);
+                        _logger.info(conf.name.en, `- Inserted new summary record for ${doc.key.currency} ${doc.key.isCash == null ? 'null' : doc.key.isCash ? 'DEP' : 'CRE'}`);
                     } else if (res.modifiedCount > 0) {
-                        _logger.info(conf.name.en, `- Modified summary record for ${doc.key.currency}`);
+                        _logger.info(conf.name.en, `- Modified summary record for ${doc.key.currency} ${doc.key.isCash == null ? 'null' : doc.key.isCash ? 'DEP' : 'CRE'}`);
                     }
 
                     const _doc = {};
@@ -256,9 +256,9 @@
                         }
                         const res = mongo.getDB(summaryDB)[coll].deleteOne(_doc);
                         if (res.deletedCount > 0) {
-                            _logger.warn(conf.name.en, `- Deleted summary record for ${_doc.currency}`);
+                            _logger.warn(conf.name.en, `- Deleted summary record for ${_doc.currency} ${_doc.isCash == null ? 'null' : _doc.isCash ? 'DEP' : 'CRE'}`);
                         } else {
-                            _logger.info(conf.name.en, `- No summary record deleted for ${_doc.currency}`);
+                            _logger.info(conf.name.en, `- No summary record deleted for ${_doc.currency} ${_doc.isCash == null ? 'null' : _doc.isCash ? 'DEP' : 'CRE'}`);
                         }
                     } catch (e) {
                         _logger.err(conf.name.en, `- Something is WRONG while deleting summary record for ${doc}`);
@@ -296,7 +296,7 @@
     const SmartBot = class {
         constructor (source, destination) {
             const _logger = new Shell.Log(`iBOT`);
-            const _assert = new Shell.Assert();``
+            const _assert = new Shell.Assert();
             _assert.setLogger(_logger);
 
             let _gameIds = [];
