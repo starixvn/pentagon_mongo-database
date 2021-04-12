@@ -126,16 +126,20 @@
                 ,   stake: {$sum: conf.fields.stake}
                 ,   payout: {$sum: conf.fields.payout}
                 ,   '__archive.currency': 1
+                ,   '__archive.isCash': 1
                 }});
                 agg.push({$group: {
-                    _id: `$__archive.currency`
+                    _id: {
+                        currency: `$__archive.currency`
+                    ,   isCash: {$ifNull: [`$__archive.isCash`, null]}
+                    }
                 ,   stake: {$sum: `$stake`}
                 ,   payout: {$sum: `$payout`}
                 ,   tickets: {$sum: 1}
                 }});
                 agg.push({$project: {
                     _id: 0,
-                    'key.time': {$literal: _from}, 'key.gameId': {$literal: conf.gameId}, 'key.currency': `$_id`,
+                    'key.time': {$literal: _from}, 'key.gameId': {$literal: conf.gameId}, 'key.currency': `$_id.currency`, 'key.isCash': `$_id.isCash`,
                     'value.stake': `$stake`, 'value.payout': `$payout`, 'value.tickets': `$tickets`
                 }});
 
@@ -143,17 +147,26 @@
             };
             const _insertCurrency = (conf) => {
                 const timer = new Tool.Timer();
-                const uids = [];
+                const uidsCurrency = [];
                 mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
                     {$match: {'__archive.currency': {$exists: false}, memberId: {$gt: 0}}}
                 ,   {$project: {_id: 0, uid: 1}}
                 ,   {$group: {_id: `$uid`}}
                 ]).forEach(doc => {
-                    uids.push(doc._id);
+                    uidsCurrency.push(doc._id);
+                });
+
+                const uidsCash = [];
+                mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
+                    {$match: {'__archive.isCash': {$exists: false}, memberId: {$gt: 0}}}
+                ,   {$project: {_id: 0, uid: 1}}
+                ,   {$group: {_id: `$uid`}}
+                ]).forEach(doc => {
+                    uidsCash.push(doc._id);
                 });
 
                 const updCurrencyPipe = [];
-                mongo.getDB(conf.coll.db).userinfos.find({id: {$in: uids}}, {_id: 0, id: 1, currency: 1}).forEach(doc => {
+                mongo.getDB(conf.coll.db).userinfos.find({id: {$in: uidsCurrency}}, {_id: 0, id: 1, currency: 1}).forEach(doc => {
                     updCurrencyPipe.push({updateMany: {
                         filter: {uid: doc.id, '__archive.currency': {$exists: false}}
                     ,   update: [
@@ -161,11 +174,19 @@
                         ]
                     }});
                 });
+                mongo.getDB(conf.coll.db).userinfos.find({id: {$in: uidsCash}}, {_id: 0, id: 1, isCash: 1}).forEach(doc => {
+                    updCurrencyPipe.push({updateMany: {
+                        filter: {uid: doc.id, '__archive.isCash': {$exists: false}}
+                    ,   update: [
+                            {$set: {'__archive.isCash': {$literal: doc.isCash ? doc.isCash : null}}}
+                        ]
+                    }});
+                });
                 const res = mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].bulkWrite(updCurrencyPipe, {ordered: false});
 
                 if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
-                    _logger.info(`${conf.name.en} Insert Currency`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
-                    _logger.info(`${conf.name.en} Insert Currency`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
+                    _logger.info(`${conf.name.en} Insert User's Info`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
+                    _logger.info(`${conf.name.en} Insert User's Info`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
                 }
             };
             const _getOldSummary = (time, round, conf) => {
@@ -173,7 +194,7 @@
                 const coll = _getSummaryColl(round);
                 mongo.getDB(summaryDB)[coll].find(
                     {time: time, gameId: conf.gameId}
-                ,   {_id: 0, time: 1, gameId: 1, currency: 1}
+                ,   {_id: 0, time: 1, gameId: 1, currency: 1, isCash: 1}
                 ).forEach(doc => {
                     const _doc = {};
                     Object.keys(doc).sort().forEach((k) => {
@@ -645,9 +666,12 @@
             ,   SmartBot: Object.defineProperties(cSmartBot, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
-    ,   version: `1.0.1`
+    ,   version: `1.0.2`
     ,   changelog: {
-            '1.0.1': [
+            '1.0.2': [
+                `[SabaClub.Summary] Add isCash field to summary`
+            ]
+        ,   '1.0.1': [
                 `Hide internal variables & constants`
             ,   `Add method descriptor for enumerability`
             ,   `[SabaClub.Summary] Set last day/hour as default time`
