@@ -21,6 +21,9 @@ if ((2 ** Saba.env() & 6) > 0)
         {   idxKeys : {id: 1}
         ,   idxOpts : {unique: true, collation: {locale: 'simple'}}
         }
+    ,   {   idxKeys : {id: 1}
+        ,   idxOpts : {unique: true, collation: {locale: 'en', strength: 2}}
+        }
     ,   {   idxKeys : {UID: 1}
         ,   idxOpts : {unique: true}
         }

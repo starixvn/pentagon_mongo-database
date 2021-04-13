@@ -26,6 +26,7 @@
             name = _idxOpts.partialFilterExpression ? `F${name}` : name;
             name = `${name}_${coll._shortName}_${Object.keys(_idxKeys).join('_')}`;
             name = _idxOpts.expireAfterSeconds ? `TTL_${coll._shortName}` : name;
+            name = _idxOpts.collation && _idxOpts.collation.locale ? `${name}_${_idxOpts.collation.locale}` : name;
 
             _idxOpts.name = name;
         }
