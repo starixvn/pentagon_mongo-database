@@ -19,7 +19,7 @@ if ((2 ** Saba.env() & 6) > 0)
 {   // userinfos
     [
         {   idxKeys : {id: 1}
-        ,   idxOpts : {unique: true}
+        ,   idxOpts : {unique: true, collation: {locale: 'simple'}}
         }
     ,   {   idxKeys : {UID: 1}
         ,   idxOpts : {unique: true}
