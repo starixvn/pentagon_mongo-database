@@ -3,13 +3,12 @@
  *  =============================================================================
  */
 {
-    // 
+    // shellAutocomplete
     const shellAutocompleteProc = function (prefix) {
-        const fileList = ls().map(_ => /^\.\/(.*)$/.exec(_)[1]);
-        __autocomplete__ = __autocomplete__.concat(fileList.filter(_ => RegExp(`^${prefix}`).test(_))).sort();
+        const fileList = ls().map(_ => `${/^\.\/(.*)$/.exec(_)[1]} *`);
+        __autocomplete__ = __autocomplete__.concat(fileList.filter(_ => RegExp(`^${prefix}`).test(_).sort()));
     };
 
-    // Sec
     db.getSiblingDB(`script`).system.js.save({
         _id: `shellAutocomplete`
     ,   value:  new Code(`(() => {
