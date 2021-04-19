@@ -8,8 +8,8 @@
             idxKeys : {uid: 1, roundId: 1}
         ,   idxOpts : {unique: true}
         }
-    ,   uid_paid__id: {
-            idxKeys : {uid: 1, paid: 1, _id: 1}
+    ,   paid_id: {
+            idxKeys : {paid: 1, id: 1}
         ,   idxOpts : {}
         }
     ,   time: {
@@ -28,21 +28,24 @@
             idxKeys : {'__archive.currency': 1, memberId: 1, uid: 1}
         ,   idxOpts : {}
         }
-    ,   game_pool_createdAt: {
-            idxKeys : {game: 1, pool: 1, createdAt: 1}
+    ,   isCash: {
+            idxKeys : {'__archive.isCash': 1, memberId: 1, uid: 1}
+        ,   idxOpts : {}
+        }
+    ,   gameId_pool_createdAt: {
+            idxKeys : {gameId: 1, pool: 1, createdAt: 1}
         ,   idxOpts : {unique: true}
         }
     };
 
     if ((2 ** Saba.env() & 6) > 0)
     {   // Jackpot
-        [idxs.game_pool_createdAt].
+        [idxs.gameId_pool_createdAt].
             forEach((idx) => {Maint.createIndex(dbs.minigame.jackpots, idx.idxKeys, idx.idxOpts)});
     }
 
-    if ((2 ** Saba.env() & 6) > 0)
-    {   // Four Guardians
-        [idxs.TTL, idxs.time, idxs.id, idxs.uid_paid__id, idxs.currency].
+    if ((2 ** Saba.env() & 6) > 0) {   // 29 - Four Guardians
+        [idxs.TTL, idxs.time, idxs.id, idxs.paid_id, idxs.currency, idxs.isCash].
             forEach((idx) => {Maint.createIndex(dbs.minigame.fourguardians_rounds, idx.idxKeys, idx.idxOpts)});
         [idxs.TTL           , idxs.id, idxs.expiryTime].
             forEach((idx) => {Maint.createIndex(dbs.minigame.fourguardians_freespins, idx.idxKeys, idx.idxOpts)});

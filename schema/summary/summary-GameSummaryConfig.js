@@ -712,7 +712,7 @@ dbs.summary.game_summary_config.insertMany([
     ,   name: {
             en: `VIP Baccarat`
         ,   vi: `Cào Baccarat VIP`
-        ,   grp: `Fish Prawn Crab`
+        ,   grp: `Baccarat`
         }
     ,   coll: {
             db: `minigame`
