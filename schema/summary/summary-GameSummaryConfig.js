@@ -808,6 +808,31 @@ dbs.summary.game_summary_config.insertMany([
             hasCurrency: false
         }
     }
+
+,   {   gameId: 31
+    ,   owGameTypeId: 1642
+    ,   name: {
+            en: `Lottery`
+        ,   vi: `Xổ Số`
+        ,   grp: `Lottery`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `lottery`
+        ,   round: `_phiens`
+        ,   postfix: `_ones`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$totalAmount`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
 ]
 ,   {ordered: false}
 );

@@ -308,13 +308,12 @@
         // Not supported
     }
 
-    if ((2 ** Saba.env() & 0) > 0)
-    {   // 31 - Xo So
+    if ((2 ** Saba.env() & 0) > 2) {   // 31 - Xo So
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.lottery_phiens, idx.idxKeys, idx.idxOpts)});
-        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_thanhtoan__id].
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid__id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.lottery_cuocs, idx.idxKeys, idx.idxOpts)});
-        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.currency, idxs.isCash].
+        [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_thanhtoan__id, idxs.currency, idxs.isCash].
             forEach((idx) => {Maint.createIndex(dbs.minigame.lottery_ones, idx.idxKeys, idx.idxOpts)});
     }
 

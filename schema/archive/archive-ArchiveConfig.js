@@ -825,6 +825,37 @@ if ((2 ** Saba.env() & 6) > 0)
             }
         ,   childs: []
         }
+    ,   {   _id: 39031
+        ,   from: {
+                db: 'minigame'
+            ,   coll: 'lottery_phiens'
+            }
+        ,   to: {
+                db: 'minigame_arc'
+            ,   coll: 'lottery_phiens_bk'
+            }
+        ,   config: {
+                timeField: 'time'
+            ,   cutOffsetHours: -24
+            ,   join: 'id'
+            }
+        ,   childs: [
+                {   from: 'lottery_cuocs'
+                ,   to: 'lottery_cuocs_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ,   {   from: 'lottery_ones'
+                ,   to: 'lottery_ones_bk'
+                ,   join: 'phien'
+                ,   updateOnly: false
+                ,   filter: filter
+                ,   exCols: []
+                }
+            ]
+        }
     ,   {   _id: 25001
         ,   from: {
                 db: 'minigame'
