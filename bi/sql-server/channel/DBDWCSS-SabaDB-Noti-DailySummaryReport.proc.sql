@@ -17,6 +17,7 @@ AS
 	Revisions:
 		- 20201008@Billy:	Initial - [Gitlab: #058]
 		- 20210218@Billy:	Report by currency for SC3 - [Gitlab: #058]
+		- 20210423@Billy:	Update message format - [Gitlab: #060]
 
 	Developer's Notes:
 		- @ReportDate:				[optional]		- The date of data that will be compared. The time is in UTC timezone.
@@ -268,7 +269,7 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 							 + msg.str
 			FROM	(
 				SELECT	N'  
-\\\[' + currency + N' \\\(' + CASE isCash WHEN 0 THEN N'CRE' WHEN 1 THEN N'DEP' WHEN 2 THEN N'null' ELSE N'invalid' END + N'\)\]'
+\\\[' + currency + N' \(' + CASE isCash WHEN 0 THEN N'CRE' WHEN 1 THEN N'DEP' WHEN 2 THEN N'null' ELSE N'invalid' END + N'\)\]'
 + N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(betCount AS MONEY), 1), '.00', '')
 + N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
 + N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
