@@ -294,7 +294,7 @@
     const SummaryExt = {};
 
     const SmartBot = class {
-        constructor (source, destination) {
+        constructor (source, userinfos_source, destination) {
             const _logger = new Shell.Log(`iBOT`);
             const _assert = new Shell.Assert();
             _assert.setLogger(_logger);
@@ -307,6 +307,10 @@
             _assert.try(
                 `[source] must be a MongoDB connection.`
             ,   source instanceof Mongo
+            );
+            _assert.try(
+                `[userinfos_source] must be a MongoDB connection.`
+            ,   userinfos_source instanceof Mongo
             );
             _assert.try(
                 `[destination] must be a MongoDB connection.`
@@ -324,7 +328,7 @@
             }
 
             const _toString = () => {
-                return `[SabaClub.SmartBot]\n  Source: ${source.host}\n  Destination: ${destination.host}`;
+                return `[SabaClub.SmartBot]\n  Source: ${source.host}\n  UserInfo: ${userinfos_source.host}\n  Destination: ${destination.host}`;
             };
             const _printConfigs = (gameId) => {
                 _games.forEach((item, pos, arr) => {
@@ -455,7 +459,7 @@
                 let res = {};
 
                 // Get member name, fallback to member id if not exists
-                const memberName = (destination.getDB(`minigame`).users.findOne(
+                const memberName = (userinfos_source.getDB(`minigame`).users.findOne(
                     {'local.memberId': mem.memberId}
                 ,   {_id: 0, 'local.memberName': 1}
                 ) || {local: {memberName: mem.memberId.toString()}}).local.memberName;
@@ -666,9 +670,12 @@
             ,   SmartBot: Object.defineProperties(cSmartBot, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
-    ,   version: `1.0.2`
+    ,   version: `1.0.3`
     ,   changelog: {
-            '1.0.2': [
+            '1.0.3': [
+                `[SabaClub.SmartBot] Add parameter for input userinfo source`
+            ]
+        ,   '1.0.2': [
                 `[SabaClub.Summary] Add isCash field to summary`
             ]
         ,   '1.0.1': [
