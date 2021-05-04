@@ -16,6 +16,7 @@ AS
 
 	Revisions:
 		- 20210331@Billy:	Initial - [Gitlab: #059]
+		- 20210428@Billy:	Fix default @isTest is not behaved correctly - [Gitlab: #060]
 
 	Developer's Notes:
 		- @Var1:				[optional]		- Message that will be sent
@@ -37,7 +38,7 @@ BEGIN;
 		SELECT	@isTest		= 1
 	END CATCH;
 
-	DECLARE	@Telegram		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'T-BILLY' ELSE N'T-SCSYSHEALTH' END
+	DECLARE	@Telegram		NVARCHAR(128)	= CASE @isTest WHEN 0 THEN N'T-SCSYSHEALTH' ELSE N'T-BILLY' END
 		;
 
 	IF	@Message IS NOT NULL
@@ -54,3 +55,4 @@ BEGIN;
 	END;
 END;
 GO
+GRANT EXECUTE ON SysHealth.SendNotification TO sqlLink AS dbo;

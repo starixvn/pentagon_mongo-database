@@ -1,6 +1,4 @@
-USE	SabaDB;
 SET NOCOUNT ON;
-GO
 IF	OBJECT_ID('base.f_SplitString') IS NULL
 BEGIN;
 	EXECUTE	sys.sp_executesql N'CREATE FUNCTION base.f_SplitString() RETURNS @r TABLE (a INT) AS BEGIN RETURN END;';

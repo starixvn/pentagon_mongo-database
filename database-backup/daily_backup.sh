@@ -28,7 +28,7 @@ mongodump   --host=$host \
             --authenticationDatabase='admin' \
             --db='minigame' \
             --gzip \
-            --archive="minigame-$date.zip.bak"
+            --archive="SCx-minigame-$date.zip.bak"
 
 # Backup log database - once per hour
 if [ "$min" -lt "10" ]
@@ -39,7 +39,7 @@ then
                 --authenticationDatabase='admin' \
                 --db='log' \
                 --gzip \
-                --archive="log-$date.zip.bak"
+                --archive="SCx-log-$date.zip.bak"
 fi
 
 # Second, clean up old backup files
