@@ -32,11 +32,22 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
-        ,   payout: [
-                {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$totalAmount`,`$bet`]}, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
-            ]
+        ,   payout: (
+                (2 ** Saba.env() & 6) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$totalAmount`,`$bet`]}, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
+                ]
+            :   (2 ** Saba.env() & 8) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$cond: {
+                        if: {$or: [{$gte: ['$big', 0]}, {$gte: ['$small', 0]}]}
+                    ,   then: 0
+                    ,   else: {$sum: [{$multiply: [`$bet`, {$toInt: `$win`}]}, {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}]}
+                    }}
+                ]
+            :   [``]
+            )
         }
     ,   config: {
             hasCurrency: true
@@ -126,11 +137,22 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
-        ,   payout: [
-                {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$totalAmount`,`$bet`]}, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
-            ]
+        ,   payout: (
+                (2 ** Saba.env() & 6) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$totalAmount`,`$bet`]}, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
+                ]
+            :   (2 ** Saba.env() & 8) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$cond: {
+                        if: {$or: [{$gte: ['$big', 0]}, {$gte: ['$small', 0]}]}
+                    ,   then: 0
+                    ,   else: {$sum: [{$multiply: [`$bet`, {$toInt: `$win`}]}, {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}]}
+                    }}
+                ]
+            :   [``]
+            )
         }
     ,   config: {
             hasCurrency: true
@@ -155,11 +177,22 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
-        ,   payout: [
-                {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$totalAmount`, `$bet`]}, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
-            ]
+        ,   payout: (
+                (2 ** Saba.env() & 6) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$totalAmount`, `$bet`]}, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
+                ]
+            :   (2 ** Saba.env() & 8) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$cond: {
+                        if: {$or: [{$gte: ['$odd', 0]}, {$gte: ['$even', 0]}]}
+                    ,   then: 0
+                    ,   else: {$sum: [{$multiply: [`$bet`, {$toInt: `$win`}]}, {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}]}
+                    }}
+                ]
+            :   [``]
+            )
         }
     ,   config: {
             hasCurrency: true
@@ -184,11 +217,22 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
-        ,   payout: [
-                {$multiply: [`$betwin`, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$totalAmount`, `$bet`]}, {$toInt: `$win`}]}
-            ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
-            ]
+        ,   payout: (
+                (2 ** Saba.env() & 6) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$totalAmount`, `$bet`]}, {$toInt: `$win`}]}
+                ,   {$multiply: [{$ifNull: [`$refund`, `$tralai`]}, {$toInt: {$not: `$win`}}]}
+                ]
+            :   (2 ** Saba.env() & 8) > 0 ? [
+                    {$multiply: [`$betwin`, {$toInt: `$win`}]}
+                ,   {$cond: {
+                        if: {$or: [{$gte: ['$odd', 0]}, {$gte: ['$even', 0]}]}
+                    ,   then: 0
+                    ,   else: {$sum: [{$multiply: [`$bet`, {$toInt: `$win`}]}, {$multiply: [`$tralai`, {$toInt: {$not: `$win`}}]}]}
+                    }}
+                ]
+            :   [``]
+            )
         }
     ,   config: {
             hasCurrency: true
@@ -802,6 +846,31 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalBet`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
+,   {   gameId: 31
+    ,   owGameTypeId: 1642
+    ,   name: {
+            en: `Lottery`
+        ,   vi: `Xổ Số`
+        ,   grp: `Lottery`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `lottery`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_ones_bk`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
         }
     ,   config: {

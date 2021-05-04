@@ -38,6 +38,9 @@ BEGIN;
 			;
 	END CATCH;
 
+	IF	NULLIF(@Query, N'') IS NULL
+		RETURN;
+
 	IF	CAST(@_SC AS INT) = 1
 	AND	CAST(@_Env AS INT) = 0 -- Active
 		EXECUTE	(@Query) AT L1_SABABI;

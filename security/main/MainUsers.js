@@ -9,12 +9,6 @@
             ,   {role: `dbOwner`    , db: `config`}
             ]
         }
-    ,   {   name: `jason.ly`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `root`       , db: `admin`}
-            ]
-        }
     ,   {   name: `lmn_archive`
         ,   db: `admin`
         ,   roles: [
@@ -37,7 +31,8 @@
     ,   {   name: `lmn_readonly`
         ,   db: `admin`
         ,   roles: [
-                {role: `read`       , db: `log`}
+                {role: `read`       , db: `archive`}
+            ,   {role: `read`       , db: `log`}
             ,   {role: `read`       , db: `member`}
             ,   {role: `read`       , db: `minigame`}
             ,   {role: `read`       , db: `summary`}
@@ -53,7 +48,8 @@
     ,   {   name: `mongosqld`
         ,   db: `admin`
         ,   roles: [
-                {role: `read`       , db: `log`}
+                {role: `read`       , db: `archive`}
+            ,   {role: `read`       , db: `log`}
             ,   {role: `read`       , db: `member`}
             ,   {role: `read`       , db: `minigame`}
             ,   {role: `readWrite`  , db: `schema`}

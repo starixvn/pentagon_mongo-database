@@ -1,4 +1,4 @@
-if ((2 ** Saba.env() & 6) > 0)
+if ((2 ** Saba.env() & 14) > 0)
 {   // users
     [
         {   idxKeys : {'local.username': 1}
@@ -15,11 +15,14 @@ if ((2 ** Saba.env() & 6) > 0)
     });
 }
 
-if ((2 ** Saba.env() & 6) > 0)
+if ((2 ** Saba.env() & 14) > 0)
 {   // userinfos
     [
         {   idxKeys : {id: 1}
-        ,   idxOpts : {unique: true}
+        ,   idxOpts : {unique: true, collation: {locale: 'simple'}}
+        }
+    ,   {   idxKeys : {id: 1}
+        ,   idxOpts : {unique: true, collation: {locale: 'en', strength: 2}}
         }
     ,   {   idxKeys : {UID: 1}
         ,   idxOpts : {unique: true}
@@ -38,7 +41,7 @@ if ((2 ** Saba.env() & 6) > 0)
     });
 }
 
-if ((2 ** Saba.env() & 6) > 0)
+if ((2 ** Saba.env() & 14) > 0)
 {   // usersessions
     [
         {   idxKeys : {sessionId: 1}

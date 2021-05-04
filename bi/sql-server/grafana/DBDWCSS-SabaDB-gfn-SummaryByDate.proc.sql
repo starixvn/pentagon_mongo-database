@@ -14,6 +14,22 @@ ALTER PROCEDURE	gfn.SummaryByDate
 				,	@Currency			NVARCHAR(128)	= NULL
 WITH ENCRYPTION
 AS
+/*
+	Creator:	20201014@Billy
+	Task:		View Daily Summary on Grafana
+
+	Revisions:
+		- 20201014@Billy:	Initial - [Gitlab: #034]
+		- 20201020@Billy:	Separate WinLoss to Win and Loss - [Gitlab: #045]
+		- 20201207@Billy:	Support grouping by Game Group - [Gitlab: #053]
+		- 20210208@Billy:	View summary by currency - [Gitlab: #058]
+		- 20210322@Billy:	Update coding convention - Using base functions - [Gitlab: #059]
+		- 20210419@Billy:	Change input encoding to percentage code - [Gitlab: #060]
+
+	Developer's Notes:
+		- @string:		Input string that need to be decoded
+
+*/
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
@@ -48,7 +64,7 @@ BEGIN;
 
 	WAITFOR DELAY @WaitFor;
 
-	SELECT	@Value	=	CASE @Field
+	SELECT	@Value	=	CASE f.str
 							WHEN N'Stake' THEN N'ds.`stake`'
 							WHEN N'WinLost' THEN N'ds.`stake` - ds.`payout`'
 							WHEN N'Win' THEN N'ds.`stake` - ds.`payout`'
@@ -56,19 +72,21 @@ BEGIN;
 							WHEN N'Ticket' THEN N'ds.`tickets`'
 							ELSE NULL
 						END
-		,	@Group	=	CASE @GroupBy
+		,	@Group	=	CASE gb.str
 							WHEN N'Game' THEN N'cfg.`name.en`'
 							WHEN N'Game Group' THEN N'cfg.`name.grp`'
 							WHEN N'Currency' THEN N'ds.`currency`'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
 						END
-		,	@Filter	=	CASE @Field
+		,	@Filter	=	CASE f.str
 							WHEN N'Win' THEN N'WHERE	q.value >= 0'
 							WHEN N'Lose' THEN N'WHERE	q.value < 0'
 							ELSE N''
 						END
-		;
+	FROM		base.tf_DecodeURL(@Field) AS f
+	CROSS APPLY	base.tf_DecodeURL(@GroupBy) AS gb
+	;
 
 	IF	@Value IS NULL OR @Group IS NULL
 	BEGIN;

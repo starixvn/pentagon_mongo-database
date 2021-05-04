@@ -17,6 +17,7 @@ AS
 	Revisions:
 		- 20201008@Billy:	Initial - [Gitlab: #058]
 		- 20210218@Billy:	Report by currency for SC3 - [Gitlab: #058]
+		- 20210423@Billy:	Update message format - [Gitlab: #060]
 
 	Developer's Notes:
 		- @ReportDate:				[optional]		- The date of data that will be compared. The time is in UTC timezone.
@@ -43,6 +44,7 @@ BEGIN;
 		;
 
 	DECLARE	@SC				INT
+		,	@isCash			TINYINT
 		,	@GameId			INT
 		,	@GameType		NVARCHAR(128)
 		,	@GameTypeId		INT
@@ -53,6 +55,7 @@ BEGIN;
 	DECLARE	@SCs AS TABLE (
 				SC				TINYINT
 			,	isExpanded		BIT
+			,	isCash			TINYINT
 			,	isDone			BIT
 			,	PRIMARY KEY CLUSTERED (SC)
 			);
@@ -63,23 +66,25 @@ BEGIN;
 			,	gameId			INT
 			,	gameType		NVARCHAR(128)
 			,	currency		VARCHAR(10)
+			,	isCash			TINYINT
 			,	phienCount		INT
 			,	betCount		INT
 			,	stake			DECIMAL(19,4)
 			,	winLost			DECIMAL(19,4)
 			,	payOut			DECIMAL(19,4)
-			,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
+			,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency, isCash)
 			);
 
 	CREATE TABLE	#OW_DailySummary (
 						gameTypeId		INT
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
+					,	isCash			TINYINT
 					,	phienCount		INT
 					,	betCount		INT
 					,	stake			DECIMAL(19,4)
 					,	payOut			DECIMAL(19,4)
-					,	PRIMARY KEY CLUSTERED (gameTypeId, currency)
+					,	PRIMARY KEY CLUSTERED (gameTypeId, currency, isCash)
 					);
 
 	CREATE TABLE	#DS_DailySummary (
@@ -88,18 +93,19 @@ BEGIN;
 					,	gameTypeId		INT
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
+					,	isCash			TINYINT
 					,	betCount		INT
 					,	stake			DECIMAL(19,4)
 					,	payOut			DECIMAL(19,4)
-					,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
+					,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency, isCash)
 					);
 
 	-- List of SCs --
 	INSERT INTO	@SCs
-			(SC, isExpanded, isDone)
-	VALUES	( 1,          0,      0)
-		, 	( 2,          0,      0)
-		, 	( 3,          1,      0)
+			(SC, isExpanded, isCash, isDone)
+	VALUES	( 1,          0,      0,      0)
+		, 	( 2,          0,      1,      0)
+		, 	( 3,          1,   NULL,      0)
 		;
 
 	-- OW Query --
@@ -112,6 +118,7 @@ SET NOCOUNT ON;
 SELECT	[gameTypeId]	= b.gameId
 	,	[gameType]		= g.typenamee
 	,	[currency]		= b.CurrencyName
+	,	[isCash]		= ISNULL(s.custid / s.custid, 0)
 	,	[phienCount]	= COUNT(DISTINCT b.GameId3rd)
 	,	[betCount]		= COUNT(1)
 	,	[stake]			= SUM(b.stake)
@@ -119,23 +126,25 @@ SELECT	[gameTypeId]	= b.gameId
 FROM		dbo.bettransRnG AS b WITH (NOLOCK)
 INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 		ON	b.gameId = g.typeid
+LEFT JOIN	dbo.Dep_CustSuper AS s WITH (NOLOCK)
+		ON	b.srecommend = s.custid
 WHERE	b.vendorID = @VendorId
 	AND	b.gameID BETWEEN 1611 AND 1697
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
 	AND	b.statusID NOT IN (101, 102, 0) -- Reject, Void, running
 	AND	b.custid <> 0 -- Merged Tickets
-GROUP BY b.gameId, g.typenamee, b.CurrencyName
+GROUP BY b.gameId, g.typenamee, b.CurrencyName, s.custid / s.custid
 OPTION (RECOMPILE);
 ';
 
 		SELECT	@OW_Param = N'';
 		SELECT	@OW_Param += N'@VendorId INT, @ReportDate DATETIME';
 
-		INSERT INTO	#OW_DailySummary (gameTypeId, gameType, currency, phienCount, betCount, stake, payOut)
+		INSERT INTO	#OW_DailySummary (gameTypeId, gameType, currency, isCash, phienCount, betCount, stake, payOut)
 		EXECUTE	DB061KBT.bodb02.sys.sp_executesql @OW_Query, @OW_Param, @VendorId, @_ReportDate;
 
-		RAISERROR('', 0, 0) WITH NOWAIT;
+		RAISERROR('Executed on OW', 0, 0) WITH NOWAIT;
 	END;
 
 	SELECT	@DS_Query = N'';
@@ -145,14 +154,15 @@ SELECT	0 AS SC
 	,	cfg.gameId AS gameId
 	,	cfg.`name.en` AS gameType
 	,	IFNULL(ds.currency, "null") AS currency
+	,	IFNULL(ds.isCash, 2) AS isCash
 	,	ds.tickets AS betCount
 	,	ds.stake AS stake
 	,	ds.payOut AS payOut
 FROM		summary.daily_summaries AS ds
 INNER JOIN	summary.game_summary_config AS cfg
 		ON	ds.gameId = cfg.gameId
-WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
-	AND	ds.time < ''' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'''
+WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
+	AND	ds.time < "' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'"
 ';
 
 	BEGIN;
@@ -163,17 +173,19 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 		BEGIN;
 			UPDATE	TOP(1)
 					@SCs
-			SET		@SC = SC
-				,	isDone = 1
+			SET		@SC		= SC
+				,	@isCash	= isCash
+				,	isDone	= 1
 			WHERE	isDone = 0;
 
 			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, payOut)
+			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, payOut)
 			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0;
 
 			MERGE INTO	#DS_DailySummary AS ds
 			USING		@Tmp_DailySummary AS tmp
 					ON	ds.SC = @SC
+					AND	COALESCE(NULLIF(ds.isCash, 2), @isCash, 2) = COALESCE(NULLIF(tmp.isCash, 2), @isCash, 2)
 					AND	ds.gameTypeId = tmp.gameTypeId
 					AND	ds.currency = tmp.currency
 			WHEN MATCHED THEN
@@ -182,8 +194,8 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 				,	ds.stake += tmp.stake
 				,	ds.payOut += tmp.payOut
 			WHEN NOT MATCHED THEN
-				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,     betCount,     stake,     payOut)
-				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.betCount, tmp.stake, tmp.payOut)
+				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,                     isCash                 ,     betCount,     stake,     payOut)
+				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, COALESCE(NULLIF(tmp.isCash, 2), @isCash, 2), tmp.betCount, tmp.stake, tmp.payOut)
 			;
 			RAISERROR('Executed on SC%d.', 0, 0, @SC) WITH NOWAIT;
 		END;
@@ -191,12 +203,13 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 
 	-- Reuse @Tmp_DailySummary for checking mismatch --
 	DELETE	@Tmp_DailySummary;
-	INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, betCount, stake, winLost)
+	INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, winLost)
 	SELECT	[SC]			= ISNULL(sb.SC, 0)
 		,	[gameTypeId]	= ISNULL(ow.gameTypeId, sb.gameTypeId)
 		,	[gameId]		= ISNULL(sb.gameId, 0)
 		,	[gameType]		= ISNULL(ow.gameType, sb.gameType)
 		,	[currency]		= ISNULL(ow.currency, sb.currency)
+		,	[isCash]		= ISNULL(ow.isCash, sb.isCash)
 		,	[betCount]		= ISNULL(ow.betCount, 0) - ISNULL(sb.betCount, 0)
 		,	[stake]			= ISNULL(ow.stake, 0) -ISNULL(sb.stake, 0)
 		,	[winLost]		= ISNULL(ow.stake - ow.payOut, 0) - ISNULL(sb.stake - sb.payOut, 0)
@@ -204,6 +217,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 	FULL OUTER JOIN	#DS_DailySummary AS sb
 				ON	ow.gameTypeId = sb.gameTypeId
 				AND	ow.currency = sb.currency
+				AND	ow.isCash = sb.isCash
 	WHERE	COALESCE(ow.currency, sb.currency) <> 'UUS'
 		AND	(	ISNULL(ow.betCount, 0) <> ISNULL(sb.betCount, 0)
 			OR	ISNULL(ow.stake, 0) <> ISNULL(sb.stake, 0)
@@ -229,7 +243,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
 			FROM	(
 				SELECT	N'
-[' + currency + N']'
+[' + currency + N' (' + CASE isCash WHEN 0 THEN N'CRE' WHEN 1 THEN N'DEP' WHEN 2 THEN N'null' ELSE N'invalid' END + N')]'
 + N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(betCount AS MONEY), 1), '.00', '')
 + N'|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
 + N'|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
@@ -255,14 +269,14 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'''
 							 + msg.str
 			FROM	(
 				SELECT	N'  
-\\\[' + currency + N'\]'
+\\\[' + currency + N' \(' + CASE isCash WHEN 0 THEN N'CRE' WHEN 1 THEN N'DEP' WHEN 2 THEN N'null' ELSE N'invalid' END + N'\)\]'
 + N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(betCount AS MONEY), 1), '.00', '')
 + N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
 + N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
 				FROM	@Tmp_DailySummary
 				WHERE	SC = @SC
 					AND	gameId = @GameId
-				ORDER BY currency
+				ORDER BY currency, isCash
 				FOR XML PATH ('')
 				,	TYPE
 			) AS xmsg(xml)
@@ -302,7 +316,10 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
       - WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
 				CROSS APPLY	(
-					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
+					SELECT	[CurGrp]	= CASE dsb.isExpanded
+											WHEN 1 THEN N'(' + CASE sb.isCash WHEN 0 THEN N'Cre' WHEN 1 THEN N'Dep' WHEN 2 THEN N'nul' ELSE N'***' END + N') ' +  UPPER(sb.currency)
+											ELSE N'Total'
+										  END
 				) AS grp
 				WHERE	sb.currency <> 'UUS'
 					AND	sb.SC = dsb.SC
@@ -346,7 +363,10 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
       \- WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
 				CROSS APPLY	(
-					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
+					SELECT	[CurGrp]	= CASE dsb.isExpanded
+											WHEN 1 THEN N'(' + CASE sb.isCash WHEN 0 THEN N'Cre' WHEN 1 THEN N'Dep' WHEN 2 THEN N'nul' ELSE N'***' END + N') ' +  UPPER(sb.currency)
+											ELSE N'Total'
+										  END
 				) AS grp
 				WHERE	sb.currency <> 'UUS'
 					AND	sb.SC = dsb.SC

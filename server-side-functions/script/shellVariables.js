@@ -29,7 +29,7 @@
         } else {
             const promptStr = prompt.toString();
             const promptArr = promptStr.slice(promptStr.indexOf('{') + 1, promptStr.lastIndexOf('}')).split(/\r\n|\n/g);
-            if (!promptArr.some((item) => RegExp(/db.getSiblingDB\('script'\).loadServerScripts\(\)/).test(item))) {
+            if (!promptArr.some((item) => RegExp(/db\.getSiblingDB\('script'\).loadServerScripts\(\)/).test(item))) {
                 promptArr.splice(0, 0, `    dbs = {};\n    try {\n        db.getSiblingDB('script').loadServerScripts();\n    } catch (e) {}\n`);
                 return Function(promptArr.join('\n'));
             }
@@ -41,18 +41,30 @@
     [
         {   _id: 'dbs'
         ,   value: new Code(`(${dbsFunc.toString()})()`)
-        ,   version: 1.0
-        ,   name: 'PublicVariables'
+        ,   version: `1.0.0`
+        ,   changelog: {
+                '1.0.0': [
+                    `Release [dbs]`
+                ]
+            }
         }
     ,   {   _id: '_'
         ,   value: new Code(`(${_Func.toString()})()`)
-        ,   version: 1.0
-        ,   name: 'PublicVariables'
+        ,   version: `1.0.0`
+        ,   changelog: {
+                '1.0.0': [
+                    `Release [_]`
+                ]
+            }
         }
     ,   {   _id: 'prompt'
         ,   value: new Code(`(${promptFunc.toString()})()`)
-        ,   version: 1.0
-        ,   name: 'PublicVariables'
+        ,   version: `1.0.0`
+        ,   changelog: {
+                '1.0.0': [
+                    `Release [prompt]`
+                ]
+            }
         }
     ].forEach((item) => {db.getSiblingDB('script').system.js.save(item);});
 

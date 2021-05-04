@@ -286,4 +286,13 @@
             forEach((idx) => {Maint.createIndex(dbs.minigame_arc.vipsediewar_ones_bk, idx.idxKeys, idx.idxOpts)});
     }
 
+    if ((2 ** Saba.env() & 2) > 0) {   // 31 - Xo So
+        [idxs.time, idxs.id].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.lottery_phiens_bk, idx.idxKeys, idx.idxOpts)});
+        [           idxs.phien, idxs.uid_phien].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.lottery_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+        [idxs.time, idxs.phien, idxs.uid_phien_U].
+            forEach((idx) => {Maint.createIndex(dbs.minigame_arc.lottery_ones_bk, idx.idxKeys, idx.idxOpts)});
+    }
+
 }
