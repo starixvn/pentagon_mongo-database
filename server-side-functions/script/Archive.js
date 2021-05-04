@@ -169,6 +169,18 @@
 
                 logger.info(`${fromColl._shortName}`, `- Archiving ${insPipe.length} documents.`);
 
+                // Introduce archive_statuses collection
+                // • Related document in this collection will contain the last round id that have been archived
+                if (/_phiens$/.test(fromColl._shortName)) {
+                    const name = fromColl._shortName.replace('_phiens', '');
+                    const last_round_id = Number(toColl.find({}, {_id: 0, id: 1}).sort({id: -1}).limit(1).toArray()[0].id);
+                    fromColl._db.archive_statuses.updateOne(
+                        {name}
+                    ,   {$set: {last_round_id}}
+                    ,   {upsert: true}
+                    );
+                }
+
                 // Reset all pipes
                 insPipe = [];
                 updPipe = [];
@@ -332,7 +344,7 @@
             archiveByTimes: ${archiveByTimesFunc.toString()}
         ,   archiveByIds: ${archiveByIdsFunc.toString()}
         }`)
-    ,   version: 2.0
+    ,   version: `2.1.0`
     ,   name: 'Archive'
     });
 
