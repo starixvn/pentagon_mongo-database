@@ -30,14 +30,7 @@
 
             const _toString = () => {
                 if (!_ok) {
-                    return `\
-[Program.SQLCMD] Input object: {
-    host:   [hostname]    , srv:    [server]      , db:     [use database name]
-  , usr:    [login id]    , pwd:    [password]    , query:  ["cmdline query" and exit]
-  , header: [headers]     , colsep: [colseparator], output: [outputfile]
-  , csv:    [output in csv format]
-}
-`;
+                    return Program.SQLCMD.help();
                 } else {
                     return `\
 [Program.SQLCMD]
@@ -106,12 +99,22 @@
                     } else {
                         run(`rm`, `${_args.output[1]}`);
                     }
+                    _logger.warn(`Delete Output`, `File [${_args.output[1]}] deleted.`);
                 }
             }
             const _execute = () => {
                 let cmd = [];
-                Object.getOwnPropertyNames(_args).forEach(arg => {cmd = [...cmd, ..._args[arg]]});
-                run(...cmd);
+                Object.getOwnPropertyNames(_args).forEach(arg => {
+                    if ((! arg in ['prog', 'flags']) && _args[arg][1] == null) {
+                        return;
+                    }
+                    cmd = [...cmd, ..._args[arg]];
+                });
+                const r = run(...cmd);
+                if (fileExists(_args.output[1])) {
+                    _logger.warn(`Execute`, `File [${_args.output[1]}] created.`);
+                }
+                return r;
             };
 
             const _descriptor = {
@@ -121,6 +124,7 @@
             Object.defineProperties(this, {
                 toString            : Object.extend({value: function () { return _toString() }}, _descriptor)
             ,   tojson              : Object.extend({value: function () { return _toString() }}, _descriptor)
+            ,   help                : Object.extend({value: function () { return Program.SQLCMD.help() }}, _descriptor)
             ,   setServer           : Object.extend({value: function (obj) { return _setServer(obj) }}, _descriptor)
             ,   setDatabase         : Object.extend({value: function (obj) { return _setDatabase(obj) }}, _descriptor)
             ,   setLogin            : Object.extend({value: function (obj) { return _setLogin(obj) }}, _descriptor)
@@ -129,6 +133,7 @@
             ,   setColSeparator     : Object.extend({value: function (obj) { return _setColSeparator(obj) }}, _descriptor)
             ,   setOutput           : Object.extend({value: function (obj) { return _setOutput(obj) }}, _descriptor)
             ,   CSVOutput           : Object.extend({value: function () { return _CSVOutput() }}, _descriptor)
+            ,   delOutput           : Object.extend({value: function () { return _delOutput() }}, _descriptor)
             ,   execute             : Object.extend({value: function () { return _execute() }}, _descriptor)
             });
 
@@ -145,7 +150,18 @@
             }
         }
     };
-    const SQLCMDExt = {};
+    const SQLCMDExt = {
+        help: function () {
+            return `\
+[Program.SQLCMD] Input object: {
+      srv:    [server]      , db:     [use database name]
+    , usr:    [login id]    , pwd:    [password]
+    , query:  ["cmdline query" and exit]
+    , header: [headers]     , colsep: [colseparator]
+    , output: [outputfile]  , csv:    [output in csv format]
+}`;
+        }
+    };
 
     // Program class
     db.getSiblingDB('script').system.js.save({
@@ -162,9 +178,15 @@
                 SQLCMD: Object.defineProperties(cSQLCMD, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
-    ,   version: `1.0.0`
+    ,   version: `1.1.0`
     ,   changelog: {
-            '1.0.0': [
+            '1.1.0': [
+                `Add global help() method`
+            ,   `Add delOutput() method`
+            ,   `Fix output issue when input is null`
+            ,   `Add log message for execute() method`
+            ]
+        ,   '1.0.0': [
                 `Release [Program.SQLCMD]`
             ]
         }

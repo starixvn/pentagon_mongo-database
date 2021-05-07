@@ -45,7 +45,7 @@ BEGIN;
 			,	PRIMARY KEY CLUSTERED (metric, time)
 			);
 
-	SELECT	@Value	=	CASE @Field
+	SELECT	@Value	=	CASE f.str
 							WHEN N'Stake' THEN N'ds.`stake`'
 							WHEN N'WinLost' THEN N'ds.`stake` - ds.`payout`'
 							WHEN N'Win' THEN N'ds.`stake` - ds.`payout`'
@@ -53,18 +53,20 @@ BEGIN;
 							WHEN N'Ticket' THEN N'ds.`tickets`'
 							ELSE NULL
 						END
-		,	@Group	=	CASE @GroupBy
+		,	@Group	=	CASE gb.str
 							WHEN N'Game' THEN N'cfg.`name.en`'
 							WHEN N'Game Group' THEN N'cfg.`name.grp`'
 							WHEN N'Currency' THEN N'ds.`currency`'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
 						END
-		,	@Filter	=	CASE @Field
+		,	@Filter	=	CASE f.str
 							WHEN N'Win' THEN N'WHERE	q.value >= 0'
 							WHEN N'Lose' THEN N'WHERE	q.value < 0'
 							ELSE N''
 						END
+	FROM		base.tf_DecodeURL(@Field) AS f
+	CROSS APPLY	base.tf_DecodeURL(@GroupBy) AS gb
 		;
 
 	IF	@Value IS NULL OR @Group IS NULL
