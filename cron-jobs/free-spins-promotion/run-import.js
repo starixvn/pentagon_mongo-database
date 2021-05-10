@@ -72,7 +72,7 @@ EXECUTE dbo.Task_LuckyDraw3rd_Freebets_Update;
     // Change connection to DBSABA
     sql.setServer(`10.40.40.52`);
     sql.setDatabase(`SabaDB`);
-    sql.setQuery(`EXECUTE SysHealth.FreeSpinPromotion_SpinLogs;`);
+    sql.setQuery(`EXECUTE SysHealth.FreeSpinPromotion_SpinLogs NULL, 0;`);
 
     // Checking result
     returnCode = sql.execute();

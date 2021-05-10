@@ -846,7 +846,7 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
-            ,   logField: '_phiens'
+            ,   logField: '_rounds'
             ,   logValue: 'id'
             }
         ,   childs: [

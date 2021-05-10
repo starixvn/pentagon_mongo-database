@@ -93,14 +93,16 @@
                 _setColSeparator(`,`);
             };
             const _delOutput = () => {
-                if (_args.output[1]) {
-                    if (_isWindows()) {
-                        run(`cmd`, `/C`, `del ${_args.output[1]}`);
-                    } else {
-                        run(`rm`, `${_args.output[1]}`);
-                    }
-                    _logger.warn(`Delete Output`, `File [${_args.output[1]}] deleted.`);
+                if (!_args.output[1]) {
+                    return;
                 }
+
+                if (_isWindows()) {
+                    run(`cmd`, `/C`, `del ${_args.output[1]}`);
+                } else {
+                    run(`rm`, `${_args.output[1]}`);
+                }
+                _logger.warn(`Delete Output`, `File [${_args.output[1]}] deleted.`);
             }
             const _execute = () => {
                 let cmd = [];
@@ -111,7 +113,7 @@
                     cmd = [...cmd, ..._args[arg]];
                 });
                 const r = run(...cmd);
-                if (fileExists(_args.output[1])) {
+                if (_args.output[1] && fileExists(_args.output[1])) {
                     _logger.warn(`Execute`, `File [${_args.output[1]}] created.`);
                 }
                 return r;
@@ -178,9 +180,12 @@
                 SQLCMD: Object.defineProperties(cSQLCMD, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
             }
         })()`)
-    ,   version: `1.1.0`
+    ,   version: `1.1.1`
     ,   changelog: {
-            '1.1.0': [
+            '1.1.1': [
+                `[Program.SQLCMD] Fix error raised when execute with no output.`
+            ]
+        ,   '1.1.0': [
                 `Add global help() method`
             ,   `Add delOutput() method`
             ,   `Fix output issue when input is null`
