@@ -111,7 +111,7 @@
                     cmd = [...cmd, ..._args[arg]];
                 });
                 const r = run(...cmd);
-                if (fileExists(_args.output[1])) {
+                if (_args.output[1] && fileExists(_args.output[1])) {
                     _logger.warn(`Execute`, `File [${_args.output[1]}] created.`);
                 }
                 return r;
