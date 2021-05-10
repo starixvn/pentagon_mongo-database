@@ -172,7 +172,14 @@
         const configSchema = {
             from: {db: "string", coll: "string"}
         ,   to: {db: "string", coll: "string"}
-        ,   config: {timeField: "string", cutOffsetHours: "number", join: "string", filter: "object"}
+        ,   config: {
+                timeField: "string"
+            ,   cutOffsetHours: "number"
+            ,   join: "string"
+            ,   filter: "object"
+            ,   logField: "string"
+            ,   logValue: "string"
+            }
         ,   childs: Array
         };
 
@@ -192,6 +199,8 @@
             ,   cutOffTime: new Date((Math.floor(Date.now() / 3600000) + item.config.cutOffsetHours) * 3600000)
             ,   filter: item.config.filter
             ,   updateOnly: !!item.config.updateOnly
+            ,   logField: item.config.logField
+            ,   logValue: item.config.logValue
             };
             const childOpts = [];
             item.childs.forEach((child) => {
@@ -203,6 +212,8 @@
                 ,   updateOnly: child.updateOnly
                 ,   filter: child.filter
                 ,   exCols: child.exCols
+                ,   logField: child.logField
+                ,   logValue: child.logValue
                 });
             });
 
@@ -746,7 +757,7 @@
             ,   expireSpins: ${expireSpinsFunc.toString()}
             }
         }`)
-    ,   version: `2.6.1`
+    ,   version: `2.7.0`
     ,   name: `SabaClub`
     });
 
