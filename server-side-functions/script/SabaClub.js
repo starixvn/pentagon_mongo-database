@@ -172,7 +172,14 @@
         const configSchema = {
             from: {db: "string", coll: "string"}
         ,   to: {db: "string", coll: "string"}
-        ,   config: {timeField: "string", cutOffsetHours: "number", join: "string", filter: "object"}
+        ,   config: {
+                timeField: "string"
+            ,   cutOffsetHours: "number"
+            ,   join: "string"
+            ,   filter: "object"
+            ,   logField: "string"
+            ,   logValue: "string"
+            }
         ,   childs: Array
         };
 
@@ -192,6 +199,8 @@
             ,   cutOffTime: new Date((Math.floor(Date.now() / 3600000) + item.config.cutOffsetHours) * 3600000)
             ,   filter: item.config.filter
             ,   updateOnly: !!item.config.updateOnly
+            ,   logField: item.config.logField
+            ,   logValue: item.config.logValue
             };
             const childOpts = [];
             item.childs.forEach((child) => {
@@ -203,6 +212,8 @@
                 ,   updateOnly: child.updateOnly
                 ,   filter: child.filter
                 ,   exCols: child.exCols
+                ,   logField: child.logField
+                ,   logValue: child.logValue
                 });
             });
 
@@ -284,15 +295,15 @@
 
         if (!(mongo instanceof Mongo)) {
             logger.err(`Audit`, `Must be connected to Mongo instance to run this function.`);
-            return;
+            return 1;
         }
         if (typeof file != "string" && !pathExists(file)) {
             logger.err(`Audit`, `Filepath [${file}] does NOT exist.`);
-            return;
+            return 1;
         }
         if (typeof roundField != "string") {
             logger.err(`Audit`, `Round field's name [${roundField}] MUST be a string.`);
-            return;
+            return 1;
         }
 
         const schemaSch = {
@@ -304,7 +315,7 @@
         };
         if (!schema || schema.length <= 0 || schema.some((col) => !Misc.auditSchema(col, schemaSch))) {
             logger.err(`Audit`, `CSV's schema does NOT have correct format.`);
-            return;
+            return 2;
         }
 
         // Generate key
@@ -323,7 +334,7 @@
         });
         if (round.length !== 1) {
             logger.err(`Audit`, `The file [${file}] contains incorrect number of rounds = [${round.length}]. Must have only 1.`);
-            return;
+            return 3;
         }
 
         // Variable
@@ -345,7 +356,7 @@
             }
 
             if (!force && err) {
-                return;
+                return 4;
             }
         }
 
@@ -433,6 +444,8 @@
             res = mongo.getDB(`minigame`).spins.updateMany({$or: rollbackMembers, availSpins: {$lt: 0}}, [{$set: {availSpins: 0}}]);
             logger.info(`Add Spins`, `${res.matchedCount} members have negative spins. Corrected ${res.modifiedCount} members.`);
         }
+
+        return 0;
     };
 
     // Saba.Spins.importSpinsNoRound()
@@ -744,7 +757,7 @@
             ,   expireSpins: ${expireSpinsFunc.toString()}
             }
         }`)
-    ,   version: 2.6
+    ,   version: `2.7.0`
     ,   name: `SabaClub`
     });
 

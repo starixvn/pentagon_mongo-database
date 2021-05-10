@@ -29,6 +29,8 @@
         ,   updateOnly: "boolean"
         ,   filter: "object"
         ,   exCols: Array
+        ,   logField: "string"
+        ,   logValue: "string"
         };
         if (!Misc.auditSchema(arcOpts, arcOptsSchema)) {
             logger.err(`Audit`, `timeOpts' schema is NOT correct.`);
@@ -52,6 +54,8 @@
         ,   updateOnly: "boolean"
         ,   filter: "object"
         ,   exCols: Array
+        ,   logField: "string"
+        ,   logValue: "string"
         };
         if (childOpts.some((coll) => !Misc.auditSchema(coll, childCollSchema))) {
             logger.err(`Audit`, `childOpts' schema is NOT correct.`);
@@ -149,6 +153,8 @@
                     ,   updateOnly: child.updateOnly ? true : false
                     ,   filter: child.filter ? child.filter : {}
                     ,   exCols: child.exCols ? child.exCols : []
+                    ,   logField: child.logField
+                    ,   logValue: child.logValue
                     };
                     Archive.archiveByIds(child.fromColl, child.toColl, dataOpts, arcOpts);
                 });
@@ -168,6 +174,26 @@
                 }
 
                 logger.info(`${fromColl._shortName}`, `- Archiving ${insPipe.length} documents.`);
+
+                // Introduce archive_statuses collection
+                // • Related document in this collection will contain the last round id that have been archived
+                if (arcOpts.logField && arcOpts.logValue) {
+                    const name = fromColl._shortName.replace(arcOpts.logField, '');
+                    const set = {};
+                    const prj = {_id: 0};
+                    const sort = {};
+                    const df = {};
+
+                    prj[arcOpts.logValue] = 1;
+                    sort[arcOpts.logValue] = -1;
+                    df[arcOpts.logValue] = null;
+                    set[`lastArcId.${arcOpts.logField}`] = Number((toColl.find({}, prj).sort(sort).limit(1).toArray()[0] || df)[arcOpts.logValue]);
+                    fromColl._db.archive_statuses.updateOne(
+                        {name}
+                    ,   {$set: set}
+                    ,   {upsert: true}
+                    );
+                }
 
                 // Reset all pipes
                 insPipe = [];
@@ -199,7 +225,7 @@
         // • This is to prevent the changes in this function affect the variable outside
         //   due to referencing object.
         const dataOpts = Object.extend([], _dataOpts);
-        const arcOpts = Object.extend({updateOnly: false, filter: {}, exCols: []}, _arcOpts);
+        const arcOpts = Object.extend({updateOnly: false, filter: {}, exCols: [], logField: null, logValue: null}, _arcOpts);
 
         // Param verification
         // • This will compare the object with corresponding user-defined schema
@@ -213,11 +239,12 @@
             return;
         }
         const arcOptsSchema = {
-            '!': true
-        ,   joinCol: "string"
+            joinCol: "string"
         ,   updateOnly: "boolean"
         ,   filter: "object"
         ,   exCols: Array
+        ,   logField: "string"
+        ,   logValue: "string"
         };
         if (!Misc.auditSchema(arcOpts, arcOptsSchema)) {
             logger.err(`Audit`, `arcOpts' schema is NOT correct.`);
@@ -314,6 +341,26 @@
 
                     logger.info(`${fromColl._shortName}`, `- Archiving ${insPipe.length} documents.`);
 
+                    // Introduce archive_statuses collection
+                    // • Related document in this collection will contain the last round id that have been archived
+                    if (arcOpts.logField && arcOpts.logValue) {
+                        const name = fromColl._shortName.replace(arcOpts.logField, '');
+                        const set = {};
+                        const prj = {_id: 0};
+                        const sort = {};
+                        const df = {};
+
+                        prj[arcOpts.logValue] = 1;
+                        sort[arcOpts.logValue] = -1;
+                        df[arcOpts.logValue] = null;
+                        set[`lastArcId.${arcOpts.logField}`] = Number((toColl.find({}, prj).sort(sort).limit(1).toArray()[0] || df)[arcOpts.logValue]);
+                        fromColl._db.archive_statuses.updateOne(
+                            {name}
+                        ,   {$set: set}
+                        ,   {upsert: true}
+                        );
+                    }
+
                     insPipe = [];
                 }
             });
@@ -332,7 +379,7 @@
             archiveByTimes: ${archiveByTimesFunc.toString()}
         ,   archiveByIds: ${archiveByIdsFunc.toString()}
         }`)
-    ,   version: 2.0
+    ,   version: `2.1.0`
     ,   name: 'Archive'
     });
 
