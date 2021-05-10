@@ -18,6 +18,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'taixiu_cuocs'
@@ -49,6 +51,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'xocxoc_cuocs'
@@ -73,6 +77,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'baucua_cuocs'
@@ -97,6 +103,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'txturbo_cuocs'
@@ -128,6 +136,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'chanle_cuocs'
@@ -159,6 +169,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'chanleturbo_cuocs'
@@ -190,6 +202,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'minidragontiger_cuocs'
@@ -214,6 +228,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenopromax_cuocs'
@@ -238,6 +254,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'minisedie_cuocs'
@@ -262,6 +280,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'baccarat_cuocs'
@@ -286,6 +306,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenoproviet_cuocs'
@@ -322,6 +344,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenomax_cuocs'
@@ -353,6 +377,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenomax2_cuocs'
@@ -384,6 +410,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenomini_cuocs'
@@ -415,6 +443,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenomini2_cuocs'
@@ -446,6 +476,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenoeast_cuocs'
@@ -477,6 +509,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenowest_cuocs'
@@ -508,6 +542,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenosouth_cuocs'
@@ -539,6 +575,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'kenonorth_cuocs'
@@ -570,6 +608,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'roulette_cuocs'
@@ -601,6 +641,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'vipsedie_cuocs'
@@ -625,6 +667,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'blackjack_cuocs'
@@ -633,6 +677,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 ,   updateOnly: false
                 ,   filter: filter
                 ,   exCols: []
+                ,   logField: '_cuocs'
+                ,   logValue: 'id'
                 }
             ]
         }
@@ -649,6 +695,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'specialsedie_cuocs'
@@ -680,6 +728,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'sicbo_cuocs'
@@ -711,6 +761,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'vipfishprawncrab_cuocs'
@@ -735,6 +787,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'vipbaccarat_cuocs'
@@ -759,6 +813,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'vipsediewar_cuocs'
@@ -790,6 +846,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'fourguardians_fames'
@@ -805,6 +863,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 ,   updateOnly: false
                 ,   filter: filter
                 ,   exCols: []
+                ,   logField: '_freespins'
+                ,   logValue: 'id'
                 }
             ]
         }
@@ -838,6 +898,8 @@ if ((2 ** Saba.env() & 6) > 0)
                 timeField: 'time'
             ,   cutOffsetHours: -24
             ,   join: 'id'
+            ,   logField: '_phiens'
+            ,   logValue: 'id'
             }
         ,   childs: [
                 {   from: 'lottery_cuocs'
