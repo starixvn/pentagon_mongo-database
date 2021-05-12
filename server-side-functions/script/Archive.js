@@ -62,7 +62,7 @@
             return;
         }
 
-        logger.info(`CutOffTime`, `${arcOpts.cutOffTime.toISOString()}`);
+        logger.info(`${fromColl._shortName}`, `CutOffTime: ${arcOpts.cutOffTime.toISOString()}`);
 
         // Insert pipe
         // • The list of operation that will insert the documents into destination colection
@@ -276,6 +276,10 @@
         const filter = Object.extend({'__archive.eventtime': {$exists: false}}, arcOpts.filter);
         filter[arcOpts.joinCol] = {$in: []}
         dataOpts.forEach((data) => {
+            if (data.joinVal == null) {
+                return;
+            }
+
             filter[arcOpts.joinCol]['$in'].push(data.joinVal);
 
             const updFilter = {'__archive.eventtime': {$exists: false}};
@@ -379,7 +383,7 @@
             archiveByTimes: ${archiveByTimesFunc.toString()}
         ,   archiveByIds: ${archiveByIdsFunc.toString()}
         }`)
-    ,   version: `2.1.0`
+    ,   version: `2.1.1`
     ,   name: 'Archive'
     });
 
