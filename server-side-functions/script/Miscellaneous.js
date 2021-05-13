@@ -1,4 +1,4 @@
-{
+deploy: {
     // Misc.log()
     const logFunc = (message, title, label, type) => {
         try {
@@ -145,17 +145,29 @@
     };
 
     // Misc
-    db.getSiblingDB('script').system.js.save({
-        _id: 'Misc'
-    ,   value:  new Code(`{
-            log: ${logFunc.toString()}
-        ,   readCSV: ${readCSVFunc.toString()}
-        ,   auditSchema: ${auditSchemaFunc.toString()}
-        }`)
-    ,   version: 2.2
-    ,   name: 'Miscellaneous'
-    });
+    const _id = `Misc`;
+    const version = `2.2.0`;
+    const changelog = {};
+    const value = new Code(`{
+        log: ${logFunc.toString()}
+    ,   readCSV: ${readCSVFunc.toString()}
+    ,   auditSchema: ${auditSchemaFunc.toString()}
+    }`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
-    // Reload scripts
+    // Reload library
     db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`SCRIPT-${_id.toUpperCase().pad(9,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }

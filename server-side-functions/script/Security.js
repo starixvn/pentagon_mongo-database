@@ -1,4 +1,4 @@
-{
+deploy: {
     // Sec.defineRole()
     const definePrincipalFunc = (principal, type) => {
         if (!type) {
@@ -71,15 +71,27 @@
     };
 
     // Sec
-    db.getSiblingDB(`script`).system.js.save({
-        _id: `Sec`
-    ,   value:  new Code(`{
-            definePrincipal: ${definePrincipalFunc.toString()}
-        }`)
-    ,   version: 1.1
-    ,   name: `Security`
-    });
+    const _id = `Sec`;
+    const version = `1.1.0`;
+    const changelog = {};
+    const value = new Code(`{
+        definePrincipal: ${definePrincipalFunc.toString()}
+    }`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
-    // Reload scripts
-    db.getSiblingDB(`script`).loadServerScripts();
+    // Reload library
+    db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`SCRIPT-${_id.toUpperCase().pad(9,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }

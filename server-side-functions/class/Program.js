@@ -1,8 +1,4 @@
-/*  =============================================================================
- *  class/Program.js v1.0.0
- *  =============================================================================
- */
-{
+deploy: {
     const SQLCMD = class {
         constructor (obj) {
             const _logger = new Shell.Log(`SQLCMD`);
@@ -166,37 +162,49 @@
     };
 
     // Program class
-    db.getSiblingDB('script').system.js.save({
-        _id: `Program`
-    ,   value: new Code(`(() => {
-            const cSQLCMD = Object.extend(${tojson(SQLCMD)}, ${tojson(SQLCMDExt)});
-            const _toStr = function () {return this.constructor.name};
+    const _id = `Program`;
+    const version = `1.1.1`;
+    const changelog = {
+        '1.1.1': [
+            `[Program.SQLCMD] Fix error raised when execute with no output.`
+        ]
+    ,   '1.1.0': [
+            `Add global help() method`
+        ,   `Add delOutput() method`
+        ,   `Fix output issue when input is null`
+        ,   `Add log message for execute() method`
+        ]
+    ,   '1.0.0': [
+            `Release [Program.SQLCMD]`
+        ]
+    };
+    const value = new Code(`(() => {
+        const cSQLCMD = Object.extend(${tojson(SQLCMD)}, ${tojson(SQLCMDExt)});
+        const _toStr = function () {return this.constructor.name};
 
-            const _descriptor = {
-                writable: false
-            ,   enumerable: true
-            };
-            return {
-                SQLCMD: Object.defineProperties(cSQLCMD, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
-            }
-        })()`)
-    ,   version: `1.1.1`
-    ,   changelog: {
-            '1.1.1': [
-                `[Program.SQLCMD] Fix error raised when execute with no output.`
-            ]
-        ,   '1.1.0': [
-                `Add global help() method`
-            ,   `Add delOutput() method`
-            ,   `Fix output issue when input is null`
-            ,   `Add log message for execute() method`
-            ]
-        ,   '1.0.0': [
-                `Release [Program.SQLCMD]`
-            ]
+        const _descriptor = {
+            writable: false
+        ,   enumerable: true
+        };
+        return {
+            SQLCMD: Object.defineProperties(cSQLCMD, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
         }
-    });
+    })()`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
     // Reload library
     db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`CLASS-${_id.toUpperCase().pad(10,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }

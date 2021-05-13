@@ -1,8 +1,4 @@
-/*  =============================================================================
- *  class/SabaClub.js v1.0.2
- *  =============================================================================
- */
-{
+deploy: {
     const Summary = class {
         constructor (mongo, summaryDB) {
             const _logger = new Shell.Log(`SUMMARY`);
@@ -654,45 +650,57 @@
     const SmartBotExt = {};
 
     // SabaClub class
-    db.getSiblingDB('script').system.js.save({
-        _id: `SabaClub`
-    ,   value: new Code(`(() => {
-            const cSummary = Object.extend(${tojson(Summary)}, ${tojson(SummaryExt)});
-            const cSmartBot = Object.extend(${tojson(SmartBot)}, ${tojson(SmartBotExt)});
-            const _toStr = function () {return this.constructor.name};
+    const _id = `SabaClub`;
+    const version = `1.0.3`;
+    const changelog = {
+        '1.0.3': [
+            `[SabaClub.SmartBot] Add parameter for input userinfo source`
+        ]
+    ,   '1.0.2': [
+            `[SabaClub.Summary] Add isCash field to summary`
+        ]
+    ,   '1.0.1': [
+            `Hide internal variables & constants`
+        ,   `Add method descriptor for enumerability`
+        ,   `[SabaClub.Summary] Set last day/hour as default time`
+        ,   `[SabaClub.Summary] Fix getTimeStr() error when input is not Date`
+        ,   `[SabaClub.Summary] Fix input time being moved to 1 day prior`
+        ,   `Release [SabaClub.SmartBot]`
+        ,   `Add descriptor to class' universal methods`
+        ]
+    ,   '1.0.0': [
+            `Release [SabaClub.Summary]`
+        ]
+    };
+    const value = new Code(`(() => {
+        const cSummary = Object.extend(${tojson(Summary)}, ${tojson(SummaryExt)});
+        const cSmartBot = Object.extend(${tojson(SmartBot)}, ${tojson(SmartBotExt)});
+        const _toStr = function () {return this.constructor.name};
 
-            const _descriptor = {
-                writable: false
-            ,   enumerable: true
-            };
-            return {
-                Summary: Object.defineProperties(cSummary, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
-            ,   SmartBot: Object.defineProperties(cSmartBot, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
-            }
-        })()`)
-    ,   version: `1.0.3`
-    ,   changelog: {
-            '1.0.3': [
-                `[SabaClub.SmartBot] Add parameter for input userinfo source`
-            ]
-        ,   '1.0.2': [
-                `[SabaClub.Summary] Add isCash field to summary`
-            ]
-        ,   '1.0.1': [
-                `Hide internal variables & constants`
-            ,   `Add method descriptor for enumerability`
-            ,   `[SabaClub.Summary] Set last day/hour as default time`
-            ,   `[SabaClub.Summary] Fix getTimeStr() error when input is not Date`
-            ,   `[SabaClub.Summary] Fix input time being moved to 1 day prior`
-            ,   `Release [SabaClub.SmartBot]`
-            ,   `Add descriptor to class' universal methods`
-            ]
-        ,   '1.0.0': [
-                `Release [SabaClub.Summary]`
-            ]
+        const _descriptor = {
+            writable: false
+        ,   enumerable: true
+        };
+        return {
+            Summary: Object.defineProperties(cSummary, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+        ,   SmartBot: Object.defineProperties(cSmartBot, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
         }
-    });
+    })()`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
     // Reload library
     db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`CLASS-${_id.toUpperCase().pad(10,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }
