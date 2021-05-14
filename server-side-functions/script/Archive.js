@@ -1,4 +1,4 @@
-{
+deploy: {
     // Archive.archiveByTimes()
     const archiveByTimesFunc = (fromColl, toColl, _arcOpts, _childOpts) => {
         const logger = new Shell.Log(`ARC-BY-TIME`);
@@ -62,7 +62,7 @@
             return;
         }
 
-        logger.info(`CutOffTime`, `${arcOpts.cutOffTime.toISOString()}`);
+        logger.info(`${fromColl._shortName}`, `CutOffTime: ${arcOpts.cutOffTime.toISOString()}`);
 
         // Insert pipe
         // • The list of operation that will insert the documents into destination colection
@@ -276,6 +276,10 @@
         const filter = Object.extend({'__archive.eventtime': {$exists: false}}, arcOpts.filter);
         filter[arcOpts.joinCol] = {$in: []}
         dataOpts.forEach((data) => {
+            if (data.joinVal == null) {
+                return;
+            }
+
             filter[arcOpts.joinCol]['$in'].push(data.joinVal);
 
             const updFilter = {'__archive.eventtime': {$exists: false}};
@@ -373,17 +377,29 @@
     };
 
     // Archive
-    db.getSiblingDB('script').system.js.save({
-        _id: 'Archive'
-    ,   value:  new Code(`{
-            archiveByTimes: ${archiveByTimesFunc.toString()}
-        ,   archiveByIds: ${archiveByIdsFunc.toString()}
-        }`)
-    ,   version: `2.1.0`
-    ,   name: 'Archive'
-    });
+    const _id = `Archive`;
+    const version = `2.1.1`;
+    const changelog = {};
+    const value = new Code(`{
+        archiveByTimes: ${archiveByTimesFunc.toString()}
+    ,   archiveByIds: ${archiveByIdsFunc.toString()}
+    }`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
-    // Reload scripts
+    // Reload library
     db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`SCRIPT-${_id.toUpperCase().pad(9,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }
 
