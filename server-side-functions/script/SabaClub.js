@@ -1,4 +1,4 @@
-{
+deploy: {
     // Saba.summarizeDaily()
     const summarizeDailyFunc = (mongo, summaryDay, bypassExpired = false, summaryDB = `summary`) => {
         const logger = new Shell.Log(`SUMMARY`);
@@ -744,23 +744,35 @@
     };
 
     // Saba
-    db.getSiblingDB(`script`).system.js.save({
-        _id: `Saba`
-    ,   value:  new Code(`{
-            summarizeDaily: ${summarizeDailyFunc.toString()}
-        ,   runArchive: ${runArchiveFunc.toString()}
-        ,   removeData: ${removeDataFunc.toString()}
-        ,   env: ${envFunc.toString()}
-        ,   Spins: {
-                importSpins: ${importSpinsFunc.toString()}
-            ,   importSpinsNoRound: ${importSpinsNoRoundFunc.toString()}
-            ,   expireSpins: ${expireSpinsFunc.toString()}
-            }
-        }`)
-    ,   version: `2.7.0`
-    ,   name: `SabaClub`
-    });
+    const _id = `Saba`;
+    const version = `2.7.0`;
+    const changelog = {};
+    const value = new Code(`{
+        summarizeDaily: ${summarizeDailyFunc.toString()}
+    ,   runArchive: ${runArchiveFunc.toString()}
+    ,   removeData: ${removeDataFunc.toString()}
+    ,   env: ${envFunc.toString()}
+    ,   Spins: {
+            importSpins: ${importSpinsFunc.toString()}
+        ,   importSpinsNoRound: ${importSpinsNoRoundFunc.toString()}
+        ,   expireSpins: ${expireSpinsFunc.toString()}
+        }
+    }`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
-    // Reload scripts
-    db.getSiblingDB(`script`).loadServerScripts();
+    // Reload library
+    db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`SCRIPT-${_id.toUpperCase().pad(9,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }

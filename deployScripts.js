@@ -11,9 +11,8 @@
     ].forEach((path) => {
         try {
             load(path);
-            logger.info(`Success`, `Deployed [${path}]`);
         } catch (e) {
-            logger.err(`Failure`, `${e}`);
+            logger.err(`Failure`, `${e}\n\n`);
         }
     });
 }

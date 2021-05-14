@@ -6,6 +6,7 @@
     pro.forEach(instance => {
         const oldDB = global.db;
         global.db = instance;
+        try { db.runCommand({ping: 1}) } catch { db.runCommand({ping: 1}) };
         db.getSiblingDB('admin').auth(login);
         load(`server-side-functions/class/Shell.js`);
 
@@ -17,9 +18,9 @@
         ].forEach((path) => {
             try {
                 load(path);
-                logger.info(`${db._mongo.host}`, `Deployed [${path}]`);
+                logger.info(`${db._mongo.host}`, `Deployed [${path}]\n${'='.repeat(50)}\n\n`);
             } catch (e) {
-                logger.err(`${db._mongo.host}`, `${e}`);
+                logger.err(`${db._mongo.host}`, `${e}\n${'='.repeat(50)}\n\n`);
             }
         });
 
@@ -41,9 +42,9 @@
         ].forEach((path) => {
             try {
                 load(path);
-                logger.info(`${db._mongo.host}`, `Deployed [${path}]`);
+                logger.info(`${db._mongo.host}`, `Deployed [${path}]\n${'='.repeat(50)}\n\n`);
             } catch (e) {
-                logger.err(`${db._mongo.host}`, `${e}`);
+                logger.err(`${db._mongo.host}`, `${e}\n${'='.repeat(50)}\n\n`);
             }
         });
 

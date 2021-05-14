@@ -1,8 +1,4 @@
-/*  =============================================================================
- *  class/Shell.js v1.0.1
- *  =============================================================================
- */
-{
+deploy: {
     const Format = class {
         constructor () {
             const _compatibility = !_isWindows();
@@ -207,40 +203,52 @@
     const AssertExt = {};
 
     // Shell class
-    db.getSiblingDB('script').system.js.save({
-        _id: `Shell`
-    ,   value: new Code(`(() => {
-            const cFormat = Object.extend(${tojson(Format)}, ${tojson(FormatExt)});
-            const cLog = Object.extend(${tojson(Log)}, ${tojson(LogExt)});
-            const cAssert = Object.extend(${tojson(Assert)}, ${tojson(AssertExt)});
-            const _toStr = function () {return this.constructor.name};
+    const _id = `Shell`;
+    const version = `1.0.1`;
+    const changelog = {
+        '1.0.1': [
+            `Hide internal variables & constants`
+        ,   `Add method descriptor for enumerability`
+        ,   `[Shell.Assert] Add test() method`
+        ,   `Add descriptor to class' universal methods`
+        ]
+    ,   '1.0.0': [
+            `Release [Shell.Format]`
+        ,   `Release [Shell.Log]`
+        ,   `Release [Shell.Assert]`
+        ]
+    };
+    const value = new Code(`(() => {
+        const cFormat = Object.extend(${tojson(Format)}, ${tojson(FormatExt)});
+        const cLog = Object.extend(${tojson(Log)}, ${tojson(LogExt)});
+        const cAssert = Object.extend(${tojson(Assert)}, ${tojson(AssertExt)});
+        const _toStr = function () {return this.constructor.name};
 
-            const _descriptor = {
-                writable: false
-            ,   enumerable: true
-            };
-            return {
-                Format: Object.defineProperties(cFormat, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
-            ,   Log: Object.defineProperties(cLog, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
-            ,   Assert: Object.defineProperties(cAssert, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
-            }
-        })()`)
-    ,   version: `1.0.1`
-    ,   changelog: {
-            '1.0.1': [
-                `Hide internal variables & constants`
-            ,   `Add method descriptor for enumerability`
-            ,   `[Shell.Assert] Add test() method`
-            ,   `Add descriptor to class' universal methods`
-            ]
-        ,   '1.0.0': [
-                `Release [Shell.Format]`
-            ,   `Release [Shell.Log]`
-            ,   `Release [Shell.Assert]`
-            ]
+        const _descriptor = {
+            writable: false
+        ,   enumerable: true
+        };
+        return {
+            Format: Object.defineProperties(cFormat, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+        ,   Log: Object.defineProperties(cLog, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
+        ,   Assert: Object.defineProperties(cAssert, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)})
         }
-    });
+    })()`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
     // Reload library
     db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`CLASS-${_id.toUpperCase().pad(10,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }

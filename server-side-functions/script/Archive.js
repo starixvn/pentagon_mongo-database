@@ -1,4 +1,4 @@
-{
+deploy: {
     // Archive.archiveByTimes()
     const archiveByTimesFunc = (fromColl, toColl, _arcOpts, _childOpts) => {
         const logger = new Shell.Log(`ARC-BY-TIME`);
@@ -377,17 +377,29 @@
     };
 
     // Archive
-    db.getSiblingDB('script').system.js.save({
-        _id: 'Archive'
-    ,   value:  new Code(`{
-            archiveByTimes: ${archiveByTimesFunc.toString()}
-        ,   archiveByIds: ${archiveByIdsFunc.toString()}
-        }`)
-    ,   version: `2.1.1`
-    ,   name: 'Archive'
-    });
+    const _id = `Archive`;
+    const version = `2.1.1`;
+    const changelog = {};
+    const value = new Code(`{
+        archiveByTimes: ${archiveByTimesFunc.toString()}
+    ,   archiveByIds: ${archiveByIdsFunc.toString()}
+    }`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
-    // Reload scripts
+    // Reload library
     db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`SCRIPT-${_id.toUpperCase().pad(9,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }
 

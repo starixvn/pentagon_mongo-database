@@ -1,4 +1,4 @@
-{
+deploy: {
     // Maint.createIndex()
     const createIndexFunc = (coll, idxKeys, idxOpts = {}) => {
         // Parameters' type verification
@@ -121,16 +121,28 @@
     };
 
     // Maint
-    db.getSiblingDB(`script`).system.js.save({
-        _id: `Maint`
-    ,   value:  new Code(`{
-            createIndex: ${createIndexFunc.toString()}
-        ,   reIndex: ${reIndexFunc.toString()}
-        }`)
-    ,   version: 2.1
-    ,   name: `Maintenance`
-    });
+    const _id = `Maint`;
+    const version = `2.1.0`;
+    const changelog = {};
+    const value = new Code(`{
+        createIndex: ${createIndexFunc.toString()}
+    ,   reIndex: ${reIndexFunc.toString()}
+    }`);
+    const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
+    const res = db.getSiblingDB('script').system.js.save({_id, value, version, changelog});
 
-    // Reload scripts
-    db.getSiblingDB(`script`).loadServerScripts();
+    // Reload library
+    db.getSiblingDB('script').loadServerScripts();
+
+    // Log result
+    const logger = new Shell.Log(`SCRIPT-${_id.toUpperCase().pad(9,1)}`);
+    if (res.nUpserted) {
+        logger.verbose(`Created`, `[${_id}@${version}]`);
+        break deploy;
+    }
+    if (res.nModified) {
+        logger.verbose(`Modified`, `[${_id}@${lastVersion}] => [${_id}@${version}]`);
+        break deploy;
+    }
+    logger.verbose(`Unchanged`, `[${_id}@${version}]`);
 }
