@@ -1,5 +1,7 @@
 // load(`__Pandora__/FreeBetPromotion - AutomationScript.js`)
 {
+    print(`\n\n${'='.repeat(100)}`);
+
     // Load scripts
     db = (new Mongo('mongodb://lmn_summary:LmnSummary@10.10.50.13:37101/?replicaSet=L2Local&appName=FreeSpinsPromotionAutoImport')).getDB('admin');
     db._mongo.getDB('script').loadServerScripts();
@@ -20,7 +22,7 @@
 __FreeSpinsPromotion-\
 ${now.getUTCFullYear()}\
 ${now.getUTCMonth().toString().padStart(2,'0')}\
-${now.getUTCDay().toString().padStart(2,'0')}-\
+${now.getUTCDate().toString().padStart(2,'0')}-\
 ${now.getUTCHours().toString().padStart(2,'0')}\
 ${now.getUTCMinutes().toString().padStart(2,'0')}\
 00__.csv`
@@ -28,9 +30,7 @@ ${now.getUTCMinutes().toString().padStart(2,'0')}\
     const sql = new Program.SQLCMD(cfg);
 
     // Get CSV content
-    sql.setQuery(`\
-EXECUTE dbo.Task_LuckyDraw3rd_Freebets_Select;
-`)
+    sql.setQuery(`EXECUTE dbo.Task_LuckyDraw3rd_Freebets_Select;`)
     returnCode = sql.execute();
     if (returnCode != 0) {
         let msg = `Execute SQL error.`;
@@ -59,15 +59,13 @@ ${cat(cfg.output)}`
     }
 
     sql.setOutput(`tmpOutput`);
-    sql.setQuery(`\
-EXECUTE dbo.Task_LuckyDraw3rd_Freebets_Update;
-`)
+    sql.setQuery(`EXECUTE dbo.Task_LuckyDraw3rd_Freebets_Update;`)
     returnCode = sql.execute();
-    sql.delOutput();
     if (returnCode != 0) {
-        logger.err(`SQL Update ${returnCode}`, `Execute SQL error.`);
+        logger.err(`SQL Update ${returnCode}`, `Execute SQL error. ${cat('tmpOutput')}`);
         quit(-returnCode);
     }
+    sql.delOutput();
 
     // Change connection to DBSABA
     sql.setServer(`10.40.40.52`);
@@ -76,9 +74,10 @@ EXECUTE dbo.Task_LuckyDraw3rd_Freebets_Update;
 
     // Checking result
     returnCode = sql.execute();
-    sql.delOutput();
     if (returnCode != 0) {
-        logger.err(`SQL Check ${returnCode}`, `Execute SQL error.`);
+        logger.err(`SQL Check ${returnCode}`, `Execute SQL error. ${cat('tmpOutput')}`);
+        sql.delOutput();
         quit(-returnCode);
     }
+    sql.delOutput();
 }

@@ -17,6 +17,7 @@ deploy: {
             ,   header  : []                // -h
             ,   colsep  : []                // -s
             ,   output  : []                // -o
+            ,   err     : [`-m-1`]          // -m
             ,   flags   : [
                     `-I`                    // -I (enable quoted identifiers)
                 ,   `-W`                    // -W (remove trailing spaces)
@@ -108,6 +109,7 @@ deploy: {
                     }
                     cmd = [...cmd, ..._args[arg]];
                 });
+                _logger.info(`Execute`, `Starting ${cmd[0]}...`);
                 const r = run(...cmd);
                 if (_args.output[1] && fileExists(_args.output[1])) {
                     _logger.warn(`Execute`, `File [${_args.output[1]}] created.`);
@@ -163,10 +165,14 @@ deploy: {
 
     // Program class
     const _id = `Program`;
-    const version = `1.1.1`;
+    const version = `1.1.2`;
     const changelog = {
-        '1.1.1': [
-            `[Program.SQLCMD] Fix error raised when execute with no output.`
+        '1.1.2': [
+            `[Program.SQLCMD] Add errorlevel option to output all console message to stdout`
+        ,   `[Program.SQLCMD] Add more logging info`
+        ]
+    ,   '1.1.1': [
+            `[Program.SQLCMD] Fix error raised when execute with no output`
         ]
     ,   '1.1.0': [
             `Add global help() method`
