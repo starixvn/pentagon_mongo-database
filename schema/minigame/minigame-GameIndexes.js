@@ -308,7 +308,7 @@
         // Not supported
     }
 
-    if ((2 ** Saba.env() & 2) > 0) {   // 31 - Xo So
+    if ((2 ** Saba.env() & 6) > 0) {   // 31 - Xo So
         [idxs.TTL, idxs.time, idxs.id].
             forEach((idx) => {Maint.createIndex(dbs.minigame.lottery_phiens, idx.idxKeys, idx.idxOpts)});
         [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid__id].
