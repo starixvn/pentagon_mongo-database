@@ -902,7 +902,7 @@ deploy: {
       };
       const _runBetLogSummary = (time) => {
         const _round = `hour`;
-        const _time = _getTime(time, _round);
+        const _time = _getTime(time || (Date.now() - _getRoundDuration(_round)), _round);
         const timer = new Tool.Timer();
         const _coll = `betlog_summaries`;
 
