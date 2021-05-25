@@ -34,6 +34,8 @@
     [idxs.TTL, idxs.requestTimeStamp, idxs.obCustId_gameRoundId_gameTypeId, idxs.gameTypeId_gameRoundId_obCustId, idxs.obTransId, idxs.summarized].
       forEach(idx => {Maint.createIndex(dbs.log.bets, idx.idxKeys, idx.idxOpts)});
     [idxs.TTL, idxs.requestTimeStamp, idxs.obCustId_gameRoundId_gameTypeId, idxs.gameTypeId_gameRoundId_obCustId].
+      forEach(idx => {Maint.createIndex(dbs.log.end_games, idx.idxKeys, idx.idxOpts)});
+    [idxs.TTL, idxs.requestTimeStamp, idxs.obCustId_gameRoundId_gameTypeId, idxs.gameTypeId_gameRoundId_obCustId].
       forEach(idx => {Maint.createIndex(dbs.log.failed_requests, idx.idxKeys, idx.idxOpts)});
   }
 }
