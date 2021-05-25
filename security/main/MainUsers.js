@@ -1,77 +1,79 @@
 {
-    [
-        {   name: `billy.bui`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `root`       , db: `admin`}
-            ,   {role: `dbOwner`    , db: `admin`}
-            ,   {role: `dbOwner`    , db: `local`}
-            ,   {role: `dbOwner`    , db: `config`}
-            ]
-        }
-    ,   {   name: `lmn_archive`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `read`       , db: `archive`}
-            ,   {role: `readWrite`  , db: `log`}
-            ,   {role: `readWrite`  , db: `member`}
-            ,   {role: `readWrite`  , db: `minigame`}
-            ,   {role: `read`       , db: `script`}
-            ]
-        }
-    ,   {   name: `lmn_backend`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `readWrite`  , db: `log`}
-            ,   {role: `readWrite`  , db: `member`}
-            ,   {role: `readWrite`  , db: `minigame`}
-            ,   {role: `read`       , db: `summary`}
-            ]
-        }
-    ,   {   name: `lmn_readonly`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `read`       , db: `archive`}
-            ,   {role: `read`       , db: `log`}
-            ,   {role: `read`       , db: `member`}
-            ,   {role: `read`       , db: `minigame`}
-            ,   {role: `read`       , db: `summary`}
-            ]
-        }
-    ,   {   name: `mongodb_exporter`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `clusterMonitor` , db: `admin`}
-            ,   {role: `monitorSystem`  , db: `admin`}
-            ]
-        }
-    ,   {   name: `mongosqld`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `read`       , db: `archive`}
-            ,   {role: `read`       , db: `log`}
-            ,   {role: `read`       , db: `member`}
-            ,   {role: `read`       , db: `minigame`}
-            ,   {role: `readWrite`  , db: `schema`}
-            ,   {role: `read`       , db: `summary`}
-            ]
-        }
-    ,   {   name: `lmn_summary`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `readWrite`  , db: `minigame`}
-            ,   {role: `read`       , db: `script`}
-            ,   {role: `readWrite`  , db: `summary`}
-            ]
-        }
-    ,   {   name: `lmn_backup`
-        ,   db: `admin`
-        ,   roles: [
-                {role: `readSystem` , db: `admin`}
-            ]
-        }
-    ].forEach(user => {
-        user.roles = (user.roles || []).concat({role: 'public', db: 'admin'})
-        Sec.definePrincipal(user, `user`);
-    });
+  [
+    { name: `billy.bui`,
+      db: `admin`,
+      roles: [
+        {role: `root`       , db: `admin`},
+        {role: `dbOwner`    , db: `admin`},
+        {role: `dbOwner`    , db: `local`},
+        {role: `dbOwner`    , db: `config`},
+      ],
+    },
+    { name: `lmn_archive`,
+      db: `admin`,
+      roles: [
+        {role: `read`       , db: `archive`},
+        {role: `readWrite`  , db: `log`},
+        {role: `readWrite`  , db: `member`},
+        {role: `readWrite`  , db: `minigame`},
+        {role: `read`       , db: `script`},
+      ],
+    },
+    { name: `lmn_backend`,
+      db: `admin`,
+      roles: [
+          {role: `readWrite`  , db: `log`},
+          {role: `readWrite`  , db: `member`},
+          {role: `readWrite`  , db: `minigame`},
+          {role: `read`       , db: `summary`},
+      ],
+    },
+    { name: `lmn_readonly`,
+      db: `admin`,
+      roles: [
+        {role: `read`       , db: `archive`},
+        {role: `read`       , db: `log`},
+        {role: `read`       , db: `member`},
+        {role: `read`       , db: `minigame`},
+        {role: `read`       , db: `summary`},
+      ],
+    },
+    { name: `mongodb_exporter`,
+      db: `admin`,
+      roles: [
+        {role: `clusterMonitor` , db: `admin`},
+        {role: `monitorSystem`  , db: `admin`},
+      ],
+    },
+    { name: `mongosqld`,
+      db: `admin`,
+      roles: [
+        {role: `read`       , db: `archive`},
+        {role: `read`       , db: `log`},
+        {role: `read`       , db: `member`},
+        {role: `read`       , db: `minigame`},
+        {role: `readWrite`  , db: `schema`},
+        {role: `read`       , db: `summary`},
+      ],
+    },
+    { name: `lmn_summary`,
+      db: `admin`,
+      roles: [
+        {role: `readWrite`  , db: `log`},
+        {role: `readWrite`  , db: `minigame`},
+        {role: `read`       , db: `script`},
+        {role: `readWrite`  , db: `summary`},
+        {role: `readWrite`  , db: `Proteus`},
+      ],
+    },
+    { name: `lmn_backup`,
+      db: `admin`,
+      roles: [
+        {role: `readSystem` , db: `admin`},
+      ],
+    },
+  ].forEach(user => {
+    user.roles = (user.roles || []).concat({role: 'public', db: 'admin'});
+    Sec.definePrincipal(user, `user`);
+  });
 }
