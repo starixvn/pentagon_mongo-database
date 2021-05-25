@@ -259,7 +259,7 @@ deploy: {
           } catch (e) {
             _logger.err(conf.name.en, `- Something is WRONG while deleting summary record for ${doc}`);
           }
-        })
+        });
         _logger.info(conf.name.en, `Done summarize data in ${timer.getTimerDuration()} ms`);
       };
       const _runSummary = (time, round) => {
@@ -796,12 +796,195 @@ deploy: {
   };
   const BetLogProcessorExt = {};
 
+  const BetLogSummary = class {
+    constructor (source, destination) {
+      const _logger = new Shell.Log(`BETLOG-SUMMARY`);
+      const _assert = new Shell.Assert();
+      _assert.setLogger(_logger);
+      const database = `Proteus`;
+
+      _assert.setTitle(`Audit`);
+      _assert.try(
+        `[source] must be a MongoDB connection.`,
+        source instanceof Mongo,
+      );
+      _assert.try(
+        `[destination] must be a MongoDB connection.`,
+        destination instanceof Mongo,
+      );
+      if (_assert.hasError()) {
+        return;
+      }
+
+      const _toString = () => {
+        return `[SabaClub.BetLogProcessor] Summarize from [${source.host}] to ${destination.host}`;
+      };
+      const _getRoundDuration = (round) => {
+        let roundDuration = 1000;
+
+        if (String.toLowerCase(round) == 'day') {
+          roundDuration = 24 * 3600 * 1000;
+        };
+        if (String.toLowerCase(round) == 'hour') {
+          roundDuration = 3600 * 1000;
+        };
+
+        return roundDuration;
+      };
+      const _getTime = (time, round) => {
+        let _time = Date.now();
+        const _roundDuration = _getRoundDuration(round);
+
+        if (time instanceof Date) {
+          _time = time.valueOf();
+        };
+        if (typeof time == "number") {
+          _time = time;
+        }
+        else {
+          _time = Date.parse(time);
+        };
+
+        return _time ? new Date(Math.floor(_time / _roundDuration) * _roundDuration) : null;
+      };
+      const _getTimeStr = (time, round) => {
+        const _time = _getTime(time, round);
+        if (String.toLowerCase(round) == 'day') {
+          return _time.toISOString().substr(0,10);
+        };
+        if (String.toLowerCase(round) == 'hour') {
+          return `${_time.toISOString().substr(0,10)} ${_time.toISOString().substr(11,8)}`;
+        };
+      };
+      const _buildSummaryAgg = (time, round) => {
+        const _roundDuration = _getRoundDuration(round);
+        const _from = _getTime(time, round);
+        const _to = _getTime(_from.valueOf() + _roundDuration, round);
+        const agg = [];
+
+        agg.push({$match: {$and: [
+          {'time.request': {$gte: _from.toISOString()}},
+          {'time.request': {$lt: _to.toISOString()}},
+        ]}});
+        agg.push({$project: {_id: 0, 'data.gameType': 1, 'data.currency': 1, 'data.amount': 1, system: 1}});
+        agg.push({$group: {
+          _id: {
+            gameId: '$data.gameType',
+            currency: '$data.currency',
+            system: '$system',
+          },
+          requestCount: {$sum: 1},
+          totalAmount: {$sum: '$data.amount'},
+        }});
+        agg.push({$project: {
+          _id: 0,
+          'key.time': {$literal: _from}, 'key.gameId': `$_id.gameId`, 'key.currency': `$_id.currency`, 'key.system': `$_id.system`,
+          'value.requestCount': `$requestCount`, 'value.totalAmount': `$totalAmount`,
+        }});
+
+        return agg;
+      };
+      const _getOldSummary = (time, round) => {
+        const _time = _getTime(time, round);
+        const summaries = [];
+        dbsDst.summary.betlog_summaries.find(
+          {time: _time},
+          {_id: 0, time: 1, gameId: 1, currency: 1, system: 1},
+        ).forEach(doc => {
+          const _doc = {};
+          Object.keys(doc).sort().forEach((k) => {
+            _doc[k] = doc[k];
+          });
+          summaries.push(tojson(_doc));
+        });
+
+        return summaries;
+      };
+      const _runBetLogSummary = (time) => {
+        const _round = `hour`;
+        const _time = _getTime(time, _round);
+        const timer = new Tool.Timer();
+        const _coll = `betlog_summaries`;
+
+        timer.register(`start`);
+        const agg = _buildSummaryAgg(_time, _round);
+        timer.register(`agg`);
+        const oldSums = _getOldSummary(_time, _round);
+        timer.register(`oldSums`);
+        const summaries = dbsSrc[database].betlogs.aggregate(agg).toArray();
+        timer.register(`summaries`);
+
+        if (summaries.length > 0) {
+          _logger.info(`summary`, `Summary for ${_getTimeStr(_time, _round)} started`);
+        }
+        summaries.forEach(doc => {
+          const res = dbsDst.summary.betlog_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
+          if (res.upsertedId) {
+            _logger.info(_coll, `- Inserted new summary record for ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
+          } else if (res.modifiedCount > 0) {
+            _logger.info(_coll, `- Modified summary record for ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
+          }
+
+          const _doc = {};
+          Object.keys(doc.key).sort().forEach((k) => {
+            _doc[k] = doc.key[k];
+          });
+          const idx = oldSums.indexOf(tojson(_doc));
+          if (idx >= 0) {
+            oldSums.splice(idx, 1);
+          }
+        });
+
+        oldSums.forEach(doc => {
+          try {
+            let _doc = null;
+            eval(`_doc = ${doc}`);
+            if (typeof _doc != "object") {
+              _doc = null;
+            }
+            const res = dbsDst.summary.betlog_summaries.deleteOne(_doc);
+            if (res.deletedCount > 0) {
+              _logger.warn(_coll, `- Deleted summary record for ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
+            } else {
+              _logger.info(_coll, `- No summary record deleted for ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
+            }
+          } catch (e) {
+            _logger.err(_coll, `- Something is WRONG while deleting summary record for ${doc}`);
+            _logger.err(_coll, `    ${tojsononeline(e)}`);
+          }
+        });
+        if (summaries.length > 0) {
+          _logger.info(_coll, `Done summarize data in ${timer.getTimerDuration()} ms`);
+          _logger.info(`summary`, `Data summary for ${_getTimeStr(_time, _round)} finished\n\n`);
+        }
+      };
+
+      const _descriptor = {
+        writable: false,
+        enumerable: true,
+      };
+      Object.defineProperties(this, {
+        toString          : Object.extend({value: function () { return _toString() }}, _descriptor),
+        tojson            : Object.extend({value: function () { return _toString() }}, _descriptor),
+        runBetLogSummary  : Object.extend({value: function (time) { return _runBetLogSummary(time) }}, _descriptor),
+      });
+
+      const dbsSrc = new MongoSrv.DBs(source);
+      if(dbsSrc[database] == null) {
+        dbsSrc[database] = source.getDB(database);
+      }
+      const dbsDst = new MongoSrv.DBs(destination);
+    }
+  }
+  const BetLogSummaryExt = {};
+
   // SabaClub class
   const _id = `SabaClub`;
   const version = `1.1.0`;
   const changelog = {
     '1.1.0': [
-      `Release [SabaClub.BetLogProcessor]`
+      `Release [SabaClub.BetLogProcessor]`,
+      `Release [SabaClub.BetLogSummary]`,
     ],
     '1.0.3': [
       `[SabaClub.SmartBot] Add parameter for input userinfo source`,
@@ -826,6 +1009,7 @@ deploy: {
     const cSummary = Object.extend(${tojson(Summary)}, ${tojson(SummaryExt)});
     const cSmartBot = Object.extend(${tojson(SmartBot)}, ${tojson(SmartBotExt)});
     const cBetLogProcessor = Object.extend(${tojson(BetLogProcessor)}, ${tojson(BetLogProcessorExt)});
+    const cBetLogSummary = Object.extend(${tojson(BetLogSummary)}, ${tojson(BetLogSummaryExt)});
     const _toStr = function () {return this.constructor.name};
 
     const _descriptor = {
@@ -836,6 +1020,7 @@ deploy: {
       Summary: Object.defineProperties(cSummary, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)}),
       SmartBot: Object.defineProperties(cSmartBot, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)}),
       BetLogProcessor: Object.defineProperties(cBetLogProcessor, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)}),
+      BetLogSummary: Object.defineProperties(cBetLogSummary, {toString: Object.extend({value: _toStr}, _descriptor), tojson: Object.extend({value: _toStr}, _descriptor)}),
     }
   })()`);
   const lastVersion = (db.getSiblingDB('script').system.js.findOne({_id}, {_id: 0, version: 1}) || {version}).version;
