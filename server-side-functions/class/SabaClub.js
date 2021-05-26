@@ -920,9 +920,9 @@ deploy: {
         summaries.forEach(doc => {
           const res = dbsDst.summary.betlog_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
           if (res.upsertedId) {
-            _logger.info(_coll, `- Inserted new summary record for ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
+            _logger.info(_coll, `- Inserted new summary record for G${doc.key.gameId} ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
           } else if (res.modifiedCount > 0) {
-            _logger.info(_coll, `- Modified summary record for ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
+            _logger.info(_coll, `- Modified summary record for G${doc.key.gameId} ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
           }
 
           const _doc = {};
@@ -944,9 +944,9 @@ deploy: {
             }
             const res = dbsDst.summary.betlog_summaries.deleteOne(_doc);
             if (res.deletedCount > 0) {
-              _logger.warn(_coll, `- Deleted summary record for ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
+              _logger.warn(_coll, `- Deleted summary record for G${_doc.gameId} ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
             } else {
-              _logger.info(_coll, `- No summary record deleted for ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
+              _logger.info(_coll, `- No summary record deleted for G${_doc.gameId} ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
             }
           } catch (e) {
             _logger.err(_coll, `- Something is WRONG while deleting summary record for ${doc}`);
