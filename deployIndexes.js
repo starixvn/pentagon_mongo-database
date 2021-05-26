@@ -12,6 +12,7 @@
     'schema/minigame/minigame-SmartBotIndexes.js',
     'schema/minigame/minigame-SpinIndexes.js',
     'schema/minigame/minigame-UserIndexes.js',
+    'schema/Proteus/Proteus-BetLogIndexes.js',
     'schema/summary/summary-BetLogSummaries.js',
     'schema/summary/summary-DailySummaries.js',
     'schema/summary/summary-GameSummaryConfig.js',
