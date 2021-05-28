@@ -866,20 +866,33 @@ deploy: {
           {'time.request': {$gte: _from.toISOString()}},
           {'time.request': {$lt: _to.toISOString()}},
         ]}});
-        agg.push({$project: {_id: 0, 'data.gameType': 1, 'data.currency': 1, 'data.amount': 1, system: 1}});
+        agg.push({$project: {_id: 0, data: 1, system: 1}});
         agg.push({$group: {
           _id: {
-            gameId: '$data.gameType',
-            currency: '$data.currency',
-            system: '$system',
+            gameId: `$data.gameType`,
+            currency: `$data.currency`,
+            siteId: `$data.siteId`,
+            memberId: `$data.memberId`,
+            roundId: `$data.roundId`,
+            system: `$system`,
           },
           requestCount: {$sum: 1},
-          totalAmount: {$sum: '$data.amount'},
+          totalAmount: {$sum: `$data.amount`}
+        }});
+        agg.push({$group: {
+          _id: {
+            gameId: `$_id.gameId`,
+            currency: `$_id.currency`,
+            system: `$_id.system`,
+          },
+          betCount: {$sum: 1},
+          requestCount: {$sum: `$requestCount`},
+          totalAmount: {$sum: `$totalAmount`},
         }});
         agg.push({$project: {
           _id: 0,
           'key.time': {$literal: _from}, 'key.gameId': `$_id.gameId`, 'key.currency': `$_id.currency`, 'key.system': `$_id.system`,
-          'value.requestCount': `$requestCount`, 'value.totalAmount': `$totalAmount`,
+          'value.betCount': `$betCount`, 'value.requestCount': `$requestCount`, 'value.totalAmount': `$totalAmount`,
         }});
 
         return agg;
@@ -980,8 +993,11 @@ deploy: {
 
   // SabaClub class
   const _id = `SabaClub`;
-  const version = `1.1.0`;
+  const version = `1.1.1`;
   const changelog = {
+    '1.1.1': [
+      `[SabaClub.BetLogSummary] Add betCount to summary data`
+    ],
     '1.1.0': [
       `Release [SabaClub.BetLogProcessor]`,
       `Release [SabaClub.BetLogSummary]`,
