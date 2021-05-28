@@ -693,7 +693,7 @@ deploy: {
           amount    : Number(data.call.amount),
           balance   : Number(data.result.balance),
         };
-        cooked.system = data.system | 1;
+        cooked.system = data.system || 1;
 
         return cooked;
       };
@@ -711,6 +711,7 @@ deploy: {
           'call.choiceId'     : 1,
           'call.amount'       : 1,
           'result.balance'    : 1,
+          system              : 1,
         }
       };
       const _markBetLogDone = (betlog, _ids) => {
@@ -996,7 +997,8 @@ deploy: {
   const version = `1.1.1`;
   const changelog = {
     '1.1.1': [
-      `[SabaClub.BetLogSummary] Add betCount to summary data`
+      `[SabaClub.BetLogSummary] Add betCount to summary data`,
+      `[SabaClub.BetLogProcessor] Fix missing system in data project`
     ],
     '1.1.0': [
       `Release [SabaClub.BetLogProcessor]`,
