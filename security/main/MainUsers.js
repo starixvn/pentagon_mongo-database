@@ -53,6 +53,7 @@
         {role: `read`       , db: `log`},
         {role: `read`       , db: `member`},
         {role: `read`       , db: `minigame`},
+        {role: `read`       , db: `Proteus`},
         {role: `readWrite`  , db: `schema`},
         {role: `read`       , db: `summary`},
       ],
