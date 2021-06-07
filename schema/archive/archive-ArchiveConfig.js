@@ -1,4 +1,4 @@
-if ((2 ** Saba.env() & 6) > 0)
+if ((2 ** Saba.env() & 14) > 0)
 {
     const filter = {
         memberId: {$gt: 0}
