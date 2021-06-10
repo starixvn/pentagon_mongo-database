@@ -17,5 +17,7 @@
       forEach(idx => {Maint.createIndex(dbs.log_arc.end_games_bk, idx.idxKeys, idx.idxOpts)});
     [idxs.requestTimeStamp, idxs.summarized].
       forEach(idx => {Maint.createIndex(dbs.log_arc.failed_requests_bk, idx.idxKeys, idx.idxOpts)});
+    [idxs.requestTimeStamp].
+      forEach(idx => {Maint.createIndex(dbs.log_arc.signin_requests_bk, idx.idxKeys, idx.idxOpts)});
   }
 }
