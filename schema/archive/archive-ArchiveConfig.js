@@ -1,1004 +1,1004 @@
-if ((2 ** Saba.env() & 14) > 0)
-{
-    const filter = {
-        memberId: {$gt: 0}
-    };
-    dbs.archive.archive_config.remove({});
-    dbs.archive.archive_config.insertMany([
-        {   _id: 39001
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'taixiu_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'taixiu_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'taixiu_cuocs'
-                ,   to: 'taixiu_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'taixiu_ones'
-                ,   to: 'taixiu_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39002
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'xocxoc_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'xocxoc_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'xocxoc_cuocs'
-                ,   to: 'xocxoc_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39003
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'baucua_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'baucua_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'baucua_cuocs'
-                ,   to: 'baucua_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39004
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'txturbo_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'txturbo_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'txturbo_cuocs'
-                ,   to: 'txturbo_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'txturbo_ones'
-                ,   to: 'txturbo_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39005
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'chanle_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'chanle_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'chanle_cuocs'
-                ,   to: 'chanle_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'chanle_ones'
-                ,   to: 'chanle_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39006
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'chanleturbo_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'chanleturbo_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'chanleturbo_cuocs'
-                ,   to: 'chanleturbo_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'chanleturbo_ones'
-                ,   to: 'chanleturbo_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39007
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'minidragontiger_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'minidragontiger_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'minidragontiger_cuocs'
-                ,   to: 'minidragontiger_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39008
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenopromax_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenopromax_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenopromax_cuocs'
-                ,   to: 'kenopromax_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39009
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'minisedie_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'minisedie_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'minisedie_cuocs'
-                ,   to: 'minisedie_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39010
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'baccarat_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'baccarat_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'baccarat_cuocs'
-                ,   to: 'baccarat_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39011
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenoproviet_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenoproviet_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenoproviet_cuocs'
-                ,   to: 'kenoproviet_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenoproviet_ones'
-                ,   to: 'kenoproviet_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenoproviet_phiens_log'
-                ,   to: 'kenoproviet_phiens_log_bk'
-                ,   join: 'id'
-                ,   updateOnly: false
-                }
-            ]
-        }
-    ,   {   _id: 39012
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenomax_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenomax_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenomax_cuocs'
-                ,   to: 'kenomax_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenomax_ones'
-                ,   to: 'kenomax_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39013
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenomax2_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenomax2_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenomax2_cuocs'
-                ,   to: 'kenomax2_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenomax2_ones'
-                ,   to: 'kenomax2_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39014
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenomini_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenomini_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenomini_cuocs'
-                ,   to: 'kenomini_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenomini_ones'
-                ,   to: 'kenomini_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39015
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenomini2_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenomini2_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenomini2_cuocs'
-                ,   to: 'kenomini2_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenomini2_ones'
-                ,   to: 'kenomini2_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39016
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenoeast_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenoeast_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenoeast_cuocs'
-                ,   to: 'kenoeast_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenoeast_ones'
-                ,   to: 'kenoeast_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39017
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenowest_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenowest_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenowest_cuocs'
-                ,   to: 'kenowest_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenowest_ones'
-                ,   to: 'kenowest_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39018
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenosouth_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenosouth_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenosouth_cuocs'
-                ,   to: 'kenosouth_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenosouth_ones'
-                ,   to: 'kenosouth_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39019
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'kenonorth_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'kenonorth_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'kenonorth_cuocs'
-                ,   to: 'kenonorth_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'kenonorth_ones'
-                ,   to: 'kenonorth_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39021
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'roulette_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'roulette_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'roulette_cuocs'
-                ,   to: 'roulette_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'roulette_ones'
-                ,   to: 'roulette_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39022
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'vipsedie_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'vipsedie_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'vipsedie_cuocs'
-                ,   to: 'vipsedie_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39023
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'blackjack_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'blackjack_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'blackjack_cuocs'
-                ,   to: 'blackjack_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                ,   logField: '_cuocs'
-                ,   logValue: 'id'
-                }
-            ]
-        }
-    ,   {   _id: 39024
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'specialsedie_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'specialsedie_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'specialsedie_cuocs'
-                ,   to: 'specialsedie_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'specialsedie_ones'
-                ,   to: 'specialsedie_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39025
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'sicbo_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'sicbo_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'sicbo_cuocs'
-                ,   to: 'sicbo_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'sicbo_ones'
-                ,   to: 'sicbo_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39026
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'vipfishprawncrab_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'vipfishprawncrab_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'vipfishprawncrab_cuocs'
-                ,   to: 'vipfishprawncrab_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39027
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'vipbaccarat_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'vipbaccarat_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'vipbaccarat_cuocs'
-                ,   to: 'vipbaccarat_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39028
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'vipsediewar_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'vipsediewar_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'vipsediewar_cuocs'
-                ,   to: 'vipsediewar_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'vipsediewar_ones'
-                ,   to: 'vipsediewar_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 39029
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'fourguardians_rounds'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'fourguardians_rounds_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_rounds'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'fourguardians_fames'
-                ,   to: 'fourguardians_fames_bk'
-                ,   join: 'roundId'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'fourguardians_freespins'
-                ,   to: 'fourguardians_freespins_bk'
-                ,   join: 'roundId'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                ,   logField: '_freespins'
-                ,   logValue: 'id'
-                }
-            ]
-        }
-    ,   {   _id: 39029.1
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'fourguardians_fames'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'fourguardians_fames_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24 * 8
-            ,   join: 'roundId'
-            ,   updateOnly: true
-            }
-        ,   childs: []
-        }
-    ,   {   _id: 39031
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'lottery_phiens'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'lottery_phiens_bk'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: 'id'
-            ,   logField: '_phiens'
-            ,   logValue: 'id'
-            }
-        ,   childs: [
-                {   from: 'lottery_cuocs'
-                ,   to: 'lottery_cuocs_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ,   {   from: 'lottery_ones'
-                ,   to: 'lottery_ones_bk'
-                ,   join: 'phien'
-                ,   updateOnly: false
-                ,   filter: filter
-                ,   exCols: []
-                }
-            ]
-        }
-    ,   {   _id: 25001
-        ,   from: {
-                db: 'minigame'
-            ,   coll: 'usersessions'
-            }
-        ,   to: {
-                db: 'minigame_arc'
-            ,   coll: 'usersessions_bk'
-            }
-        ,   config: {
-                timeField: 'recheckInTime'
-            ,   cutOffsetHours: -24
-            ,   join: ''
-            }
-        ,   childs: []
-        }
-    ,   {   _id: 19001
-        ,   from: {
-                db: 'log'
-            ,   coll: 'bets'
-            }
-        ,   to: {
-                db: 'log_arc'
-            ,   coll: 'bets_bk'
-            }
-        ,   config: {
-                timeField: ''
-            ,   cutOffsetHours: 0
-            ,   join: ''
-            }
-        ,   childs: []
-        }
-    ,   {   _id: 19002
-        ,   from: {
-                db: 'log'
-            ,   coll: 'end_games'
-            }
-        ,   to: {
-                db: 'log_arc'
-            ,   coll: 'end_games_bk'
-            }
-        ,   config: {
-                timeField: ''
-            ,   cutOffsetHours: 0
-            ,   join: ''
-            }
-        ,   childs: []
-        }
-    ,   {   _id: 19003
-        ,   from: {
-                db: 'log'
-            ,   coll: 'failed_requests'
-            }
-        ,   to: {
-                db: 'log_arc'
-            ,   coll: 'failed_requests_bk'
-            }
-        ,   config: {
-                timeField: ''
-            ,   cutOffsetHours: 0
-            ,   join: ''
-            }
-        ,   childs: []
-        }
-    ,   {   _id: 38001
-        ,   from: {
-                db: 'member'
-            ,   coll: 'member_auths'
-            }
-        ,   to: {
-                db: 'member_arc'
-            ,   coll: 'member_auths'
-            }
-        ,   config: {
-                timeField: 'time'
-            ,   cutOffsetHours: -24
-            ,   join: ''
-            }
-        ,   childs: []
-        }
-    ]
-    ,   {ordered: false}
-    );
+if ((2 ** Saba.env() & 14) > 0) {
+  const filter = {
+    memberId: {$gt: 0}
+  };
+  dbs.archive.archive_config.remove({});
+  dbs.archive.archive_config.insertMany(
+    [
+      { _id: 39001,
+        from: {
+          db: 'minigame',
+          coll: 'taixiu_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'taixiu_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'taixiu_cuocs',
+            to: 'taixiu_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          { from: 'taixiu_ones',
+            to: 'taixiu_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39002,
+        from: {
+          db: 'minigame',
+          coll: 'xocxoc_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'xocxoc_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'xocxoc_cuocs',
+            to: 'xocxoc_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39003,
+        from: {
+          db: 'minigame',
+          coll: 'baucua_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'baucua_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'baucua_cuocs',
+            to: 'baucua_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39004,
+        from: {
+          db: 'minigame',
+          coll: 'txturbo_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'txturbo_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'txturbo_cuocs',
+            to: 'txturbo_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'txturbo_ones',
+            to: 'txturbo_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39005,
+        from: {
+          db: 'minigame',
+          coll: 'chanle_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'chanle_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'chanle_cuocs',
+            to: 'chanle_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'chanle_ones',
+            to: 'chanle_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39006,
+        from: {
+          db: 'minigame',
+          coll: 'chanleturbo_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'chanleturbo_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'chanleturbo_cuocs',
+            to: 'chanleturbo_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'chanleturbo_ones',
+            to: 'chanleturbo_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39007,
+        from: {
+          db: 'minigame',
+          coll: 'minidragontiger_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'minidragontiger_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'minidragontiger_cuocs',
+            to: 'minidragontiger_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39008,
+        from: {
+          db: 'minigame',
+          coll: 'kenopromax_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenopromax_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenopromax_cuocs',
+            to: 'kenopromax_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39009,
+        from: {
+          db: 'minigame',
+          coll: 'minisedie_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'minisedie_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'minisedie_cuocs',
+            to: 'minisedie_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39010,
+        from: {
+          db: 'minigame',
+          coll: 'baccarat_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'baccarat_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'baccarat_cuocs',
+            to: 'baccarat_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39011,
+        from: {
+          db: 'minigame',
+          coll: 'kenoproviet_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenoproviet_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenoproviet_cuocs',
+            to: 'kenoproviet_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenoproviet_ones',
+            to: 'kenoproviet_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenoproviet_phiens_log',
+            to: 'kenoproviet_phiens_log_bk',
+            join: 'id',
+            updateOnly: false,
+          }
+        ],
+      },
+      { _id: 39012,
+        from: {
+          db: 'minigame',
+          coll: 'kenomax_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenomax_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenomax_cuocs',
+            to: 'kenomax_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenomax_ones',
+            to: 'kenomax_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39013,
+        from: {
+          db: 'minigame',
+          coll: 'kenomax2_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenomax2_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenomax2_cuocs',
+            to: 'kenomax2_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenomax2_ones',
+            to: 'kenomax2_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39014,
+        from: {
+          db: 'minigame',
+          coll: 'kenomini_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenomini_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenomini_cuocs',
+            to: 'kenomini_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenomini_ones',
+            to: 'kenomini_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39015,
+        from: {
+          db: 'minigame',
+          coll: 'kenomini2_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenomini2_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenomini2_cuocs',
+            to: 'kenomini2_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenomini2_ones',
+            to: 'kenomini2_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39016,
+        from: {
+          db: 'minigame',
+          coll: 'kenoeast_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenoeast_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenoeast_cuocs',
+            to: 'kenoeast_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenoeast_ones',
+            to: 'kenoeast_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39017,
+        from: {
+          db: 'minigame',
+          coll: 'kenowest_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenowest_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenowest_cuocs',
+            to: 'kenowest_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenowest_ones',
+            to: 'kenowest_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39018,
+        from: {
+          db: 'minigame',
+          coll: 'kenosouth_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenosouth_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenosouth_cuocs',
+            to: 'kenosouth_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenosouth_ones',
+            to: 'kenosouth_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39019,
+        from: {
+          db: 'minigame',
+          coll: 'kenonorth_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'kenonorth_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'kenonorth_cuocs',
+            to: 'kenonorth_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'kenonorth_ones',
+            to: 'kenonorth_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39021,
+        from: {
+          db: 'minigame',
+          coll: 'roulette_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'roulette_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'roulette_cuocs',
+            to: 'roulette_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'roulette_ones',
+            to: 'roulette_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39022,
+        from: {
+          db: 'minigame',
+          coll: 'vipsedie_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'vipsedie_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'vipsedie_cuocs',
+            to: 'vipsedie_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39023,
+        from: {
+          db: 'minigame',
+          coll: 'blackjack_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'blackjack_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'blackjack_cuocs',
+            to: 'blackjack_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+            logField: '_cuocs',
+            logValue: 'id',
+          }
+        ],
+      },
+      { _id: 39024,
+        from: {
+          db: 'minigame',
+          coll: 'specialsedie_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'specialsedie_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'specialsedie_cuocs',
+            to: 'specialsedie_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'specialsedie_ones',
+            to: 'specialsedie_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39025,
+        from: {
+          db: 'minigame',
+          coll: 'sicbo_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'sicbo_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'sicbo_cuocs',
+            to: 'sicbo_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'sicbo_ones',
+            to: 'sicbo_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39026,
+        from: {
+          db: 'minigame',
+          coll: 'vipfishprawncrab_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'vipfishprawncrab_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'vipfishprawncrab_cuocs',
+            to: 'vipfishprawncrab_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39027,
+        from: {
+          db: 'minigame',
+          coll: 'vipbaccarat_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'vipbaccarat_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'vipbaccarat_cuocs',
+            to: 'vipbaccarat_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39028,
+        from: {
+          db: 'minigame',
+          coll: 'vipsediewar_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'vipsediewar_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'vipsediewar_cuocs',
+            to: 'vipsediewar_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'vipsediewar_ones',
+            to: 'vipsediewar_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 39029,
+        from: {
+          db: 'minigame',
+          coll: 'fourguardians_rounds',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'fourguardians_rounds_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_rounds',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'fourguardians_fames',
+            to: 'fourguardians_fames_bk',
+            join: 'roundId',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'fourguardians_freespins',
+            to: 'fourguardians_freespins_bk',
+            join: 'roundId',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+            logField: '_freespins',
+            logValue: 'id',
+          }
+        ],
+      },
+      { _id: 39029.1,
+        from: {
+          db: 'minigame',
+          coll: 'fourguardians_fames',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'fourguardians_fames_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24 * 8,
+          join: 'roundId',
+          updateOnly: true,
+        },
+        childs: [],
+      },
+      { _id: 39031,
+        from: {
+          db: 'minigame',
+          coll: 'lottery_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'lottery_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'lottery_cuocs',
+            to: 'lottery_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+          {   from: 'lottery_ones',
+            to: 'lottery_ones_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          }
+        ],
+      },
+      { _id: 25001,
+        from: {
+          db: 'minigame',
+          coll: 'usersessions',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'usersessions_bk',
+        },
+        config: {
+          timeField: 'recheckInTime',
+          cutOffsetHours: -24,
+          join: '',
+        },
+        childs: [],
+      },
+      { _id: 19001,
+        from: {
+          db: 'log',
+          coll: 'bets',
+        },
+        to: {
+          db: 'log_arc',
+          coll: 'bets_bk',
+        },
+        config: {
+          timeField: '',
+          cutOffsetHours: 0,
+          join: '',
+        },
+        childs: [],
+      },
+      { _id: 19002,
+        from: {
+          db: 'log',
+          coll: 'end_games',
+        },
+        to: {
+          db: 'log_arc',
+          coll: 'end_games_bk',
+        },
+        config: {
+          timeField: '',
+          cutOffsetHours: 0,
+          join: '',
+        },
+        childs: [],
+      },
+      { _id: 19003,
+        from: {
+          db: 'log',
+          coll: 'failed_requests',
+        },
+        to: {
+          db: 'log_arc',
+          coll: 'failed_requests_bk',
+        },
+        config: {
+          timeField: '',
+          cutOffsetHours: 0,
+          join: '',
+        },
+        childs: [],
+      },
+      { _id: 38001,
+        from: {
+          db: 'member',
+          coll: 'member_auths',
+        },
+        to: {
+          db: 'member_arc',
+          coll: 'member_auths',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: '',
+        },
+        childs: [],
+      }
+    ],
+    {ordered: false},
+  );
 }
