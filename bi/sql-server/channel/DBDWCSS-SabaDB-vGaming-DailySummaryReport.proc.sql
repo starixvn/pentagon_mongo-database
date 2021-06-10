@@ -1,47 +1,67 @@
 USE	SabaDB;
-IF	OBJECT_ID('Noti.DailySummaryReport') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE Noti.DailySummaryReport AS';
-END;
+EXECUTE	dbo.sp_MSR_InitProcedure N'DailySummaryReport', N'vGaming';
 GO
-ALTER PROCEDURE	Noti.DailySummaryReport
-					@ReportDate		DATETIME		= NULL
-				,	@isTest			BIT				= 0
+ALTER PROCEDURE	vGaming.DailySummaryReport
+					@Var1			SQL_VARIANT		= NULL
+				,	@Var2			SQL_VARIANT		= NULL
 WITH ENCRYPTION
 AS
 /*
-	Creator:	20201008@Billy
-	Task:		Compare Daily Summary result between OW and SB then send result via Notification Channel - [Gitlab: #000]
-	Database:	DBDWCSS.SabaDB
+	Creator:		20210529@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Compare Daily Summary for vGaming
+					Send result via Noti telegram channel
 
-	Revisions:
-		- 20201008@Billy:	Initial - [Gitlab: #058]
-		- 20210218@Billy:	Report by currency for SC3 - [Gitlab: #058]
-		- 20210423@Billy:	Update message format - [Gitlab: #060]
+	Parameters:
+		@Var1				[optional]		- The date of data that will be compared. The time is in UTC timezone.
+				<DEFAULT>	NULL			- Yesterday
 
-	Developer's Notes:
-		- @ReportDate:				[optional]		- The date of data that will be compared. The time is in UTC timezone.
-						<DEFAULT>	NULL			- Yesterday
+		@Var2:				[optional]		- Is this testing execution?
+				<DEFAULT>	NULL			- Treat as if testing
 
+
+	Version:	2.0.0
+	Revision:
+		- [2.0.0]	20210531@Billy		Split into SabaClub & vGaming report
+		- [1.0.2]	20210423@Billy		Update message format - [Gitlab: #060]
+		- [1.0.1]	20210218@Billy		Report by currency for SC3 - [Gitlab: #058]
+		- [1.0.0]	20201008@Billy		Release Noti.DailySummaryReport - [Gitlab: #058]
+		- [0.0.1]	20201008@Billy		Initital - [Gitlab: #058]
 */
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
-	DECLARE	@VendorId		INT 			= 42
-		,	@_ReportDate	DATETIME		= ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE))
-		,	@Letstalk		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'' ELSE N'DBNotification' END
-		,	@Telegram		NVARCHAR(128)	= CASE @isTest WHEN 1 THEN N'T-BILLY' ELSE N'T-SCNOTI' END
+	DECLARE	@ReportDate		DATETIME
+		,	@isTest			BIT
+		;
+
+	BEGIN TRY;
+		SELECT	@ReportDate		= CONVERT(DATETIME, @Var1);
+	END TRY BEGIN CATCH;
+		SELECT	@ReportDate		= NULL;
+	END CATCH;
+
+	BEGIN TRY;
+		SELECT	@isTest			= CONVERT(BIT, @Var2);
+	END TRY BEGIN CATCH;
+		SELECT	@isTest			= NULL;
+	END CATCH;
+
+	SELECT	@ReportDate		= ISNULL(@ReportDate, ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE)))
+		,	@isTest			= ISNULL(@isTest, 1)
+		;
+
+	DECLARE	@VendorId		INT 			= 66
 		,	@Status			NVARCHAR(128)	= N'OK'
 		;
 
-	IF	NOT (DATEDIFF(DAY, @_ReportDate, GETUTCDATE()) BETWEEN 1 AND 7)
+	IF	NOT (DATEDIFF(DAY, @ReportDate, GETUTCDATE()) BETWEEN 1 AND 7)
+	BEGIN;
+		RAISERROR(N'\
+[ERR]   @ReportDate is out of range', 0, 0) WITH NOWAIT;
 		RETURN;
-
-	DECLARE	@OW_Query		NVARCHAR(MAX)
-		,	@OW_Param		NVARCHAR(MAX)
-		,	@DS_Query		NVARCHAR(MAX)
-		;
+	END;
 
 	DECLARE	@SC				INT
 		,	@isCash			TINYINT
@@ -103,69 +123,16 @@ BEGIN;
 	-- List of SCs --
 	INSERT INTO	@SCs
 			(SC, isExpanded, isCash, isDone)
-	VALUES	( 1,          0,      0,      0)
-		, 	( 2,          0,      1,      0)
-		, 	( 3,          1,   NULL,      0)
+	VALUES	( 3,          1,   NULL,      0)
 		;
 
-	-- OW Query --
-	BEGIN;
-		SELECT	@OW_Query = N'';
-		SELECT	@OW_Query += N'\
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-SET NOCOUNT ON;
-
-SELECT	[gameTypeId]	= b.gameId
-	,	[gameType]		= g.typenamee
-	,	[currency]		= b.CurrencyName
-	,	[isCash]		= ISNULL(s.custid / s.custid, 0)
-	,	[phienCount]	= COUNT(DISTINCT b.GameId3rd)
-	,	[betCount]		= COUNT(1)
-	,	[stake]			= SUM(b.stake)
-	,	[payOut]		= SUM(b.winlost)
-FROM		dbo.bettransRnG AS b WITH (NOLOCK)
-INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
-		ON	b.gameId = g.typeid
-LEFT JOIN	dbo.Dep_CustSuper AS s WITH (NOLOCK)
-		ON	b.srecommend = s.custid
-WHERE	b.vendorID = @VendorId
-	AND	b.gameID BETWEEN 1611 AND 1697
-	AND	b.Transdate3rd >= @ReportDate
-	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
-	AND	b.statusID NOT IN (101, 102, 0) -- Reject, Void, running
-	AND	b.custid <> 0 -- Merged Tickets
-GROUP BY b.gameId, g.typenamee, b.CurrencyName, s.custid / s.custid
-OPTION (RECOMPILE);
-';
-
-		SELECT	@OW_Param = N'';
-		SELECT	@OW_Param += N'@VendorId INT, @ReportDate DATETIME';
-
+	BEGIN;	-- OW --
 		INSERT INTO	#OW_DailySummary (gameTypeId, gameType, currency, isCash, phienCount, betCount, stake, payOut)
-		EXECUTE	DB061KBT.bodb02.sys.sp_executesql @OW_Query, @OW_Param, @VendorId, @_ReportDate;
+		EXECUTE	dbr.OW_DailySummary @VendorId, @ReportDate;
+		RAISERROR('Executed on OW - V%d.', 0, 0, @VendorId) WITH NOWAIT;
+	END;	-- OW --
 
-		RAISERROR('Executed on OW', 0, 0) WITH NOWAIT;
-	END;
-
-	SELECT	@DS_Query = N'';
-	SELECT	@DS_Query += N'\
-SELECT	0 AS SC
-	,	cfg.owGameTypeId AS gameTypeId
-	,	cfg.gameId AS gameId
-	,	cfg.`name.en` AS gameType
-	,	IFNULL(ds.currency, "null") AS currency
-	,	IFNULL(ds.isCash, 2) AS isCash
-	,	ds.tickets AS betCount
-	,	ds.stake AS stake
-	,	ds.payOut AS payOut
-FROM		summary.daily_summaries AS ds
-INNER JOIN	summary.game_summary_config AS cfg
-		ON	ds.gameId = cfg.gameId
-WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
-	AND	ds.time < "' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'"
-';
-
-	BEGIN;
+	BEGIN;	-- SB --
 		UPDATE	@SCs
 		SET		isDone = 0;
 
@@ -180,7 +147,7 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 
 			DELETE	@Tmp_DailySummary;
 			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, payOut)
-			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0;
+			EXECUTE	dbr.SB_DailySummary @SC, @ReportDate;
 
 			MERGE INTO	#DS_DailySummary AS ds
 			USING		@Tmp_DailySummary AS tmp
@@ -197,9 +164,9 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,                     isCash                 ,     betCount,     stake,     payOut)
 				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, COALESCE(NULLIF(tmp.isCash, 2), @isCash, 2), tmp.betCount, tmp.stake, tmp.payOut)
 			;
-			RAISERROR('Executed on SC%d.', 0, 0, @SC) WITH NOWAIT;
+			RAISERROR('Executed on vG%d.', 0, 0, @SC) WITH NOWAIT;
 		END;
-	END;
+	END;	-- SB --
 
 	-- Reuse @Tmp_DailySummary for checking mismatch --
 	DELETE	@Tmp_DailySummary;
@@ -225,8 +192,7 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 			);
 
 	IF	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
-	-- TRUE - Has mismatch --
-	BEGIN;
+	BEGIN;	-- TRUE - Has mismatch --
 		SELECT	@Status = N'MISMATCH';
 
 		WHILE	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
@@ -239,8 +205,8 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 			FROM	@Tmp_DailySummary
 			ORDER BY SC, gameId;
 
-			SELECT	@Title		= @Status + N'] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
-				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
+			SELECT	@Title		= @Status + N'] [vGaming Summary ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23)
+				,	@Message	= N'[vG' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
 			FROM	(
 				SELECT	N'
 [' + currency + N' (' + CASE isCash WHEN 0 THEN N'CRE' WHEN 1 THEN N'DEP' WHEN 2 THEN N'null' ELSE N'invalid' END + N')]'
@@ -257,15 +223,10 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 			CROSS APPLY	(
 				SELECT	xmsg.xml.value('.', 'NVARCHAR(MAX)')
 			) AS msg(str);
+			EXECUTE	Letstalk.SendNotification @Message, @Title, @isTest;
 
-			EXECUTE	DBNOTI.NotificationDB.dbo.Letstalk_SendMessage
-						@To			= @Letstalk
-					,	@Title		= @Title
-					,	@Msg		= @Message
-					;
-
-			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]  
-\\\[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(BC\|TO\|WL\)'
+			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[vGaming Summary ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23) + N'\]  
+\\\[vG' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(BC\|TO\|WL\)'
 							 + msg.str
 			FROM	(
 				SELECT	N'  
@@ -283,27 +244,21 @@ WHERE	ds.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
 			CROSS APPLY	(
 				SELECT	xmsg.xml.value('.', 'NVARCHAR(MAX)')
 			) AS msg(str);
-
-			EXECUTE	DBNOTI.NotificationDB.dbo.Skype_SendMessage
-						@To			= @Telegram
-					,	@Msg		= @Message
-					;
-					;
+			EXECUTE	Noti.SendNotification @Message, @isTest;
 
 			DELETE	@Tmp_DailySummary
 			WHERE	SC = @SC
 				AND	gameId = @GameId;
 		END;
-	END;
+	END;	-- TRUE - Has mismatch --
 
-
-	BEGIN;
-		SELECT	@Title		= @Status + N'] [Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23)
+	BEGIN;	-- Summary --
+		SELECT	@Title		= @Status + N'] [vGaming Summary ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23)
 			,	@Message	= msg.str
 		FROM	(
 			SELECT	N'
 
-SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+vG' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			FROM	(
 				SELECT	SC, isExpanded
 				FROM	@SCs
@@ -338,19 +293,14 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 		CROSS APPLY	(
 			SELECT	xmsg.xml.value('.', 'NVARCHAR(MAX)')
 		) AS msg(str);
+		EXECUTE	Letstalk.SendNotification @Message, @Title, @isTest;
 
-		EXECUTE	DBNOTI.NotificationDB.dbo.Letstalk_SendMessage
-					@To			= @Letstalk
-				,	@Title		= @Title
-				,	@Msg		= @Message
-				;
-
-		SELECT	@Message	= N'\\\[' + @Status + N'\] \\\[Summary ' + CONVERT(NVARCHAR(MAX), @_ReportDate, 23) + N'\]' + msg.str
+		SELECT	@Message	= N'\\\[' + @Status + N'\] \\\[vGaming Summary ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23) + N'\]' + msg.str
 		FROM	(
 			SELECT	N'  
 
 ---
-SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+vG' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			FROM	(
 				SELECT	SC, isExpanded
 				FROM	@SCs
@@ -385,13 +335,9 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 		CROSS APPLY	(
 			SELECT	xmsg.xml.value('.', 'NVARCHAR(MAX)')
 		) AS msg(str);
-
-		EXECUTE	DBNOTI.NotificationDB.dbo.Skype_SendMessage
-					@To			= @Telegram
-				,	@Msg		= @Message
-				;
-	END;
+		EXECUTE	Noti.SendNotification @Message, @isTest;
+	END;	-- Summary --
 END;
 GO
-EXECUTE	Noti.DailySummaryReport NULL, 1;
+EXECUTE	vGaming.DailySummaryReport;
 GO

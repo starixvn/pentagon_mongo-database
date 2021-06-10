@@ -1,4 +1,4 @@
-if ((2 ** Saba.env() & 6) > 0)
+if ((2 ** Saba.env() & 14) > 0)
 {   // member_auths
     [
         {   idxKeys : {memberId: 1, iP: 1}

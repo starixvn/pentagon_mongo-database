@@ -15,7 +15,11 @@ if ((2 ** Saba.env() & 14) > 0)
 dbs.summary_arc.game_summary_config.remove({});
 dbs.summary_arc.game_summary_config.insertMany([
     {   gameId: 1
-    ,   owGameTypeId: 1612
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1612
+    :   (2 ** Saba.env() & 8) > 0 ? 3802
+    :   null
+    )
     ,   name: {
             en: `Big Small`
         ,   vi: `Tài Xỉu`
@@ -55,7 +59,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 2
-    ,   owGameTypeId: 1613
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1613
+    :   (2 ** Saba.env() & 8) > 0 ? 3803
+    :   null
+    )
     ,   name: {
             en: `Se Die`
         ,   vi: `Xóc Đĩa`
@@ -88,7 +96,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 3
-    ,   owGameTypeId: 1614
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1614
+    :   (2 ** Saba.env() & 8) > 0 ? 3804
+    :   null
+    )
     ,   name: {
             en: `Fish Prawn Crab`
         ,   vi: `Bầu Cua`
@@ -120,7 +132,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 4
-    ,   owGameTypeId: 1615
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1615
+    :   (2 ** Saba.env() & 8) > 0 ? 3805
+    :   null
+    )
     ,   name: {
             en: `Turbo Big Small`
         ,   vi: `Tài Xỉu Siêu Tốc`
@@ -160,7 +176,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 5
-    ,   owGameTypeId: 1616
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1616
+    :   (2 ** Saba.env() & 8) > 0 ? 3806
+    :   null
+    )
     ,   name: {
             en: `Odd Even`
         ,   vi: `Chẵn Lẻ`
@@ -200,7 +220,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 6
-    ,   owGameTypeId: 1617
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1617
+    :   (2 ** Saba.env() & 8) > 0 ? 3807
+    :   null
+    )
     ,   name: {
             en: `Turbo Odd Even`
         ,   vi: `Chẵn Lẻ Siêu Tốc`
@@ -240,7 +264,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 7
-    ,   owGameTypeId: 1618
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1618
+    :   (2 ** Saba.env() & 8) > 0 ? 3808
+    :   null
+    )
     ,   name: {
             en: `Dragon Tiger`
         ,   vi: `Rồng Hổ`
@@ -265,7 +293,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 8
-    ,   owGameTypeId: 1619
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1619
+    :   (2 ** Saba.env() & 8) > 0 ? 3809
+    :   null
+    )
     ,   name: {
             en: `Keno Pro Max`
         ,   vi: `Keno Pro Max`
@@ -290,7 +322,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 9
-    ,   owGameTypeId: 1620
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1620
+    :   (2 ** Saba.env() & 8) > 0 ? 3823
+    :   null
+    )
     ,   name: {
             en: `Mini Se Die`
         ,   vi: `Xóc Đĩa Mini`
@@ -315,7 +351,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 10
-    ,   owGameTypeId: 1621
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1621
+    :   (2 ** Saba.env() & 8) > 0 ? 3810
+    :   null
+    )
     ,   name: {
             en: `Baccarat`
         ,   vi: `Cào Baccarat`
@@ -340,7 +380,10 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 11
-    ,   owGameTypeId: 1622
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1622
+    :   null
+    )
     ,   name: {
             en: `Keno Pro Viet`
         ,   vi: `Keno Pro Viet`
@@ -365,7 +408,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 12
-    ,   owGameTypeId: 1623
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1623
+    :   (2 ** Saba.env() & 8) > 0 ? 3811
+    :   null
+    )
     ,   name: {
             en: `Keno Max`
         ,   vi: `Keno Max`
@@ -390,7 +437,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 13
-    ,   owGameTypeId: 1624
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1624
+    :   (2 ** Saba.env() & 8) > 0 ? 3812
+    :   null
+    )
     ,   name: {
             en: `Keno Max 2`
         ,   vi: `Keno Max 2`
@@ -415,7 +466,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 14
-    ,   owGameTypeId: 1625
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1625
+    :   (2 ** Saba.env() & 8) > 0 ? 3813
+    :   null
+    )
     ,   name: {
             en: `Keno Mini`
         ,   vi: `Keno Mini`
@@ -440,7 +495,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 15
-    ,   owGameTypeId: 1626
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1626
+    :   (2 ** Saba.env() & 8) > 0 ? 3814
+    :   null
+    )
     ,   name: {
             en: `Keno Mini 2`
         ,   vi: `Keno Mini 2`
@@ -465,7 +524,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 16
-    ,   owGameTypeId: 1627
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1627
+    :   (2 ** Saba.env() & 8) > 0 ? 3815
+    :   null
+    )
     ,   name: {
             en: `Keno East`
         ,   vi: `Keno Đông`
@@ -490,7 +553,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 17
-    ,   owGameTypeId: 1628
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1628
+    :   (2 ** Saba.env() & 8) > 0 ? 3816
+    :   null
+    )
     ,   name: {
             en: `Keno West`
         ,   vi: `Keno Tây`
@@ -515,7 +582,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 18
-    ,   owGameTypeId: 1629
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1629
+    :   (2 ** Saba.env() & 8) > 0 ? 3817
+    :   null
+    )
     ,   name: {
             en: `Keno South`
         ,   vi: `Keno Nam`
@@ -540,7 +611,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 19
-    ,   owGameTypeId: 1630
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1630
+    :   (2 ** Saba.env() & 8) > 0 ? 3818
+    :   null
+    )
     ,   name: {
             en: `Keno North`
         ,   vi: `Keno Bắc`
@@ -590,7 +665,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 21
-    ,   owGameTypeId: 1632
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1632
+    :   (2 ** Saba.env() & 8) > 0 ? 3819
+    :   null
+    )
     ,   name: {
             en: `Roulette`
         ,   vi: `Roulette`
@@ -615,7 +694,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 22
-    ,   owGameTypeId: 1633
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1633
+    :   (2 ** Saba.env() & 8) > 0 ? 3824
+    :   null
+    )
     ,   name: {
             en: `VIP Se Die`
         ,   vi: `Xóc Đĩa VIP`
@@ -640,7 +723,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 23
-    ,   owGameTypeId: 1634
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1634
+    :   (2 ** Saba.env() & 8) > 0 ? 3820
+    :   null
+    )
     ,   name: {
             en: `Blackjack`
         ,   vi: `Blackjack`
@@ -665,7 +752,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 24
-    ,   owGameTypeId: 1635
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1635
+    :   (2 ** Saba.env() & 8) > 0 ? 3825
+    :   null
+    )
     ,   name: {
             en: `Special Se Die`
         ,   vi: `Xóc Đĩa Cân Cửa`
@@ -694,7 +785,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 25
-    ,   owGameTypeId: 1636
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1636
+    :   (2 ** Saba.env() & 8) > 0 ? 3821
+    :   null
+    )
     ,   name: {
             en: `Sic Bo`
         ,   vi: `Sic Bo`
@@ -727,7 +822,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 26
-    ,   owGameTypeId: 1637
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1637
+    :   (2 ** Saba.env() & 8) > 0 ? 3826
+    :   null
+    )
     ,   name: {
             en: `VIP Fish Prawn Crab`
         ,   vi: `Bầu Cua VIP`
@@ -752,7 +851,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 27
-    ,   owGameTypeId: 1638
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1638
+    :   (2 ** Saba.env() & 8) > 0 ? 3827
+    :   null
+    )
     ,   name: {
             en: `VIP Baccarat`
         ,   vi: `Cào Baccarat VIP`
@@ -777,7 +880,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 28
-    ,   owGameTypeId: 1639
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1639
+    :   (2 ** Saba.env() & 8) > 0 ? 3828
+    :   null
+    )
     ,   name: {
             en: `Se Die War`
         ,   vi: `Xóc Dĩa Đối Kháng`
@@ -802,7 +909,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 29
-    ,   owGameTypeId: 1640
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1640
+    :   (2 ** Saba.env() & 8) > 0 ? 3829
+    :   null
+    )
     ,   name: {
             en: `Four Guardians`
         ,   vi: `Long Lân Quy Phụng`
@@ -829,7 +940,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 30
-    ,   owGameTypeId: 1641
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1641
+    :   (2 ** Saba.env() & 8) > 0 ? 3822
+    :   null
+    )
     ,   name: {
             en: `Fish Prawn Crab Pro`
         ,   vi: `Bầu Cua Pro`
@@ -854,7 +969,11 @@ dbs.summary_arc.game_summary_config.insertMany([
     }
 
 ,   {   gameId: 31
-    ,   owGameTypeId: 1642
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 6) > 0 ? 1642
+    :   (2 ** Saba.env() & 8) > 0 ? 3830
+    :   null
+    )
     ,   name: {
             en: `Lottery`
         ,   vi: `Xổ Số`

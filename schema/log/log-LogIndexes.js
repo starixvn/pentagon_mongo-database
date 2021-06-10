@@ -9,23 +9,23 @@
       idxOpts : {},
     },
     obCustId_gameRoundId_gameTypeId: {
-      idxKeys : {"call.obCustId": 1, "call.gameRoundId": 1, "call.gameTypeId": 1},
+      idxKeys : {'call.obCustId': 1, 'call.gameRoundId': 1, 'call.gameTypeId': 1},
       idxOpts : {},
     },
     gameTypeId_gameRoundId_obCustId: {
-      idxKeys : {"call.gameTypeId": 1, "call.gameRoundId": 1, "call.obCustId": 1},
+      idxKeys : {'call.gameTypeId': 1, 'call.gameRoundId': 1, 'call.obCustId': 1},
       idxOpts : {},
     },
     obTransId: {
-      idxKeys : {"result.obTransId": 1},
-      idxOpts : {},
-    },
-    requestTimeStamp: {
-      idxKeys : {requestTimeStamp: 1},
+      idxKeys : {'result.obTransId': 1},
       idxOpts : {},
     },
     summarized: {
       idxKeys : {'__archive.summarized': 1, _id: 1},
+      idxOpts : {},
+    },
+    memberId: {
+      idxKeys : {'request.memberId': 1},
       idxOpts : {},
     },
   };
@@ -37,5 +37,7 @@
       forEach(idx => {Maint.createIndex(dbs.log.end_games, idx.idxKeys, idx.idxOpts)});
     [idxs.TTL, idxs.requestTimeStamp, idxs.obCustId_gameRoundId_gameTypeId, idxs.gameTypeId_gameRoundId_obCustId].
       forEach(idx => {Maint.createIndex(dbs.log.failed_requests, idx.idxKeys, idx.idxOpts)});
+    [idxs.TTL, idxs.requestTimeStamp, idxs.memberId].
+      forEach(idx => {Maint.createIndex(dbs.log.signin_requests, idx.idxKeys, idx.idxOpts)});
   }
 }

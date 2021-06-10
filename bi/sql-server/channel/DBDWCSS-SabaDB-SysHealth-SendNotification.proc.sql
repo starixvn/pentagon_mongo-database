@@ -1,8 +1,5 @@
 USE	SabaDB;
-IF	OBJECT_ID('SysHealth.SendNotification') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE SysHealth.SendNotification AS';
-END;
+EXECUTE	dbo.sp_MSR_InitProcedure N'SendNotification', N'SysHealth';
 GO
 ALTER PROCEDURE	SysHealth.SendNotification
 					@Var1			NVARCHAR(MAX)	= NULL
@@ -10,19 +7,22 @@ ALTER PROCEDURE	SysHealth.SendNotification
 WITH ENCRYPTION
 AS
 /*
-	Creator:	20210331@Billy
-	Task:		Compare FreeSpins Promotion - Spin Logs data between OW and SB then send result via Notification Channel - [Gitlab: #059]
-	Database:	DBDWCSS.SabaDB
+	Creator:		20210331@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Send message to telegram channel - [Skynex.SC] DB SysHealth
 
-	Revisions:
-		- 20210331@Billy:	Initial - [Gitlab: #059]
-		- 20210428@Billy:	Fix default @isTest is not behaved correctly - [Gitlab: #060]
+	Parameters:
+		@Var1:				[optional]		- Message that will be sent
+				<DEFAULT>	NULL			- Message will NOT be sent
 
-	Developer's Notes:
-		- @Var1:				[optional]		- Message that will be sent
-					<DEFAULT>	NULL			- Message will NOT be sent
-		- @Var2:				[optional]		- Is this testing message?
-					<DEFAULT>	NULL			- Treat as if testing message
+		@Var2:				[optional]		- Is this testing message?
+				<DEFAULT>	NULL			- Treat as if testing message
+
+	Version:	1.0.1
+	Revision:
+		- [1.0.1]	20210428@Billy	Fix default @isTest is not behaved correctly - [Gitlab: #060]
+		- [1.0.0]	20210331@Billy	Release SysHealth.SendNotification - [Gitlab: #059]
+		- [0.0.1]	20210331@Billy	Initital - [Gitlab: #059]
 */
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;

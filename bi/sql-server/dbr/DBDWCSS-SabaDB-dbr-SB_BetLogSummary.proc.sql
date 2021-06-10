@@ -1,0 +1,82 @@
+USE SabaDB;
+EXECUTE	dbo.sp_MSR_InitProcedure N'SB_BetLogSummary', N'dbr';
+GO
+ALTER PROCEDURE	dbr.SB_BetLogSummary
+					@Var1			SQL_VARIANT		= NULL
+				,	@Var2			SQL_VARIANT		= NULL
+WITH ENCRYPTION
+AS
+/*
+	Creator:		20210601@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Get BetLog Summary data from SB database
+
+	Parameters:
+		@Var1				[optional]		- The id of Luminet system that will be selected
+				<DEFAULT>	NULL			- No data
+		@Var2				[optional]		- The date of data that will be selected. The time is in UTC timezone.
+				<DEFAULT>	NULL			- Yesterday 00:00:00 AM
+
+	Version:	1.0.0
+	Revision:
+		- [1.0.0]	20210601@Billy		Release dbr.SB_BetLogSummary
+		- [0.0.1]	20210601@Billy		Initital
+*/
+BEGIN;
+	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+	SET NOCOUNT ON;
+
+	DECLARE	@Timer			DATETIME2		= SYSUTCDATETIME()
+		;
+
+	DECLARE	@_ReportDate	DATETIME
+		,	@_L				INT
+		;
+
+	BEGIN TRY;
+		SELECT	@_L = CONVERT(INT, @Var1);
+	END TRY BEGIN CATCH;
+		SELECT	@_L = NULL;
+	END CATCH;
+
+	BEGIN TRY;
+		SELECT	@_ReportDate = CONVERT(DATETIME, @Var2);
+	END TRY BEGIN CATCH;
+		SELECT	@_ReportDate = NULL;
+	END CATCH;
+
+	SELECT	@_ReportDate	= ISNULL(@_ReportDate, CONVERT(DATE, DATEADD(DAY, -1, GETUTCDATE())))
+		;
+
+	DECLARE	@Query		NVARCHAR(MAX)
+		;
+
+	SELECT	@Query = N''
+		;
+
+	SELECT	@Query += N'\
+SELECT	' + CAST(@_L AS NVARCHAR(MAX)) + ' AS SC
+	,	cfg.gameId AS gameId
+	,	cfg.`name.en` AS gameType
+	,	IFNULL(bs.currency, "null") AS currency
+	,	IFNULL(bs.system, 1) AS sys
+	,	SUM(bs.requestCount) AS requestCount
+	,	SUM(bs.betCount) AS betCount
+	,	SUM(bs.totalAmount) AS turnOver
+FROM		summary.betlog_summaries AS bs
+INNER JOIN	summary.game_summary_config AS cfg
+		ON	bs.gameId = cfg.gameId
+WHERE	bs.time >= "' + CONVERT(NVARCHAR(MAX), @_ReportDate, 127) + N'"
+	AND	bs.time < "' + CONVERT(NVARCHAR(MAX), DATEADD(DAY, 1, @_ReportDate), 127) + N'"
+GROUP BY bs.gameId, bs.currency, bs.system
+';
+
+	EXECUTE	base.ExecuteSabaQuery @Query, @_L, 0;
+
+	RETURN	DATEDIFF(MILLISECOND, @Timer, SYSUTCDATETIME());
+END;
+GO
+EXECUTE	dbr.SB_BetLogSummary 1;
+EXECUTE	dbr.SB_BetLogSummary 2;
+EXECUTE	dbr.SB_BetLogSummary 3;
+EXECUTE	dbr.SB_BetLogSummary;
