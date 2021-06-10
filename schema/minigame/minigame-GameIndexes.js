@@ -48,6 +48,10 @@
       idxKeys : {ended: 1},
       idxOpts : {},
     },
+    endTime: {
+      idxKeys : {endTime: 1},
+      idxOpts : {},
+    },
   };
 
   if ((2 ** Saba.env() & 14) > 0) {   // 01 - Tai Xiu
@@ -250,7 +254,7 @@
   if ((2 ** Saba.env() & 14) > 0) {   // 23 - Blackjack
     [idxs.TTL, idxs.time, idxs.id, idxs.ended].
       forEach((idx) => {Maint.createIndex(dbs.minigame.blackjack_phiens, idx.idxKeys, idx.idxOpts)});
-    [idxs.TTL, idxs.time, idxs.phien__id, idxs.id, idxs.uid_thanhtoan__id, idxs.currency, idxs.isCash].
+    [idxs.TTL, idxs.time, idxs.phien__id, idxs.id, idxs.uid_thanhtoan__id, idxs.currency, idxs.isCash, idxs.endTime].
       forEach((idx) => {Maint.createIndex(dbs.minigame.blackjack_cuocs, idx.idxKeys, idx.idxOpts)});
   }
 
