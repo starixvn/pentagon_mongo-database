@@ -1,7 +1,17 @@
 {
     // dbs
     const dbsFunc = () => {
-      const dbs = {};
+      const dbs = {
+        toString: function () {
+          const prop = Object.getOwnPropertyNames(this).filter(_ => this[_] instanceof DB);
+          const propLen = Math.max(...prop.map(_ => _.length));
+          if (prop.length == 0) return '{ }';
+          return `${prop.map(_ => `  ${_.pad(propLen)} : ${this[_]}\n`).join('')}`;
+        },
+        tojson: function () {
+          return this.toString();
+        },
+      };
       if (typeof db != "undefined" && db instanceof DB) {
         dbs._mongo = db._mongo;
         db._mongo.getDBNames().forEach((database) => {
@@ -18,7 +28,7 @@
       // Funny part: the autocomplete failed with Proxy object because there is no Symbol.toPrimitive value
       const _descriptor = {writable: false, enumerable: false,};
       Object.defineProperties(proxy, {
-        [Symbol.toPrimitive] : Object.extend({value: function () { return null }}, _descriptor),
+        [Symbol.toPrimitive]  : Object.extend({value: function () { return null }}, _descriptor),
       });
       return proxy;
     };
@@ -56,7 +66,7 @@
         version: `1.1.0`,
         changelog: {
           '1.1.0': [
-            `[dbs] Proxified dbs to access non-existent DBs`
+            `[dbs] Proxified dbs to access non-existent DBs`,
           ],
           '1.0.0': [
             `Release [dbs]`,

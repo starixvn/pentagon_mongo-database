@@ -25,6 +25,13 @@ deploy: {
         });
         cnt = databases.length;
       };
+      const _list = () => {
+        _update();
+        const prop = Object.getOwnPropertyNames(this).filter(_ => this[_] instanceof DB);
+        const propLen = Math.max(...prop.map(_ => _.length));
+        if (prop.length == 0) return '{ }';
+        return `${prop.map(_ => `  ${_.pad(propLen)} : ${this[_]}\n`).join('')}`;
+      };
 
       const _descriptor = {writable: false, enumerable: true,};
       Object.defineProperties(this, {
@@ -32,6 +39,7 @@ deploy: {
         toString  : Object.extend({value: function () { return _toString() }}, _descriptor),
         tojson    : Object.extend({value: function () { return _toString() }}, _descriptor),
         update    : Object.extend({value: function () { return _update() }}, _descriptor),
+        list      : Object.extend({value: function () { return _list() }}, _descriptor),
       });
 
       _update();
@@ -56,7 +64,8 @@ deploy: {
   const version = `1.1.0`;
   const changelog = {
     '1.1.0': [
-      `[${_id}.DBs] Proxify instance to access non-existing DB`
+      `[${_id}.DBs] Proxify instance to access non-existing DB`,
+      `[${_id}.DBs] Add list() function`,
     ],
     '1.0.0': [
       `Release [${_id}.DBs]`,
