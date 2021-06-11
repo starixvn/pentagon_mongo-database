@@ -1,6 +1,6 @@
 deploy: {
   const DBs = class {
-    constructor (mongo = db._mongo) {
+    constructor (mongo) {
       const _logger = new Shell.Log(`DBs`);
       const _assert = new Shell.Assert();
       _assert.setLogger(_logger);
