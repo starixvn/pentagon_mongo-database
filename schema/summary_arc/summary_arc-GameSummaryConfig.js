@@ -996,6 +996,31 @@ dbs.summary_arc.game_summary_config.insertMany([
             hasCurrency: true
         }
     }
+
+,   {   gameId: 35
+    ,   owGameTypeId: 1643
+    ,   name: {
+            en: `Three Cards`
+        ,   vi: `Ba Lá Đỏ Đen`
+        ,   grp: `Card Games`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `threecards`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_cuocs_bk`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$red`, `$black`, `$diamonds`, `$hearts`, `$spades`, `$clubs`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
 ]
 ,   {ordered: false}
 );
