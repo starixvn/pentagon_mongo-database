@@ -33,7 +33,7 @@
         tables: [
           { sql_name: `betlogs`,
             mongo_name: `betlogs`,
-            pipeline: `[{$project: {_id: 0}}]`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `time.request` , sql_name: `requestTime` }),
               Object.extend(type.float, {mongo_name: `time.response`, sql_name: `responseMs`  }),
@@ -57,7 +57,7 @@
         tables: [
           { sql_name: `bets`,
             mongo_name: `bets`,
-            pipeline: `[{$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp` , sql_name: `requestTS`   }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`, sql_name: `responseTS`  }),
@@ -79,7 +79,7 @@
           },
           { sql_name: `bets_failed`,
             mongo_name: `failed_requests`,
-            pipeline: `[{$match: {'call._t': 'PlaceBetCall'}}, {$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$match": {"call._t": "PlaceBetCall"}}, {"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp`       , sql_name: `requestTS`   }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`      , sql_name: `responseTS`  }),
@@ -102,7 +102,7 @@
           },
           { sql_name: `end_games`,
             mongo_name: `end_games`,
-            pipeline: `[{$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp`   , sql_name: `requestTS`     }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`  , sql_name: `responseTS`    }),
@@ -121,7 +121,7 @@
           },
           { sql_name: `end_games_failed`,
             mongo_name: `failed_requests`,
-            pipeline: `[{$match: {'call._t': 'EndGameCall'}}, {$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$match": {"call._t": "EndGameCall"}}, {"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp`       , sql_name: `requestTS`     }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`      , sql_name: `responseTS`    }),
@@ -143,7 +143,7 @@
           },
           { sql_name: `enter_portal_failed`,
             mongo_name: `failed_requests`,
-            pipeline: `[{$match: {'call._t': 'EnterPortalCall'}}, {$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$match": {"call._t": "EnterPortalCall"}}, {"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp`       , sql_name: `requestTS`     }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`      , sql_name: `responseTS`    }),
@@ -161,7 +161,7 @@
           },
           { sql_name: `get_balance_failed`,
             mongo_name: `failed_requests`,
-            pipeline: `[{$match: {'call._t': 'GetBalanceCall'}}, {$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$match": {"call._t": "GetBalanceCall"}}, {"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp`       , sql_name: `requestTS`     }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`      , sql_name: `responseTS`    }),
@@ -176,7 +176,7 @@
           },
           { sql_name: `signins`,
             mongo_name: `signin_requests`,
-            pipeline: `[{$project: {_id: 0, __archive: 0}}]`,
+            pipeline: `[{"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `requestTimeStamp`         , sql_name: `requestTS`       }),
               Object.extend(type.str  , {mongo_name: `responseTimeStamp`        , sql_name: `responseTS`      }),
@@ -221,12 +221,12 @@
           /** ARCHIVE STATUSES (B) */
           { sql_name: `archive_statuses`,
             mongo_name: `archive_statuses`,
-            pipeline: `[{$project: {
-              _id: 0,
-              name: 1,
-              _phiens: {$ifNull: ['$lastArcId._phiens', '$lastArcId._rounds']},
-              _cuocs: '$lastArcId._cuocs',
-              _freespins: '$lastArcId._freespins',
+            pipeline: `[{"$project": {
+              "_id": 0,
+              "name": 1,
+              "_phiens": {"$ifNull": ["$lastArcId._phiens", "$lastArcId._rounds"]},
+              "_cuocs": "$lastArcId._cuocs",
+              "_freespins": "$lastArcId._freespins",
             }}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `name`, sql_name: `name`}),
@@ -239,9 +239,9 @@
           { sql_name: `baccarat_rounds`,
             mongo_name: `baccarat_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -253,14 +253,14 @@
           { sql_name: `baccarat_tickets`,
             mongo_name: `baccarat_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                banker: 1, bankerPair: 1, big: 1, player: 1, playerPair: 1, small: 1, tie: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$banker', '$bankerPair', '$big', '$player', '$playerPair', '$small', '$tie']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "banker": 1, "bankerPair": 1, "big": 1, "player": 1, "playerPair": 1, "small": 1, "tie": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$big", "$player", "$playerPair", "$small", "$tie"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -294,9 +294,9 @@
           { sql_name: `baucua_rounds`,
             mongo_name: `baucua_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -308,14 +308,14 @@
           { sql_name: `baucua_tickets`,
             mongo_name: `baucua_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                crab: 1, fish: 1, gourd: 1, prawn: 1, rooster: 1, stag: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$crab', '$fish', '$gourd', '$prawn', '$rooster', '$stag']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "crab": 1, "fish": 1, "gourd": 1, "prawn": 1, "rooster": 1, "stag": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$crab", "$fish", "$gourd", "$prawn", "$rooster", "$stag"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -348,9 +348,9 @@
           { sql_name: `blackjack_rounds`,
             mongo_name: `blackjack_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1, ended: 1, roundStartTime: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1, "ended": 1, "roundStartTime": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -364,14 +364,14 @@
           { sql_name: `blackjack_tickets`,
             mongo_name: `blackjack_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                id: 1, pos: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: '$bet',
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "id": 1, "pos": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": "$bet",
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -400,9 +400,9 @@
           { sql_name: `chanleturbo_rounds`,
             mongo_name: `chanleturbo_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -414,20 +414,20 @@
           { sql_name: `chanleturbo_tickets`,
             mongo_name: `chanleturbo_ones`,
             pipeline: `[
-              {$match: {memberId: {$gt: 0}}},
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                odd: {$cond: [{$eq: ['$choice', 'odd']}, '$totalAmount', 0]},
-                even: {$cond: [{$eq: ['$choice', 'even']}, '$totalAmount', 0]},
-                totalAmount: 1, thanhtoan: 1,
-                betwin: {$sum: [
-                  {$multiply: ['$betwin', {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$totalAmount', '$bet']}, {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$refund', '$tralai']}, {$toInt: {$not: '$win'}}]},
+              {"$match": {"memberId": {"$gt": 0}}},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "odd": {"$cond": [{"$eq": ["$choice", "odd"]}, "$totalAmount", 0]},
+                "even": {"$cond": [{"$eq": ["$choice", "even"]}, "$totalAmount", 0]},
+                "totalAmount": 1, "thanhtoan": 1,
+                "betwin": {"$sum": [
+                  {"$multiply": ["$betwin", {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
                 ]},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -456,9 +456,9 @@
           { sql_name: `fourguardians_rounds`,
             mongo_name: `fourguardians_rounds`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -470,12 +470,12 @@
           { sql_name: `fourguardians_tickets`,
             mongo_name: `fourguardians_rounds`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeSpin: 1, id: 1, uid: 1, name: 1, time: 1, memberId: 1, endTime: 1,
-                bet: 1, totalAmount: 1, betWin: 1, paid: 1,
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeSpin": 1, "id": 1, "uid": 1, "name": 1, "time": 1, "memberId": 1, "endTime": 1,
+                "bet": 1, "totalAmount": 1, "betWin": 1, "paid": 1,
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -503,12 +503,12 @@
           { sql_name: `fourguardians_freespins`,
             mongo_name: `fourguardians_freespins`,
             pipeline: `[
-              {$project: {
-                _id: 0, uid: 1, memberId: 1, name: 1,
-                id: 1, roundId: 1,
-                bet: 1, total: 1, available: 1,
-                time: 1, expiryTime: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "uid": 1, "memberId": 1, "name": 1,
+                "id": 1, "roundId": 1,
+                "bet": 1, "total": 1, "available": 1,
+                "time": 1, "expiryTime": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -531,9 +531,9 @@
           { sql_name: `fourguardians_fames`,
             mongo_name: `fourguardians_fames`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeSpin 1, uid: 1, name: 1, memberId: 1, roundId: 1, time: 1,
-                bet: 1, totalAmount: 1, winningAmount: 1,
+              {"$project": {
+                "_id": 0, "freeSpin": 1, "uid": 1, "name": 1, "memberId": 1, "roundId": 1, "time": 1,
+                "bet": 1, "totalAmount": 1, "winningAmount": 1,
               }},
             ]`,
             columns: [
@@ -556,11 +556,11 @@
           { sql_name: `game_configs`,
             mongo_name: `game_configs`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, type: 1, name: 1, enabled: 1, botenabled: 1,
-                minbet: 1, maxbet: 1, bot_maxbet: 1,
-                disabledround: 1, disabled_message: 1, delayStartTime: 1,
-                enableFreeBet: 1, smartBotEnabled: 1, smartBotGroupRatio: 1,
+              {"$project": {
+                "_id": 0, "time": 1, "type": 1, "name": 1, "enabled": 1, "botenabled": 1,
+                "minbet": 1, "maxbet": 1, "bot_maxbet": 1,
+                "disabledround": 1, "disabled_message": 1, "delayStartTime": 1,
+                "enableFreeBet": 1, "smartBotEnabled": 1, "smartBotGroupRatio": 1,
               }},
             ]`,
             columns: [
@@ -584,8 +584,8 @@
           { sql_name: `idcounters`,
             mongo_name: `idcounters`,
             pipeline: `[
-              {$project: {
-                _id: 0, f: 1, m: 1, c: 1,
+              {"$project": {
+                "_id": 0, "f": 1, "m": 1, "c": 1,
               }},
             ]`,
             columns: [
@@ -598,11 +598,11 @@
           { sql_name: `jackpots`,
             mongo_name: `jackpots`,
             pipeline: `[
-              {$project: {
-                _id: 0, gameId: 1, gameName: 1,
-                createdAt: 1, createdTime: 1,
-                pool: 1, amount: 1, initAmount: 1, byBots: 1, byMembers: 1,
-                hitAt: 1, hitTime: 1, winnerId: 1, winnerName: 1, winningRatio: 1,
+              {"$project": {
+                "_id": 0, "gameId": 1, "gameName": 1,
+                "createdAt": 1, "createdTime": 1,
+                "pool": 1, "amount": 1, "initAmount": 1, "byBots": 1, "byMembers": 1,
+                "hitAt": 1, "hitTime": 1, "winnerId": 1, "winnerName": 1, "winningRatio": 1,
               }},
             ]`,
             columns: [
@@ -630,9 +630,9 @@
           { sql_name: `kenoeast_rounds`,
             mongo_name: `kenoeast_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -644,14 +644,14 @@
           { sql_name: `kenoeast_tickets`,
             mongo_name: `kenoeast_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -685,9 +685,9 @@
           { sql_name: `kenowest_rounds`,
             mongo_name: `kenowest_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -699,14 +699,14 @@
           { sql_name: `kenowest_tickets`,
             mongo_name: `kenowest_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -740,9 +740,9 @@
           { sql_name: `kenosouth_rounds`,
             mongo_name: `kenosouth_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -754,14 +754,14 @@
           { sql_name: `kenosouth_tickets`,
             mongo_name: `kenosouth_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -795,9 +795,9 @@
           { sql_name: `kenonorth_rounds`,
             mongo_name: `kenonorth_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -809,14 +809,14 @@
           { sql_name: `kenonorth_tickets`,
             mongo_name: `kenonorth_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -850,9 +850,9 @@
           { sql_name: `kenomax_rounds`,
             mongo_name: `kenomax_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -864,14 +864,14 @@
           { sql_name: `kenomax_tickets`,
             mongo_name: `kenomax_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -905,9 +905,9 @@
           { sql_name: `kenomax2_rounds`,
             mongo_name: `kenomax2_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -919,14 +919,14 @@
           { sql_name: `kenomax2_tickets`,
             mongo_name: `kenomax2_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -960,9 +960,9 @@
           { sql_name: `kenomini_rounds`,
             mongo_name: `kenomini_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -974,14 +974,14 @@
           { sql_name: `kenomini_tickets`,
             mongo_name: `kenomini_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1015,9 +1015,9 @@
           { sql_name: `kenomini2_rounds`,
             mongo_name: `kenomini2_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1029,14 +1029,14 @@
           { sql_name: `kenomini2_tickets`,
             mongo_name: `kenomini2_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1071,9 +1071,9 @@
           { sql_name: `kenopromax_rounds`,
             mongo_name: `kenopromax_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1085,14 +1085,14 @@
           { sql_name: `kenopromax_tickets`,
             mongo_name: `kenopromax_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, earth: 1, even: 1, fire: 1, gold: 1, odd: 1, small: 1, water: 1, wood: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$big', '$earth', '$even', '$fire', '$gold', '$odd', '$small', '$water', '$wood']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1127,9 +1127,9 @@
           { sql_name: `lottery_rounds`,
             mongo_name: `lottery_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1141,12 +1141,12 @@
           { sql_name: `lottery_tickets`,
             mongo_name: `lottery_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                totalAmount: 1, betwin: 1, thanhtoan: 1,
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1171,9 +1171,9 @@
           { sql_name: `minidragontiger_rounds`,
             mongo_name: `minidragontiger_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1185,14 +1185,14 @@
           { sql_name: `minidragontiger_tickets`,
             mongo_name: `minidragontiger_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                dragon: 1, tie: 1, tiger: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$dragon', '$tie', '$tiger']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "dragon": 1, "tie": 1, "tiger": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$dragon", "$tie", "$tiger"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1222,9 +1222,9 @@
           { sql_name: `minisedie_rounds`,
             mongo_name: `minisedie_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1236,14 +1236,14 @@
           { sql_name: `minisedie_tickets`,
             mongo_name: `minisedie_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                even: 1, odd: 1, red3: 1, red4: 1, white3: 1, white4: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$even', '$odd', '$red3', '$red4', '$white3', '$white4']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "even": 1, "odd": 1, "red3": 1, "red4": 1, "white3": 1, "white4": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$even", "$odd", "$red3", "$red4", "$white3", "$white4"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1276,9 +1276,9 @@
           { sql_name: `roulette_rounds`,
             mongo_name: `roulette_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1290,13 +1290,12 @@
           { sql_name: `roulette_tickets`,
             mongo_name: `roulette_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                even: 1, odd: 1, red3: 1, red4: 1, white3: 1, white4: 1,
-                totalAmount: 1, betwin: 1, thanhtoan: 1,
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1322,9 +1321,9 @@
           { sql_name: `sicbo_rounds`,
             mongo_name: `sicbo_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1336,14 +1335,14 @@
           { sql_name: `sicbo_tickets`,
             mongo_name: `sicbo_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: 1, small: 1, anyTriple: 1, specific1: 1, specific2: 1, specific3: 1, specific4: 1, specific5: 1, specific6: 1,
-                total4: 1, total5: 1, total6: 1, total7: 1, total8: 1, total9: 1, total10: 1, total11: 1, total12: 1, total13: 1, total14: 1, total5: 1, total16: 1, total17: 1,
-                totalAmount: 1, betwin: 1, thanhtoan: 1,
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "small": 1, "anyTriple": 1, "specific1": 1, "specific2": 1, "specific3": 1, "specific4": 1, "specific5": 1, "specific6": 1,
+                "total4": 1, "total5": 1, "total6": 1, "total7": 1, "total8": 1, "total9": 1, "total10": 1, "total11": 1, "total12": 1, "total13": 1, "total14": 1, "total15": 1, "total16": 1, "total17": 1,
+                "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1404,7 +1403,7 @@
           { sql_name: `smartbot_taixiu_bets`,
             mongo_name: `smartbot_taixiu_bets`,
             pipeline: `[
-              {$project: {_id: 0}}
+              {"$project": {"_id": 0}}
             ]`,
             columns: [
               Object.extend(type.int  , {mongo_name: `patId`    , sql_name: `patId`   }),
@@ -1430,7 +1429,7 @@
           { sql_name: `smartbot_txturbo_bets`,
             mongo_name: `smartbot_txturbo_bets`,
             pipeline: `[
-              {$project: {_id: 0}}
+              {"$project": {"_id": 0}}
             ]`,
             columns: [
               Object.extend(type.int  , {mongo_name: `patId`    , sql_name: `patId`   }),
@@ -1456,7 +1455,7 @@
           { sql_name: `smartbot_vipsedie_bets`,
             mongo_name: `smartbot_vipsedie_bets`,
             pipeline: `[
-              {$project: {_id: 0}}
+              {"$project": {"_id": 0}}
             ]`,
             columns: [
               Object.extend(type.int  , {mongo_name: `patId`    , sql_name: `patId`   }),
@@ -1482,7 +1481,7 @@
           { sql_name: `smartbot_xocxoc_bets`,
             mongo_name: `smartbot_xocxoc_bets`,
             pipeline: `[
-              {$project: {_id: 0}}
+              {"$project": {"_id": 0}}
             ]`,
             columns: [
               Object.extend(type.int  , {mongo_name: `patId`    , sql_name: `patId`   }),
@@ -1497,9 +1496,9 @@
           { sql_name: `specialsedie_rounds`,
             mongo_name: `specialsedie_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1511,20 +1510,20 @@
           { sql_name: `specialsedie_tickets`,
             mongo_name: `specialsedie_ones`,
             pipeline: `[
-              {$match: {memberId: {$gt: 0}}},
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                odd: {$cond: [{$eq: ['$choice', 'odd']}, '$totalAmount', 0]},
-                even: {$cond: [{$eq: ['$choice', 'even']}, '$totalAmount', 0]},
-                totalAmount: 1, thanhtoan: 1,
-                betwin: {$sum: [
-                  {$multiply: ['$betwin', {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$totalAmount', '$bet']}, {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$refund', '$tralai']}, {$toInt: {$not: '$win'}}]},
+              {"$match": {"memberId": {"$gt": 0}}},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "odd": {"$cond": [{"$eq": ["$choice", "odd"]}, "$totalAmount", 0]},
+                "even": {"$cond": [{"$eq": ["$choice", "even"]}, "$totalAmount", 0]},
+                "totalAmount": 1, "thanhtoan": 1,
+                "betwin": {"$sum": [
+                  {"$multiply": ["$betwin", {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
                 ]},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1552,9 +1551,9 @@
           { sql_name: `taixiu_rounds`,
             mongo_name: `taixiu_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1566,20 +1565,20 @@
           { sql_name: `taixiu_tickets`,
             mongo_name: `taixiu_ones`,
             pipeline: `[
-              {$match: {memberId: {$gt: 0}}},
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: {$cond: [{$eq: ['$choice', 'big']}, '$totalAmount', 0]},
-                small: {$cond: [{$eq: ['$choice', 'small']}, '$totalAmount', 0]},
-                totalAmount: 1, thanhtoan: 1,
-                betwin: {$sum: [
-                  {$multiply: ['$betwin', {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$totalAmount', '$bet']}, {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$refund', '$tralai']}, {$toInt: {$not: '$win'}}]},
+              {"$match": {"memberId": {"$gt": 0}}},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": {"$cond": [{"$eq": ["$choice", "big"]}, "$totalAmount", 0]},
+                "small": {"$cond": [{"$eq": ["$choice", "small"]}, "$totalAmount", 0]},
+                "totalAmount": 1, "thanhtoan": 1,
+                "betwin": {"$sum": [
+                  {"$multiply": ["$betwin", {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
                 ]},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1607,9 +1606,9 @@
           { sql_name: `txturbo_rounds`,
             mongo_name: `txturbo_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1621,20 +1620,20 @@
           { sql_name: `txturbo_tickets`,
             mongo_name: `txturbo_ones`,
             pipeline: `[
-              {$match: {memberId: {$gt: 0}}},
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                big: {$cond: [{$eq: ['$choice', 'big']}, '$totalAmount', 0]},
-                small: {$cond: [{$eq: ['$choice', 'small']}, '$totalAmount', 0]},
-                totalAmount: 1, thanhtoan: 1,
-                betwin: {$sum: [
-                  {$multiply: ['$betwin', {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$totalAmount', '$bet']}, {$toInt: '$win'}]},
-                  {$multiply: [{$ifNull: ['$refund', '$tralai']}, {$toInt: {$not: '$win'}}]},
+              {"$match": {"memberId": {"$gt": 0}}},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": {"$cond": [{"$eq": ["$choice", "big"]}, "$totalAmount", 0]},
+                "small": {"$cond": [{"$eq": ["$choice", "small"]}, "$totalAmount", 0]},
+                "totalAmount": 1, "thanhtoan": 1,
+                "betwin": {"$sum": [
+                  {"$multiply": ["$betwin", {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
                 ]},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1662,8 +1661,8 @@
           { sql_name: `userinfos`,
             mongo_name: `userinfos`,
             pipeline: `[
-              {$project: {
-                _id: 0, id: 1, joinedOn: 1, type: 1, currency: 1, UID: 1, name: 1,
+              {"$project": {
+                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1,
               }},
             ]`,
             columns: [
@@ -1678,8 +1677,8 @@
           { sql_name: `users`,
             mongo_name: `users`,
             pipeline: `[
-              {$project: {
-                _id: 1, 'local.username': 1, 'local.regDate': 1, 'local.memberId': 1, 'local.memberName': 1, 'local.clientId': 1, 'local.currency': 1,
+              {"$project": {
+                "_id": 1, "local.username": 1, "local.regDate": 1, "local.memberId": 1, "local.memberName": 1, "local.clientId": 1, "local.currency": 1,
               }},
             ]`,
             columns: [
@@ -1695,12 +1694,12 @@
           { sql_name: `usersessions`,
             mongo_name: `users`,
             pipeline: `[
-              {$project: {
-                _id: 0, username: 1, memberId: 1, memberName: 1, userId: 1,
-                ssoTime: 1, recheckInTime: 1,
-                ip: 1, browserUserAgent: 1, language: 1, currency: 1,
-                owSeq: 1, clientId: 1, siteName: 1, system: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "username": 1, "memberId": 1, "memberName": 1, "userId": 1,
+                "ssoTime": 1, "recheckInTime": 1,
+                "ip": 1, "browserUserAgent": 1, "language": 1, "currency": 1,
+                "owSeq": 1, "clientId": 1, "siteName": 1, "system": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1725,9 +1724,9 @@
           { sql_name: `vipbaccarat_rounds`,
             mongo_name: `vipbaccarat_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1739,14 +1738,14 @@
           { sql_name: `vipbaccarat_tickets`,
             mongo_name: `vipbaccarat_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                banker: 1, bankerPair: 1, big: 1, player: 1, playerPair: 1, small: 1, tie: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$banker', '$bankerPair', '$big', '$player', '$playerPair', '$small', '$tie']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "banker": 1, "bankerPair": 1, "big": 1, "player": 1, "playerPair": 1, "small": 1, "tie": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$big", "$player", "$playerPair", "$small", "$tie"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1780,9 +1779,9 @@
           { sql_name: `vipfishprawncrab_rounds`,
             mongo_name: `vipfishprawncrab_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1794,14 +1793,14 @@
           { sql_name: `vipfishprawncrab_tickets`,
             mongo_name: `vipfishprawncrab_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                crab: 1, fish: 1, gourd: 1, prawn: 1, rooster: 1, stag: 1, mountain: 1, ocean: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$crab', '$fish', '$gourd', '$prawn', '$rooster', '$stag', '$mountain', '$ocean']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "crab": 1, "fish": 1, "gourd": 1, "prawn": 1, "rooster": 1, "stag": 1, "mountain": 1, "ocean": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$crab", "$fish", "$gourd", "$prawn", "$rooster", "$stag", "$mountain", "$ocean"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1836,9 +1835,9 @@
           { sql_name: `vipsedie_rounds`,
             mongo_name: `vipsedie_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1850,14 +1849,14 @@
           { sql_name: `vipsedie_tickets`,
             mongo_name: `vipsedie_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                even: 1, odd: 1, red2: 1, red3: 1, red4: 1, white3: 1, white4: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$even', '$odd', '$red2', '$red3', '$red4', '$white3', '$white4']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "even": 1, "odd": 1, "red2": 1, "red3": 1, "red4": 1, "white3": 1, "white4": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$even", "$odd", "$red2", "$red3", "$red4", "$white3", "$white4"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1891,9 +1890,9 @@
           { sql_name: `vipsediewar_rounds`,
             mongo_name: `vipsediewar_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1905,13 +1904,13 @@
           { sql_name: `vipsediewar_tickets`,
             mongo_name: `vipsediewar_ones`,
             pipeline: `[
-              {$project: {
-                _id: 0, freeBet: 1, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                even: 1, odd: 1, red2: 1, red3: 1, red4: 1, white3: 1, white4: 1,
-                totalAmount: 1, betwin: 1, thanhtoan: 1,
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "even": 1, "odd": 1, "red2": 1, "red3": 1, "red4": 1, "white3": 1, "white4": 1,
+                "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1937,9 +1936,9 @@
           { sql_name: `xocxoc_rounds`,
             mongo_name: `xocxoc_phiens`,
             pipeline: `[
-              {$project: {
-                _id: 0, time: 1, id: 1,
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1951,14 +1950,14 @@
           { sql_name: `xocxoc_tickets`,
             mongo_name: `xocxoc_cuocs`,
             pipeline: `[
-              {$project: {
-                _id: 0, phien: 1, uid: 1, memberId: 1, name: 1, time: 1,
-                chan: 1, le: 1, red3: 1, red4: 1, white3: 1, white4: 1,
-                betwin: 1, thanhtoan: 1,
-                totalAmount: {$sum: ['$chan', '$le', '$red3', '$red4', '$white3', '$white4']},
-                currency: '$__archive.currency',
-                isCash: '$__archive.isCash',
-                archived: {$ifNull: [{$toBool: '$__archive.eventtime'}, false]},
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "chan": 1, "le": 1, "red3": 1, "red4": 1, "white3": 1, "white4": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
               }},
             ]`,
             columns: [
@@ -1993,7 +1992,7 @@
           { sql_name: `betlog_summaries`,
             mongo_name: `betlog_summaries`,
             pipeline: `[
-              {$project: {_id: 0}},
+              {"$project": {"_id": 0}},
             ]`,
             columns: [
               Object.extend(type.date , {mongo_name: `time`         , sql_name: `time`        }),
@@ -2008,7 +2007,7 @@
           { sql_name: `daily_summaries`,
             mongo_name: `daily_summaries`,
             pipeline: `[
-              {$project: {_id: 0}},
+              {"$project": {"_id": 0}},
             ]`,
             columns: [
               Object.extend(type.date , {mongo_name: `time`     , sql_name: `time`    }),
@@ -2023,7 +2022,7 @@
           { sql_name: `hourly_summaries`,
             mongo_name: `hourly_summaries`,
             pipeline: `[
-              {$project: {_id: 0}},
+              {"$project": {"_id": 0}},
             ]`,
             columns: [
               Object.extend(type.date , {mongo_name: `time`     , sql_name: `time`    }),
@@ -2038,7 +2037,7 @@
           { sql_name: `game_summary_config`,
             mongo_name: `game_summary_config`,
             pipeline: `[
-              {$project: {_id: 0}},
+              {"$project": {"_id": 0}},
             ]`,
             columns: [
               Object.extend(type.int  , {mongo_name: `gameId`       , sql_name: `gameId`    }),
