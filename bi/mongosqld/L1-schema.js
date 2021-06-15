@@ -226,7 +226,7 @@
               "name": 1,
               "_phiens": {"$ifNull": ["$lastArcId._phiens", "$lastArcId._rounds"]},
               "_cuocs": "$lastArcId._cuocs",
-              "_freespins": "$lastArcId._freespins",
+              "_freespins": "$lastArcId._freespins"
             }}]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `name`, sql_name: `name`}),
@@ -241,8 +241,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -260,8 +260,8 @@
                 "totalAmount": {"$sum": ["$banker", "$bankerPair", "$big", "$player", "$playerPair", "$small", "$tie"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -296,8 +296,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -315,8 +315,8 @@
                 "totalAmount": {"$sum": ["$crab", "$fish", "$gourd", "$prawn", "$rooster", "$stag"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -350,8 +350,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1, "ended": 1, "roundStartTime": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`             , sql_name: `id`        }),
@@ -371,8 +371,8 @@
                 "totalAmount": "$bet",
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -402,8 +402,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -423,12 +423,12 @@
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
-                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]}
                 ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -458,8 +458,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -475,8 +475,8 @@
                 "bet": 1, "totalAmount": 1, "betWin": 1, "paid": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -508,8 +508,8 @@
                 "id": 1, "roundId": 1,
                 "bet": 1, "total": 1, "available": 1,
                 "time": 1, "expiryTime": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -533,8 +533,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeSpin": 1, "uid": 1, "name": 1, "memberId": 1, "roundId": 1, "time": 1,
-                "bet": 1, "totalAmount": 1, "winningAmount": 1,
-              }},
+                "bet": 1, "totalAmount": 1, "winningAmount": 1
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -560,8 +560,8 @@
                 "_id": 0, "time": 1, "type": 1, "name": 1, "enabled": 1, "botenabled": 1,
                 "minbet": 1, "maxbet": 1, "bot_maxbet": 1,
                 "disabledround": 1, "disabled_message": 1, "delayStartTime": 1,
-                "enableFreeBet": 1, "smartBotEnabled": 1, "smartBotGroupRatio": 1,
-              }},
+                "enableFreeBet": 1, "smartBotEnabled": 1, "smartBotGroupRatio": 1
+              }}
             ]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `name`               , sql_name: `name`              }),
@@ -585,8 +585,8 @@
             mongo_name: `idcounters`,
             pipeline: `[
               {"$project": {
-                "_id": 0, "f": 1, "m": 1, "c": 1,
-              }},
+                "_id": 0, "f": 1, "m": 1, "c": 1
+              }}
             ]`,
             columns: [
               Object.extend(type.str  , {mongo_name: `m`, sql_name: `model`   }),
@@ -602,8 +602,8 @@
                 "_id": 0, "gameId": 1, "gameName": 1,
                 "createdAt": 1, "createdTime": 1,
                 "pool": 1, "amount": 1, "initAmount": 1, "byBots": 1, "byMembers": 1,
-                "hitAt": 1, "hitTime": 1, "winnerId": 1, "winnerName": 1, "winningRatio": 1,
-              }},
+                "hitAt": 1, "hitTime": 1, "winnerId": 1, "winnerName": 1, "winningRatio": 1
+              }}
             ]`,
             columns: [
               /* Game Information */
@@ -632,8 +632,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -651,8 +651,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -687,8 +687,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -706,8 +706,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -742,8 +742,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -761,8 +761,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -797,8 +797,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -816,8 +816,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -852,8 +852,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -871,8 +871,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -907,8 +907,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -926,8 +926,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -962,8 +962,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -981,8 +981,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1017,8 +1017,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1036,8 +1036,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1073,8 +1073,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1092,8 +1092,8 @@
                 "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1129,8 +1129,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1146,8 +1146,8 @@
                 "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1173,8 +1173,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1192,8 +1192,8 @@
                 "totalAmount": {"$sum": ["$dragon", "$tie", "$tiger"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1224,8 +1224,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1243,8 +1243,8 @@
                 "totalAmount": {"$sum": ["$even", "$odd", "$red3", "$red4", "$white3", "$white4"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1278,8 +1278,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1295,8 +1295,8 @@
                 "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1323,8 +1323,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1342,8 +1342,8 @@
                 "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1498,8 +1498,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1519,12 +1519,12 @@
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
-                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]}
                 ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1574,12 +1574,12 @@
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
-                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]}
                 ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1608,8 +1608,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1629,12 +1629,12 @@
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
-                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]}
                 ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1662,7 +1662,7 @@
             mongo_name: `userinfos`,
             pipeline: `[
               {"$project": {
-                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1,
+                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1
               }},
             ]`,
             columns: [
@@ -1678,7 +1678,7 @@
             mongo_name: `users`,
             pipeline: `[
               {"$project": {
-                "_id": 1, "local.username": 1, "local.regDate": 1, "local.memberId": 1, "local.memberName": 1, "local.clientId": 1, "local.currency": 1,
+                "_id": 1, "local.username": 1, "local.regDate": 1, "local.memberId": 1, "local.memberName": 1, "local.clientId": 1, "local.currency": 1
               }},
             ]`,
             columns: [
@@ -1699,8 +1699,8 @@
                 "ssoTime": 1, "recheckInTime": 1,
                 "ip": 1, "browserUserAgent": 1, "language": 1, "currency": 1,
                 "owSeq": 1, "clientId": 1, "siteName": 1, "system": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `memberId`         , sql_name: `memberId`        }),
@@ -1726,8 +1726,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1745,8 +1745,8 @@
                 "totalAmount": {"$sum": ["$banker", "$bankerPair", "$big", "$player", "$playerPair", "$small", "$tie"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1781,8 +1781,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1800,8 +1800,8 @@
                 "totalAmount": {"$sum": ["$crab", "$fish", "$gourd", "$prawn", "$rooster", "$stag", "$mountain", "$ocean"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1837,8 +1837,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1856,8 +1856,8 @@
                 "totalAmount": {"$sum": ["$even", "$odd", "$red2", "$red3", "$red4", "$white3", "$white4"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1892,8 +1892,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1910,8 +1910,8 @@
                 "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1938,8 +1938,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend(type.int64, {mongo_name: `id`       , sql_name: `id`      }),
@@ -1957,8 +1957,8 @@
                 "totalAmount": {"$sum": ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               /* Metadata */
@@ -1991,9 +1991,7 @@
         tables: [
           { sql_name: `betlog_summaries`,
             mongo_name: `betlog_summaries`,
-            pipeline: `[
-              {"$project": {"_id": 0}},
-            ]`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
             columns: [
               Object.extend(type.date , {mongo_name: `time`         , sql_name: `time`        }),
               Object.extend(type.int  , {mongo_name: `gameId`       , sql_name: `gameId`      }),
@@ -2006,9 +2004,7 @@
           },
           { sql_name: `daily_summaries`,
             mongo_name: `daily_summaries`,
-            pipeline: `[
-              {"$project": {"_id": 0}},
-            ]`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
             columns: [
               Object.extend(type.date , {mongo_name: `time`     , sql_name: `time`    }),
               Object.extend(type.int  , {mongo_name: `gameId`   , sql_name: `gameId`  }),
@@ -2021,9 +2017,7 @@
           },
           { sql_name: `hourly_summaries`,
             mongo_name: `hourly_summaries`,
-            pipeline: `[
-              {"$project": {"_id": 0}},
-            ]`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
             columns: [
               Object.extend(type.date , {mongo_name: `time`     , sql_name: `time`    }),
               Object.extend(type.int  , {mongo_name: `gameId`   , sql_name: `gameId`  }),
@@ -2036,9 +2030,7 @@
           },
           { sql_name: `game_summary_config`,
             mongo_name: `game_summary_config`,
-            pipeline: `[
-              {"$project": {"_id": 0}},
-            ]`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
             columns: [
               Object.extend(type.int  , {mongo_name: `gameId`       , sql_name: `gameId`    }),
               Object.extend(type.int  , {mongo_name: `owGameTypeId` , sql_name: `gameTypeId`}),
