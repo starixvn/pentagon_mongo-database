@@ -35,7 +35,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39002,
@@ -61,7 +61,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39003,
@@ -87,7 +87,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39004,
@@ -120,7 +120,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39005,
@@ -153,7 +153,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39006,
@@ -186,7 +186,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39007,
@@ -212,7 +212,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39008,
@@ -238,7 +238,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39009,
@@ -264,7 +264,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39010,
@@ -290,7 +290,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39011,
@@ -328,7 +328,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             to: 'kenoproviet_phiens_log_bk',
             join: 'id',
             updateOnly: false,
-          }
+          },
         ],
       },
       { _id: 39012,
@@ -361,7 +361,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39013,
@@ -394,7 +394,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39014,
@@ -427,7 +427,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39015,
@@ -460,7 +460,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39016,
@@ -493,7 +493,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39017,
@@ -526,7 +526,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39018,
@@ -559,7 +559,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39019,
@@ -592,7 +592,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39021,
@@ -625,7 +625,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39022,
@@ -651,7 +651,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39023,
@@ -679,7 +679,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             exCols: [],
             logField: '_cuocs',
             logValue: 'id',
-          }
+          },
         ],
       },
       { _id: 39024,
@@ -712,7 +712,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39025,
@@ -745,7 +745,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39026,
@@ -771,7 +771,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39027,
@@ -797,7 +797,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39028,
@@ -830,7 +830,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
         ],
       },
       { _id: 39029,
@@ -865,7 +865,7 @@ if ((2 ** Saba.env() & 14) > 0) {
             exCols: [],
             logField: '_freespins',
             logValue: 'id',
-          }
+          },
         ],
       },
       { _id: 39029.1,
@@ -915,7 +915,33 @@ if ((2 ** Saba.env() & 14) > 0) {
             updateOnly: false,
             filter: filter,
             exCols: [],
-          }
+          },
+        ],
+      },
+      { _id: 39035,
+        from: {
+          db: 'minigame',
+          coll: 'threecards_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'threecards_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'threecards_cuocs',
+            to: 'threecards_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
         ],
       },
       { _id: 25001,
