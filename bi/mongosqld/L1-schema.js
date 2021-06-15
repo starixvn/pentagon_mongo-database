@@ -221,13 +221,15 @@
           /** ARCHIVE STATUSES (B) */
           { sql_name: `archive_statuses`,
             mongo_name: `archive_statuses`,
-            pipeline: `[{"$project": {
-              "_id": 0,
-              "name": 1,
-              "_phiens": {"$ifNull": ["$lastArcId._phiens", "$lastArcId._rounds"]},
-              "_cuocs": "$lastArcId._cuocs",
-              "_freespins": "$lastArcId._freespins"
-            }}]`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0,
+                "name": 1,
+                "_phiens": {"$ifNull": ["$lastArcId._phiens", "$lastArcId._rounds"]},
+                "_cuocs": "$lastArcId._cuocs",
+                "_freespins": "$lastArcId._freespins"
+              }}
+            ]`,
             columns: [
               Object.extend({mongo_name: `name`       , sql_name: `name`              }, type.str  ),
               Object.extend({mongo_name: `_phiens`    , sql_name: `lastArcRoundId`    }, type.int64),
@@ -1553,8 +1555,8 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "time": 1, "id": 1,
-                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]},
-              }},
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
             ]`,
             columns: [
               Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
@@ -1663,7 +1665,7 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1
-              }},
+              }}
             ]`,
             columns: [
               Object.extend({mongo_name: `UID`      , sql_name: `id`      }, type.int64),
@@ -1679,7 +1681,7 @@
             pipeline: `[
               {"$project": {
                 "_id": 1, "local.username": 1, "local.regDate": 1, "local.memberId": 1, "local.memberName": 1, "local.clientId": 1, "local.currency": 1
-              }},
+              }}
             ]`,
             columns: [
               Object.extend({mongo_name: `_id`              , sql_name: `uid`       }, type.oid  ),
