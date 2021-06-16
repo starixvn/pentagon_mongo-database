@@ -13,6 +13,7 @@
         ,   'deployScripts.js'
         ,   'deployIndexes.js'
         ,   'deployIndexesArc.js'
+        ,   'deployBI.js'
         ].forEach((path) => {
             try {
                 load(path);

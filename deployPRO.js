@@ -15,6 +15,7 @@
         [   'deployClasses.js'
         ,   'deployScripts.js'
         ,   'deployIndexes.js'
+        ,   'deployBI.js'
         ].forEach((path) => {
             try {
                 load(path);
