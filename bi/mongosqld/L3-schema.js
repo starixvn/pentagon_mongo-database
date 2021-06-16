@@ -2190,9 +2190,9 @@
                 "totalAmount": {"$sum": [
                   {"$multiply": [
                     {"$add": [
-                      {$ifNull: ["$even", "$chan"]},
-                      {$ifNull: ["$odd", "$le"]},
-                      {$ifNull: ["$red2", 0]},
+                      {"$ifNull": ["$even", "$chan"]},
+                      {"$ifNull": ["$odd", "$le"]},
+                      {"$ifNull": ["$red2", 0]},
                       "$red3", "$red4", "$white3", "$white4"
                     ]},
                     {"$toInt": {"$not": "$freeBet"}}
