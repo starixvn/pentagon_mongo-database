@@ -325,7 +325,8 @@
                   {"$ifNull": ["$rooster" , "$2"]},
                   {"$ifNull": ["$fish"    , "$3"]},
                   {"$ifNull": ["$crab"    , "$4"]},
-                  {"$ifNull": ["$prawn"   , "$5"]},
+                  {"$ifNull": ["$prawn"   , "$5"]}
+                ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
