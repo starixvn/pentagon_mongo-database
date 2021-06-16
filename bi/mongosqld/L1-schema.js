@@ -257,9 +257,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "banker": 1, "bankerPair": 1, "big": 1, "player": 1, "playerPair": 1, "small": 1, "tie": 1,
+                "banker": 1, "bankerPair": 1, "player": 1, "playerPair": 1, "tie": 1, "big": 1, "small": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$big", "$player", "$playerPair", "$small", "$tie"]},
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$player", "$playerPair", "$tie", "$big", "$small"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -312,9 +312,20 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "crab": 1, "fish": 1, "gourd": 1, "prawn": 1, "rooster": 1, "stag": 1,
+                "stag"    : {"$ifNull": ["$stag"    , "$0"]},
+                "gourd"   : {"$ifNull": ["$gourd"   , "$1"]},
+                "rooster" : {"$ifNull": ["$rooster" , "$2"]},
+                "fish"    : {"$ifNull": ["$fish"    , "$3"]},
+                "crab"    : {"$ifNull": ["$crab"    , "$4"]},
+                "prawn"   : {"$ifNull": ["$prawn"   , "$5"]},
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$crab", "$fish", "$gourd", "$prawn", "$rooster", "$stag"]},
+                "totalAmount": {"$sum": [
+                  {"$ifNull": ["$stag"    , "$0"]},
+                  {"$ifNull": ["$gourd"   , "$1"]},
+                  {"$ifNull": ["$rooster" , "$2"]},
+                  {"$ifNull": ["$fish"    , "$3"]},
+                  {"$ifNull": ["$crab"    , "$4"]},
+                  {"$ifNull": ["$prawn"   , "$5"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -398,6 +409,63 @@
               Object.extend({mongo_name: `pos`        , sql_name: `pos`       }, type.int64),
             ],
           },
+          /** CHANLE (Gb) */
+          { sql_name: `chanle_rounds`,
+            mongo_name: `chanle_phiens`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `archived` , sql_name: `archived`}, type.bool ),
+            ],
+          },
+          { sql_name: `chanle_tickets`,
+            mongo_name: `chanle_ones`,
+            pipeline: `[
+              {"$match": {"memberId": {"$gt": 0}}},
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "odd": {"$cond": [{"$eq": ["$choice", "odd"]}, "$totalAmount", 0]},
+                "even": {"$cond": [{"$eq": ["$choice", "even"]}, "$totalAmount", 0]},
+                "thanhtoan": 1,
+                "totalAmount": {"$ifNull": ["$totalAmount", "$bet"]},
+                "betwin": {"$sum": [
+                  {"$multiply": ["$betwin", {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
+                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]}
+                ]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              /* Metadata */
+              Object.extend({mongo_name: `time`       , sql_name: `time`      }, type.date ),
+              Object.extend({mongo_name: `phien`      , sql_name: `roundId`   }, type.int64),
+              /* Member */
+              Object.extend({mongo_name: `uid`        , sql_name: `uid`       }, type.str  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `name`       , sql_name: `nickname`  }, type.str  ),
+              Object.extend({mongo_name: `currency`   , sql_name: `currency`  }, type.str  ),
+              /* Summary */
+              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`     }, type.int64),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
+              /* Attributes */
+              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
+              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
+              Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
+              /* Bet Choices */
+              Object.extend({mongo_name: `odd`        , sql_name: `odd`       }, type.int64),
+              Object.extend({mongo_name: `even`       , sql_name: `even`      }, type.int64),
+            ],
+          },
           /** CHANLETURBO (Gb) */
           { sql_name: `chanleturbo_rounds`,
             mongo_name: `chanleturbo_phiens`,
@@ -421,7 +489,8 @@
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
                 "odd": {"$cond": [{"$eq": ["$choice", "odd"]}, "$totalAmount", 0]},
                 "even": {"$cond": [{"$eq": ["$choice", "even"]}, "$totalAmount", 0]},
-                "totalAmount": 1, "thanhtoan": 1,
+                "thanhtoan": 1,
+                "totalAmount": {"$ifNull": ["$totalAmount", "$bet"]},
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
@@ -474,7 +543,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeSpin": 1, "id": 1, "uid": 1, "name": 1, "time": 1, "memberId": 1, "endTime": 1,
-                "bet": 1, "totalAmount": 1, "betWin": 1, "paid": 1,
+                "bet": 1, "paid": 1,
+                "betwin": "$betWin",
+                "totalAmount": {"$multiply": ["$totalAmount", {"$toInt": {"$not": "$freeSpin"}}]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -491,7 +562,7 @@
               Object.extend({mongo_name: `currency`   , sql_name: `currency`  }, type.str  ),
               /* Summary */
               Object.extend({mongo_name: `totalAmount`, sql_name: `stake`     }, type.float),
-              Object.extend({mongo_name: `betWin`     , sql_name: `payout`    }, type.float),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
               /* Attributes */
               Object.extend({mongo_name: `bet`        , sql_name: `pool`      }, type.float),
               Object.extend({mongo_name: `paid`       , sql_name: `settled`   }, type.bool ),
@@ -648,9 +719,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -703,9 +774,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -758,9 +829,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -813,9 +884,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -868,9 +939,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -923,9 +994,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -978,9 +1049,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -1033,9 +1104,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -1089,9 +1160,65 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "earth": 1, "even": 1, "fire": 1, "gold": 1, "odd": 1, "small": 1, "water": 1, "wood": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$big", "$earth", "$even", "$fire", "$gold", "$odd", "$small", "$water", "$wood"]},
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              /* Metadata */
+              Object.extend({mongo_name: `time`       , sql_name: `time`      }, type.date ),
+              Object.extend({mongo_name: `phien`      , sql_name: `roundId`   }, type.int64),
+              /* Member */
+              Object.extend({mongo_name: `uid`        , sql_name: `uid`       }, type.str  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `name`       , sql_name: `nickname`  }, type.str  ),
+              Object.extend({mongo_name: `currency`   , sql_name: `currency`  }, type.str  ),
+              /* Summary */
+              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`     }, type.int64),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
+              /* Attributes */
+              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
+              Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
+              /* Bet Choices */
+              Object.extend({mongo_name: `big`        , sql_name: `big`       }, type.int64),
+              Object.extend({mongo_name: `small`      , sql_name: `small`     }, type.int64),
+              Object.extend({mongo_name: `odd`        , sql_name: `odd`       }, type.int64),
+              Object.extend({mongo_name: `even`       , sql_name: `even`      }, type.int64),
+              Object.extend({mongo_name: `gold`       , sql_name: `gold`      }, type.int64),
+              Object.extend({mongo_name: `wood`       , sql_name: `wood`      }, type.int64),
+              Object.extend({mongo_name: `fire`       , sql_name: `fire`      }, type.int64),
+              Object.extend({mongo_name: `water`      , sql_name: `water`     }, type.int64),
+              Object.extend({mongo_name: `earth`      , sql_name: `earth`     }, type.int64),
+            ],
+          },
+          /** KENO PRO VIET (G) */
+          { sql_name: `kenoproviet_rounds`,
+            mongo_name: `kenoproviet_phiens`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `archived` , sql_name: `archived`}, type.bool ),
+            ],
+          },
+          { sql_name: `kenoproviet_tickets`,
+            mongo_name: `kenoproviet_cuocs`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "big": 1, "small": 1, "even": 1, "odd": 1, "gold": 1, "wood": 1, "fire": 1, "water": 1, "earth": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$big", "$small", "$even", "$odd", "$gold", "$wood", "$fire", "$water", "$earth"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -1339,8 +1466,6 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "big": 1, "small": 1, "anyTriple": 1, "specific1": 1, "specific2": 1, "specific3": 1, "specific4": 1, "specific5": 1, "specific6": 1,
-                "total4": 1, "total5": 1, "total6": 1, "total7": 1, "total8": 1, "total9": 1, "total10": 1, "total11": 1, "total12": 1, "total13": 1, "total14": 1, "total15": 1, "total16": 1, "total17": 1,
                 "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
@@ -1364,30 +1489,6 @@
               Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
               Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
               Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
-              /* Bet Choices */
-              Object.extend({mongo_name: `big`        , sql_name: `big`       }, type.int64),
-              Object.extend({mongo_name: `small`      , sql_name: `small`     }, type.int64),
-              Object.extend({mongo_name: `anyTriple`  , sql_name: `anyTriple` }, type.int64),
-              Object.extend({mongo_name: `specific1`  , sql_name: `specific1` }, type.int64),
-              Object.extend({mongo_name: `specific2`  , sql_name: `specific2` }, type.int64),
-              Object.extend({mongo_name: `specific3`  , sql_name: `specific3` }, type.int64),
-              Object.extend({mongo_name: `specific4`  , sql_name: `specific4` }, type.int64),
-              Object.extend({mongo_name: `specific5`  , sql_name: `specific5` }, type.int64),
-              Object.extend({mongo_name: `specific6`  , sql_name: `specific6` }, type.int64),
-              Object.extend({mongo_name: `total4`     , sql_name: `total4`    }, type.int64),
-              Object.extend({mongo_name: `total5`     , sql_name: `total5`    }, type.int64),
-              Object.extend({mongo_name: `total6`     , sql_name: `total6`    }, type.int64),
-              Object.extend({mongo_name: `total7`     , sql_name: `total7`    }, type.int64),
-              Object.extend({mongo_name: `total8`     , sql_name: `total8`    }, type.int64),
-              Object.extend({mongo_name: `total9`     , sql_name: `total9`    }, type.int64),
-              Object.extend({mongo_name: `total10`    , sql_name: `total10`   }, type.int64),
-              Object.extend({mongo_name: `total11`    , sql_name: `total11`   }, type.int64),
-              Object.extend({mongo_name: `total12`    , sql_name: `total12`   }, type.int64),
-              Object.extend({mongo_name: `total13`    , sql_name: `total13`   }, type.int64),
-              Object.extend({mongo_name: `total14`    , sql_name: `total14`   }, type.int64),
-              Object.extend({mongo_name: `total15`    , sql_name: `total15`   }, type.int64),
-              Object.extend({mongo_name: `total16`    , sql_name: `total16`   }, type.int64),
-              Object.extend({mongo_name: `total17`    , sql_name: `total17`   }, type.int64),
             ],
           },
           /** SMARTBOT TAIXIU (S) */
@@ -1517,11 +1618,12 @@
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
                 "odd": {"$cond": [{"$eq": ["$choice", "odd"]}, "$totalAmount", 0]},
                 "even": {"$cond": [{"$eq": ["$choice", "even"]}, "$totalAmount", 0]},
-                "totalAmount": 1, "thanhtoan": 1,
+                "thanhtoan": 1,
+                "totalAmount": "$amount",
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
-                  {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
-                  {"$multiply": [{"$ifNull": ["$refund", "$tralai"]}, {"$toInt": {"$not": "$win"}}]}
+                  {"$multiply": ["$amount", {"$toInt": "$win"}]},
+                  {"$multiply": ["$refund", {"$toInt": {"$not": "$win"}}]}
                 ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
@@ -1572,7 +1674,8 @@
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
                 "big": {"$cond": [{"$eq": ["$choice", "big"]}, "$totalAmount", 0]},
                 "small": {"$cond": [{"$eq": ["$choice", "small"]}, "$totalAmount", 0]},
-                "totalAmount": 1, "thanhtoan": 1,
+                "thanhtoan": 1,
+                "totalAmount": {"$ifNull": ["$totalAmount", "$bet"]},
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
@@ -1681,7 +1784,8 @@
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
                 "big": {"$cond": [{"$eq": ["$choice", "big"]}, "$totalAmount", 0]},
                 "small": {"$cond": [{"$eq": ["$choice", "small"]}, "$totalAmount", 0]},
-                "totalAmount": 1, "thanhtoan": 1,
+                "thanhtoan": 1,
+                "totalAmount": {"$ifNull": ["$totalAmount", "$bet"]},
                 "betwin": {"$sum": [
                   {"$multiply": ["$betwin", {"$toInt": "$win"}]},
                   {"$multiply": [{"$ifNull": ["$totalAmount", "$bet"]}, {"$toInt": "$win"}]},
@@ -1796,9 +1900,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "banker": 1, "bankerPair": 1, "big": 1, "player": 1, "playerPair": 1, "small": 1, "tie": 1,
+                "banker": 1, "bankerPair": 1, "player": 1, "playerPair": 1, "tie": 1, "big": 1, "small": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$big", "$player", "$playerPair", "$small", "$tie"]},
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$player", "$playerPair", "$tie", "$big", "$small"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -1851,9 +1955,9 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "crab": 1, "fish": 1, "gourd": 1, "prawn": 1, "rooster": 1, "stag": 1, "mountain": 1, "ocean": 1,
+                "stag": 1, "gourd": 1, "rooster": 1, "fish": 1, "crab": 1, "prawn": 1, "mountain": 1, "ocean": 1, "anyTriple": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$crab", "$fish", "$gourd", "$prawn", "$rooster", "$stag", "$mountain", "$ocean"]},
+                "totalAmount": {"$sum": ["$stag", "$gourd", "$rooster", "$fish", "$crab", "$prawn", "$mountain", "$ocean", "$anyTriple"]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
@@ -2008,9 +2112,21 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
-                "chan": 1, "le": 1, "red3": 1, "red4": 1, "white3": 1, "white4": 1,
+                "chan": {"$ifNull": ["$even", "$chan"]}, "le": {"$ifNull": ["$odd", "$le"]},
+                "red2": {"$ifNull": ["$red2", 0]},
+                "red3": 1, "red4": 1, "white3": 1, "white4": 1,
                 "betwin": 1, "thanhtoan": 1,
-                "totalAmount": {"$sum": ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"]},
+                "totalAmount": {"$sum": [
+                  {"$multiply": [
+                    {"$add": [
+                      {$ifNull: ["$even", "$chan"]},
+                      {$ifNull: ["$odd", "$le"]},
+                      {$ifNull: ["$red2", 0]},
+                      "$red3", "$red4", "$white3", "$white4"
+                    ]},
+                    {"$toInt": {"$not": "$freeBet"}}
+                  ]}
+                ]},
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
                 "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
