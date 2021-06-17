@@ -127,7 +127,7 @@ OPTION (RECOMPILE)
 
 	SELECT	@DS_Query = N'';
 	SELECT	@DS_Query += N'\
-SELECT	cfg.owGameTypeId AS gameTypeId
+SELECT	cfg.gameTypeId AS gameTypeId
 	,	IFNULL(ds.currency, "null") AS currency
 	,	IFNULL(ds.isCash, 2) AS isCash
 	,	ds.tickets AS betCount

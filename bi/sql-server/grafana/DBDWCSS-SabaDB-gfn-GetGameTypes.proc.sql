@@ -18,8 +18,8 @@ BEGIN;
 		;
 
 	DECLARE	@Games AS TABLE (
-				gameTypeId		SMALLINT
-			,	owGameTypeId	INT
+				gameId			SMALLINT
+			,	gameTypeId		INT
 			,	nameEN			NVARCHAR(128)
 			,	nameVI			NVARCHAR(128)
 			,	PRIMARY KEY CLUSTERED (gameTypeId)
@@ -27,22 +27,22 @@ BEGIN;
 
 	SELECT	@Query = N'';
 	SELECT	@Query += N'\
-SELECT	`gameId`
-	,	`owGameTypeId`
-	,	`name.en`
-	,	`name.vi`
+SELECT	gameId
+	,	gameTypeId
+	,	nameEN
+	,	nameVI
 FROM	summary.game_summary_config;
 ';
 
-	INSERT INTO	@Games (gameTypeId, owGameTypeId, nameEN, nameVI)
+	INSERT INTO	@Games (gameId, gameTypeId, nameEN, nameVI)
 	EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
 
 	SELECT	[value]	=	CASE @Type
-							WHEN 1 THEN LTRIM(gameTypeId)
-							WHEN 2 THEN LTRIM(owGameTypeId)
+							WHEN 1 THEN LTRIM(gameId)
+							WHEN 2 THEN LTRIM(gameTypeId)
 							WHEN 3 THEN nameEN
 							WHEN 4 THEN nameVI
-							ELSE nameEn
+							ELSE nameEN
 						END
 	FROM	@Games;
 END;

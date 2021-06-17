@@ -1652,6 +1652,42 @@
               Object.extend({mongo_name: `even`       , sql_name: `even`    }, type.int64),
             ],
           },
+          /** SPINS (S) */
+          { sql_name: `spin_logs`,
+            mongo_name: `spin_logs`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
+            columns: [
+              Object.extend({mongo_name: `roundId`    , sql_name: `roundId`   }, type.int  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `spinCnt`    , sql_name: `spinCnt`   }, type.int  ),
+              Object.extend({mongo_name: `time`       , sql_name: `time`      }, type.date ),
+              Object.extend({mongo_name: `expiryDate` , sql_name: `expiryDate`}, type.date ),
+              Object.extend({mongo_name: `key`        , sql_name: `key`       }, type.str  ),
+              Object.extend({mongo_name: `source`     , sql_name: `source`    }, type.str  ),
+            ],
+          },
+          { sql_name: `spins`,
+            mongo_name: `spins`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
+            columns: [
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `availSpins` , sql_name: `availSpins`}, type.int  ),
+              Object.extend({mongo_name: `usedSpins`  , sql_name: `usedSpins` }, type.int  ),
+              Object.extend({mongo_name: `enabled`    , sql_name: `enabled`   }, type.bool ),
+            ],
+          },
+          { sql_name: `spin_results`,
+            mongo_name: `spin_results`,
+            pipeline: `[{"$project": {"_id": 0}}]`,
+            columns: [
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `uid`      , sql_name: `uid`     }, type.str  ),
+              Object.extend({mongo_name: `name`     , sql_name: `name`    }, type.str  ),
+              Object.extend({mongo_name: `result`   , sql_name: `result`  }, type.float),
+              Object.extend({mongo_name: `memberId` , sql_name: `memberId`}, type.int64),
+            ],
+          },
           /** TAIXIU (G) */
           { sql_name: `taixiu_rounds`,
             mongo_name: `taixiu_phiens`,
@@ -1823,16 +1859,20 @@
             mongo_name: `userinfos`,
             pipeline: `[
               {"$project": {
-                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1
+                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1, "scoins": 1, "minBet": 1, "maxBet": 1, "betLimitModifiedDate": 1
               }}
             ]`,
             columns: [
-              Object.extend({mongo_name: `UID`      , sql_name: `id`      }, type.int64),
-              Object.extend({mongo_name: `id`       , sql_name: `uid`     }, type.str  ),
-              Object.extend({mongo_name: `name`     , sql_name: `nickname`}, type.str  ),
-              Object.extend({mongo_name: `joinedOn` , sql_name: `joinedOn`}, type.date ),
-              Object.extend({mongo_name: `type`     , sql_name: `isBot`   }, type.bool ),
-              Object.extend({mongo_name: `currency` , sql_name: `currency`}, type.str  ),
+              Object.extend({mongo_name: `UID`                  , sql_name: `id`                  }, type.int64),
+              Object.extend({mongo_name: `id`                   , sql_name: `uid`                 }, type.str  ),
+              Object.extend({mongo_name: `name`                 , sql_name: `nickname`            }, type.str  ),
+              Object.extend({mongo_name: `joinedOn`             , sql_name: `joinedOn`            }, type.date ),
+              Object.extend({mongo_name: `type`                 , sql_name: `isBot`               }, type.bool ),
+              Object.extend({mongo_name: `currency`             , sql_name: `currency`            }, type.str  ),
+              Object.extend({mongo_name: `scoins`               , sql_name: `scoins`              }, type.float),
+              Object.extend({mongo_name: `minBet`               , sql_name: `minBet`              }, type.float),
+              Object.extend({mongo_name: `maxBet`               , sql_name: `maxBet`              }, type.float),
+              Object.extend({mongo_name: `betLimitModifiedDate` , sql_name: `betLimitModifiedDate`}, type.date ),
             ],
           },
           { sql_name: `users`,
@@ -1853,7 +1893,7 @@
             ],
           },
           { sql_name: `usersessions`,
-            mongo_name: `users`,
+            mongo_name: `usersessions`,
             pipeline: `[
               {"$project": {
                 "_id": 0, "username": 1, "memberId": 1, "memberName": 1, "userId": 1,
@@ -2112,7 +2152,7 @@
             mongo_name: `xocxoc_cuocs`,
             pipeline: `[
               {"$project": {
-                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
                 "chan": {"$ifNull": ["$even", "$chan"]}, "le": {"$ifNull": ["$odd", "$le"]},
                 "red2": {"$ifNull": ["$red2", 0]},
                 "red3": 1, "red4": 1, "white3": 1, "white4": 1,
@@ -2147,6 +2187,7 @@
               Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
               /* Attributes */
               Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
               Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
               Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
               /* Bet Choices */

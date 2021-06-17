@@ -1,55 +1,58 @@
 {
-    const global = Function('return this;')();
-    const login = {user: 'billy.bui', pwd: passwordPrompt()};
-    const readonly = pro_readonly;
+  const global = Function('return this;')();
+  const login = {user: 'billy.bui', pwd: passwordPrompt()};
+  const readonly = pro_readonly;
 
-    pro.forEach(instance => {
-        const oldDB = global.db;
-        global.db = instance;
-        try { db.runCommand({ping: 1}) } catch { db.runCommand({ping: 1}) };
-        db.getSiblingDB('admin').auth(login);
-        load(`server-side-functions/class/Shell.js`);
+  run('git', 'pull', '--rebase');
 
-        const logger = new Shell.Log(`DEPLOY-PRO`);
+  pro.forEach(instance => {
+    const oldDB = global.db;
+    global.db = instance;
+    try { db.runCommand({ping: 1}) } catch { db.runCommand({ping: 1}) };
+    db.getSiblingDB('admin').auth(login);
+    load(`server-side-functions/class/Shell.js`);
 
-        [   'deployClasses.js'
-        ,   'deployScripts.js'
-        ,   'deployIndexes.js'
-        ,   'deployBI.js'
-        ].forEach((path) => {
-            try {
-                load(path);
-                logger.info(`${db._mongo.host}`, `Deployed [${path}]\n${'='.repeat(50)}\n\n`);
-            } catch (e) {
-                logger.err(`${db._mongo.host}`, `${e}\n${'='.repeat(50)}\n\n`);
-            }
-        });
+    const logger = new Shell.Log(`DEPLOY-PRO`);
 
-        db.getSiblingDB('admin').auth(readonly);
-        global.db = oldDB;
+    [ 'deployClasses.js',
+      'deployScripts.js',
+      'deployIndexes.js',
+      'deployBI.js',
+    ].forEach((path) => {
+      try {
+        load(path);
+        logger.info(`${db._mongo.host}`, `Deployed [${path}]\n${'='.repeat(50)}\n\n`);
+      } catch (e) {
+        logger.err(`${db._mongo.host}`, `${e}\n${'='.repeat(50)}\n\n`);
+      }
     });
 
-    pro_arc.forEach(instance => {
-        const oldDB = db;
-        db = instance;
-        db.getSiblingDB('admin').auth(login);
-        load(`server-side-functions/class/Shell.js`);
+    db.getSiblingDB('admin').auth(readonly);
+    global.db = oldDB;
+  });
 
-        const logger = new Shell.Log(`DEPLOY-PRO-ARC`);
+  pro_arc.forEach(instance => {
+    const oldDB = db;
+    db = instance;
+    db.getSiblingDB('admin').auth(login);
+    load(`server-side-functions/class/Shell.js`);
 
-        [   'deployClasses.js'
-        ,   'deployScripts.js'
-        ,   'deployIndexesArc.js'
-        ].forEach((path) => {
-            try {
-                load(path);
-                logger.info(`${db._mongo.host}`, `Deployed [${path}]\n${'='.repeat(50)}\n\n`);
-            } catch (e) {
-                logger.err(`${db._mongo.host}`, `${e}\n${'='.repeat(50)}\n\n`);
-            }
-        });
+    const logger = new Shell.Log(`DEPLOY-PRO-ARC`);
 
-        db.getSiblingDB('admin').auth(readonly);
-        db = oldDB;
+    [ 'deployClasses.js',
+      'deployScripts.js',
+      'deployIndexesArc.js',
+      'deployBIArc.js',
+    ].forEach((path) => {
+      try {
+        load(path);
+        logger.info(`${db._mongo.host}`, `Deployed [${path}]\n${'='.repeat(50)}\n\n`);
+      } catch (e) {
+        logger.err(`${db._mongo.host}`, `${e}\n${'='.repeat(50)}\n\n`);
+      }
     });
+
+    db.getSiblingDB('admin').auth(readonly);
+    db = oldDB;
+  });
 }

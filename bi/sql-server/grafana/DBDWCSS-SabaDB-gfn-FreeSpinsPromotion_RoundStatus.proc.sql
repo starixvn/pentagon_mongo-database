@@ -47,11 +47,11 @@ BEGIN;
 SELECT	rpt.roundId, rpt.memberId, rpt.username, rpt. regDate, rpt.currency, rpt.spinCnt, rpt.exSpinCnt, rpt.availSpin, rpt.importDate, rpt.expiryDate, rpt.sCoinWin, rpt.sCoinSpin, ui.joinedOn
 FROM	(
 	SELECT	_rpt.roundId, _rpt.memberId
-		,	u.`local.memberName` AS username
-		,	u.`local.regDate` AS regDate
-		,	u.`local.currency` AS currency
+		,	u.memberName AS username
+		,	u.regDate AS regDate
+		,	u.currency AS currency
 		,	_rpt.spinCnt, _rpt.exSpinCnt, _rpt.availSpin, _rpt.importDate, _rpt.expiryDate, _rpt.sCoinWin, _rpt.sCoinSpin
-		,	CONVERT(u._id, CHAR) AS _id
+		,	CONVERT(u.uid, CHAR) AS _id
 	FROM	(
 		SELECT	spl.roundId AS roundId
 			,	spl.memberId AS memberId
@@ -81,12 +81,12 @@ FROM	(
 		GROUP BY spl.roundId, spl.memberId
 	) AS _rpt
 	LEFT JOIN	minigame.users AS u
-			ON	_rpt.memberId = u.`local.memberId`
-			AND	u.`local.clientId` = "ONEworks1"' + CASE WHEN @showAll = 0 THEN N'
-	WHERE	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'")' ELSE N'' END + N'
+			ON	_rpt.memberId = u.memberId
+			AND	u.clientId = "ONEworks1"' + CASE WHEN @showAll = 0 THEN N'
+	WHERE	u.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'")' ELSE N'' END + N'
 ) AS rpt
 LEFT JOIN	minigame.userinfos AS ui
-		ON	rpt._id = ui.id
+		ON	rpt._id = ui.uid
 ;
 ';
 
