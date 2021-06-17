@@ -1,6 +1,6 @@
 {
   const time = ISODate(`2021-06-16`);
-  const _id = `L3BI-sch`;
+  const _id = `L3BI-arc`;
   const version = `0.0.1`;
   const schema_id = ObjectId(`${Math.floor(time.valueOf()/1000).toString(16)}${String.split(_id, '').map(_ => _.charCodeAt(0).toString(16)).join('')}`);
   dbs.schema.names.save({
