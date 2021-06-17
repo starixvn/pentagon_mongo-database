@@ -1680,10 +1680,12 @@
             mongo_name: `spin_results`,
             pipeline: `[{"$project": {"_id": 0}}]`,
             columns: [
-              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
-              Object.extend({mongo_name: `availSpins` , sql_name: `availSpins`}, type.int  ),
-              Object.extend({mongo_name: `usedSpins`  , sql_name: `usedSpins` }, type.int  ),
-              Object.extend({mongo_name: `enabled`    , sql_name: `enabled`   }, type.bool ),
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `uid`      , sql_name: `uid`     }, type.str  ),
+              Object.extend({mongo_name: `name`     , sql_name: `name`    }, type.str  ),
+              Object.extend({mongo_name: `result`   , sql_name: `result`  }, type.float),
+              Object.extend({mongo_name: `memberId` , sql_name: `memberId`}, type.int64),
             ],
           },
           /** TAIXIU (G) */
