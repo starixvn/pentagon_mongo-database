@@ -50,22 +50,22 @@ WHERE	sl.roundId = ' + LTRIM(@roundId) + N'
 	SELECT	@Query = N'';
 	SELECT	@Query += N'\
 SELECT	b.memberId AS CustId
-	,	u.`local.memberName` AS Username
-	,	ui.name AS Nickname
-	,	u.`local.currency` AS `$`
+	,	u.memberName AS Username
+	,	ui.nickname AS Nickname
+	,	u.currency AS `$`
 	,	ui.scoins AS `Available sᴄᴏɪɴ`
-	,	SUM(b.odd + b.even + b.red3 + b.red4 + b.white3 + b.white4) AS `Stake sᴄᴏɪɴ`
-	,	SUM(-b.betwin) AS WinLoss
-FROM		minigame.xocxoc_cuocs AS b
+	,	SUM(b.stake) AS `Stake sᴄᴏɪɴ`
+	,	SUM(-b.payout) AS WinLoss
+FROM		minigame.xocxoc_tickets AS b
 LEFT JOIN	minigame.userinfos AS ui
-		ON	b.uid = ui.id
+		ON	b.uid = ui.uid
 LEFT JOIN	minigame.users AS u
-		ON	b.memberId = u.`local.memberId`
+		ON	b.memberId = u.memberId
 WHERE	b.freeBet = true
 	AND	b.memberId > 0
 	AND	b.time >= "' + CONVERT(NVARCHAR(MAX), ISNULL(@fromDate, 0), 120) + N'"
 	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), ISNULL(@toDate, GETUTCDATE()), 120) + N'"
-	AND	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+	AND	u.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 GROUP BY b.memberId
 ORDER BY WinLoss ASC, `Available sᴄᴏɪɴ` DESC
 ';

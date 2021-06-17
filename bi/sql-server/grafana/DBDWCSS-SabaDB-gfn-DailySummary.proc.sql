@@ -46,17 +46,17 @@ BEGIN;
 			);
 
 	SELECT	@Value	=	CASE f.str
-							WHEN N'Stake' THEN N'ds.`stake`'
-							WHEN N'WinLost' THEN N'ds.`stake` - ds.`payout`'
-							WHEN N'Win' THEN N'ds.`stake` - ds.`payout`'
-							WHEN N'Lose' THEN N'ds.`payout` - ds.`stake`'
-							WHEN N'Ticket' THEN N'ds.`tickets`'
+							WHEN N'Stake' THEN N'ds.stake'
+							WHEN N'WinLost' THEN N'ds.stake - ds.payout'
+							WHEN N'Win' THEN N'ds.stake - ds.payout'
+							WHEN N'Lose' THEN N'ds.payout - ds.stake'
+							WHEN N'Ticket' THEN N'ds.tickets'
 							ELSE NULL
 						END
 		,	@Group	=	CASE gb.str
-							WHEN N'Game' THEN N'cfg.`name.en`'
-							WHEN N'Game Group' THEN N'cfg.`name.grp`'
-							WHEN N'Currency' THEN N'ds.`currency`'
+							WHEN N'Game' THEN N'cfg.nameEN'
+							WHEN N'Game Group' THEN N'cfg.groupName'
+							WHEN N'Currency' THEN N'ds.currency'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
 						END
@@ -81,7 +81,7 @@ BEGIN;
 	SELECT	@Query += N'\
 SELECT	time, metric, value
 FROM	(
-	SELECT	ds.`time` AS time
+	SELECT	ds.time AS time
 		,	' + @Group + N' AS metric
 		,	SUM(' + @Value + N') AS value
 	FROM		summary_arc.game_summary_config AS cfg
@@ -114,7 +114,7 @@ ORDER BY q.time, q.value DESC;
 	END TRY
 	BEGIN CATCH
 		SELECT	@ErrMsg = N'\
-Query from L' + @L + N'_SABAARCBI
+Query from L' + CONVERT(NVARCHAR(MAX), @L) + N'_SABAARCBI
 	- ' + ERROR_MESSAGE()
 		RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
 	END CATCH;
@@ -126,7 +126,7 @@ Query from L' + @L + N'_SABAARCBI
 		SELECT	@Query += N'\
 SELECT	time, metric, value
 FROM	(
-	SELECT	ds.`time` AS time
+	SELECT	ds.time AS time
 		,	' + @Group + N' AS metric
 		,	SUM(' + @Value + N') AS value
 	FROM		summary.game_summary_config AS cfg
@@ -135,7 +135,7 @@ FROM	(
 	WHERE	ds.currency <> "UUS"
 		AND	ds.time = "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"' + ISNULL(N'
 		AND	ds.currency = "' + @Currency + N'"', N'') + N'
-	GROUP BY ds.`time`, ' + @Group + N'
+	GROUP BY ds.time, ' + @Group + N'
 ) AS q
 ' + @Filter + N'
 ORDER BY q.time, q.value DESC;
@@ -158,7 +158,7 @@ ORDER BY q.time, q.value DESC;
 		END TRY
 		BEGIN CATCH
 			SELECT	@ErrMsg = N'\
-Query from L' + @L + N'_SABABI
+Query from L' + CONVERT(NVARCHAR(MAX), @L) + N'_SABABI
 		- ' + ERROR_MESSAGE()
 			RAISERROR(@ErrMsg, 0, 0) WITH NOWAIT;
 		END CATCH;
