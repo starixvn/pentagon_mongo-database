@@ -1,9 +1,9 @@
 {
-  run('git', 'pull', '--rebase');
-
   const global = Function('return this;')();
   const login = {user: 'billy.bui', pwd: passwordPrompt()};
   const readonly = pro_readonly;
+
+  run('git', 'pull', '--rebase');
 
   pro.forEach(instance => {
     const oldDB = global.db;
