@@ -42,6 +42,7 @@
     [ 'deployClasses.js',
       'deployScripts.js',
       'deployIndexesArc.js',
+      'deployBIArc.js',
     ].forEach((path) => {
       try {
         load(path);
