@@ -1923,7 +1923,7 @@
             ],
           },
           { sql_name: `usersessions`,
-            mongo_name: `users`,
+            mongo_name: `usersessions`,
             pipeline: `[
               {"$project": {
                 "_id": 0, "username": 1, "memberId": 1, "memberName": 1, "userId": 1,
