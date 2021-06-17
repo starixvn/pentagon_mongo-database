@@ -1859,16 +1859,20 @@
             mongo_name: `userinfos`,
             pipeline: `[
               {"$project": {
-                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1
+                "_id": 0, "id": 1, "joinedOn": 1, "type": 1, "currency": 1, "UID": 1, "name": 1, "scoins": 1, "minBet": 1, "maxBet": 1, "betLimitModifiedDate": 1
               }}
             ]`,
             columns: [
-              Object.extend({mongo_name: `UID`      , sql_name: `id`      }, type.int64),
-              Object.extend({mongo_name: `id`       , sql_name: `uid`     }, type.str  ),
-              Object.extend({mongo_name: `name`     , sql_name: `nickname`}, type.str  ),
-              Object.extend({mongo_name: `joinedOn` , sql_name: `joinedOn`}, type.date ),
-              Object.extend({mongo_name: `type`     , sql_name: `isBot`   }, type.bool ),
-              Object.extend({mongo_name: `currency` , sql_name: `currency`}, type.str  ),
+              Object.extend({mongo_name: `UID`                  , sql_name: `id`                  }, type.int64),
+              Object.extend({mongo_name: `id`                   , sql_name: `uid`                 }, type.str  ),
+              Object.extend({mongo_name: `name`                 , sql_name: `nickname`            }, type.str  ),
+              Object.extend({mongo_name: `joinedOn`             , sql_name: `joinedOn`            }, type.date ),
+              Object.extend({mongo_name: `type`                 , sql_name: `isBot`               }, type.bool ),
+              Object.extend({mongo_name: `currency`             , sql_name: `currency`            }, type.str  ),
+              Object.extend({mongo_name: `scoins`               , sql_name: `scoins`              }, type.float),
+              Object.extend({mongo_name: `minBet`               , sql_name: `minBet`              }, type.float),
+              Object.extend({mongo_name: `maxBet`               , sql_name: `maxBet`              }, type.float),
+              Object.extend({mongo_name: `betLimitModifiedDate` , sql_name: `betLimitModifiedDate`}, type.date ),
             ],
           },
           { sql_name: `users`,
