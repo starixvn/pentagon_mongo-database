@@ -2112,7 +2112,7 @@
             mongo_name: `xocxoc_cuocs`,
             pipeline: `[
               {"$project": {
-                "_id": 0, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
                 "chan": {"$ifNull": ["$even", "$chan"]}, "le": {"$ifNull": ["$odd", "$le"]},
                 "red2": {"$ifNull": ["$red2", 0]},
                 "red3": 1, "red4": 1, "white3": 1, "white4": 1,
@@ -2147,6 +2147,7 @@
               Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
               /* Attributes */
               Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
               Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
               Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
               /* Bet Choices */
