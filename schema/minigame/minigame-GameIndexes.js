@@ -333,7 +333,7 @@
       forEach((idx) => {Maint.createIndex(dbs.minigame.lottery_ones, idx.idxKeys, idx.idxOpts)});
   }
 
-  if ((2 ** Saba.env() & 2) > 0) {   // 35 - Ba La
+  if ((2 ** Saba.env() & 6) > 0) {   // 35 - Ba La
     [idxs.TTL, idxs.time, idxs.id].
       forEach((idx) => {Maint.createIndex(dbs.minigame.threecards_phiens, idx.idxKeys, idx.idxOpts)});
     [idxs.TTL, idxs.time, idxs.phien__id, idxs.uid_phien, idxs.uid_thanhtoan__id, idxs.currency, idxs.isCash].
