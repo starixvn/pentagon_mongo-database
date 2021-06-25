@@ -8,8 +8,8 @@
       idxKeys : {uid: 1, roundId: 1},
       idxOpts : {unique: true},
     },
-    paid_id: {
-      idxKeys : {paid: 1, id: 1},
+    paid_uid: {
+      idxKeys : {paid: 1, uid: 1},
       idxOpts : {},
     },
     time: {
@@ -45,7 +45,7 @@
   }
 
   if ((2 ** Saba.env() & 6) > 0) {   // 29 - Four Guardians
-    [idxs.TTL, idxs.time, idxs.id, idxs.paid_id, idxs.currency, idxs.isCash].
+    [idxs.TTL, idxs.time, idxs.id, idxs.paid_uid, idxs.currency, idxs.isCash].
       forEach((idx) => {Maint.createIndex(dbs.minigame.fourguardians_rounds, idx.idxKeys, idx.idxOpts)});
     [idxs.TTL           , idxs.id, idxs.expiryTime].
       forEach((idx) => {Maint.createIndex(dbs.minigame.fourguardians_freespins, idx.idxKeys, idx.idxOpts)});
