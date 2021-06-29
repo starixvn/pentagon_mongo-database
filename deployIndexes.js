@@ -8,6 +8,7 @@
     'schema/minigame/minigame-AdminUserIndexes.js',
     'schema/minigame/minigame-GameIndexes.js',
     'schema/minigame/minigame-GameSlotIndexes.js',
+    'schema/minigame/minigame-GlobalConfigs.js',
     'schema/minigame/minigame-MiscIndexes.js',
     'schema/minigame/minigame-SmartBotIndexes.js',
     'schema/minigame/minigame-SpinIndexes.js',
