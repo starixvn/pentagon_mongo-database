@@ -1024,6 +1024,22 @@ if ((2 ** Saba.env() & 14) > 0) {
         },
         childs: [],
       },
+      { _id: 19005,
+        from: {
+          db: 'log',
+          coll: 'signins',
+        },
+        to: {
+          db: 'log_arc',
+          coll: 'signins_bk',
+        },
+        config: {
+          timeField: '',
+          cutOffsetHours: 0,
+          join: '',
+        },
+        childs: [],
+      },
       { _id: 38001,
         from: {
           db: 'member',
