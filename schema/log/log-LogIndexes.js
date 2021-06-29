@@ -37,7 +37,13 @@
       forEach(idx => {Maint.createIndex(dbs.log.end_games, idx.idxKeys, idx.idxOpts)});
     [idxs.TTL, idxs.requestTimeStamp, idxs.obCustId_gameRoundId_gameTypeId, idxs.gameTypeId_gameRoundId_obCustId].
       forEach(idx => {Maint.createIndex(dbs.log.failed_requests, idx.idxKeys, idx.idxOpts)});
+  }
+  if ((2 ** Saba.env() & 6) > 0) {
     [idxs.TTL, idxs.requestTimeStamp, idxs.memberId].
       forEach(idx => {Maint.createIndex(dbs.log.signin_requests, idx.idxKeys, idx.idxOpts)});
+  }
+  if ((2 ** Saba.env() & 8) > 0) {
+    [idxs.TTL, idxs.requestTimeStamp, idxs.memberId].
+      forEach(idx => {Maint.createIndex(dbs.log.signins, idx.idxKeys, idx.idxOpts)});
   }
 }

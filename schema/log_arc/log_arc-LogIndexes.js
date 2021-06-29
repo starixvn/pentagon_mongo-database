@@ -17,7 +17,13 @@
       forEach(idx => {Maint.createIndex(dbs.log_arc.end_games_bk, idx.idxKeys, idx.idxOpts)});
     [idxs.requestTimeStamp, idxs.summarized].
       forEach(idx => {Maint.createIndex(dbs.log_arc.failed_requests_bk, idx.idxKeys, idx.idxOpts)});
+  }
+  if ((2 ** Saba.env() & 6) > 0) {
     [idxs.requestTimeStamp].
       forEach(idx => {Maint.createIndex(dbs.log_arc.signin_requests_bk, idx.idxKeys, idx.idxOpts)});
+  }
+  if ((2 ** Saba.env() & 8) > 0) {
+    [idxs.requestTimeStamp].
+      forEach(idx => {Maint.createIndex(dbs.log_arc.signins_bk, idx.idxKeys, idx.idxOpts)});
   }
 }

@@ -175,7 +175,7 @@
             ],
           },
           { sql_name: `signins`,
-            mongo_name: `signin_requests`,
+            mongo_name: `signins`,
             pipeline: `[{"$project": {"_id": 0, "__archive": 0}}]`,
             columns: [
               Object.extend({mongo_name: `requestTimeStamp`         , sql_name: `requestTS`       }, type.str  ),
