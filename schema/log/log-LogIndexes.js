@@ -28,6 +28,10 @@
       idxKeys : {'request.memberId': 1},
       idxOpts : {},
     },
+    memberId3: {
+      idxKeys : {'memberAuth.memberId': 1},
+      idxOpts : {},
+    },
   };
 
   if ((2 ** Saba.env() & 14) > 0) {
@@ -43,7 +47,7 @@
       forEach(idx => {Maint.createIndex(dbs.log.signin_requests, idx.idxKeys, idx.idxOpts)});
   }
   if ((2 ** Saba.env() & 8) > 0) {
-    [idxs.TTL, idxs.requestTimeStamp, idxs.memberId].
+    [idxs.TTL, idxs.requestTimeStamp, idxs.memberId3].
       forEach(idx => {Maint.createIndex(dbs.log.signins, idx.idxKeys, idx.idxOpts)});
   }
 }
