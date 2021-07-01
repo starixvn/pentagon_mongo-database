@@ -1490,21 +1490,21 @@
             ]`,
             columns: [
               /* Metadata */
-              Object.extend({mongo_name: `time`       , sql_name: `time`    }, type.date ),
-              Object.extend({mongo_name: `phien`      , sql_name: `roundId` }, type.int64),
+              Object.extend({mongo_name: `time`       , sql_name: `time`        }, type.date ),
+              Object.extend({mongo_name: `phien`      , sql_name: `roundId`     }, type.int64),
               /* Member */
-              Object.extend({mongo_name: `uid`        , sql_name: `uid`     }, type.str  ),
-              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`}, type.int64),
-              Object.extend({mongo_name: `name`       , sql_name: `nickname`}, type.str  ),
-              Object.extend({mongo_name: `currency`   , sql_name: `currency`}, type.str  ),
+              Object.extend({mongo_name: `uid`        , sql_name: `uid`         }, type.str  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`    }, type.int64),
+              Object.extend({mongo_name: `name`       , sql_name: `nickname`    }, type.str  ),
+              Object.extend({mongo_name: `currency`   , sql_name: `currency`    }, type.str  ),
               /* Summary */
-              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`   }, type.int64),
-              Object.extend({mongo_name: `betwin`     , sql_name: `payout`  }, type.float),
+              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`       }, type.int64),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`      }, type.float),
               /* Attributes */
-              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled` }, type.bool ),
-              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet` }, type.bool ),
-              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`  }, type.bool ),
-              Object.extend({mongo_name: `archived`   , sql_name: `archived`}, type.bool ),
+              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`     }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`     }, type.bool ),
+              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`      }, type.bool ),
+              Object.extend({mongo_name: `archived`   , sql_name: `archived`    }, type.bool ),
               /* Bet Choices */
               Object.extend({mongo_name: `straightUp` , sql_name: `straightUp`  }, type.int64),
               Object.extend({mongo_name: `split`      , sql_name: `split`       }, type.int64),
