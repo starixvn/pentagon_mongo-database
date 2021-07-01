@@ -1,4 +1,4 @@
-if ((2 ** Saba.env() & 14) > 0) {  // global_configs
+if ((2 ** Saba.env() & 2) > 0) {  // global_configs
   [ { idxKeys : {type: 1},
       idxOpts : {unique: true},
     }
