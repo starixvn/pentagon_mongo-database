@@ -2,7 +2,7 @@
   const time = ISODate(`2021-06-02`);
   const _id = `L1BI-sch`;
   const version = `0.0.1`;
-  const schema_id = ObjectId(`${Math.floor(time.valueOf()/1000).toString(16)}${String.split(_id, '').map(_ => _.charCodeAt(0).toString(16)).join('')}`);
+  const schema_id = ObjectId(`${Math.floor(time.valueOf()/1000).toString(16)}${String.split(_id, '').map(_ => _.charCodeAt(0).toString(16)).join("")}`);
   dbs.schema.names.save({
     _id,
     schema_id,
@@ -1422,6 +1422,66 @@
             pipeline: `[
               {"$project": {
                 "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "straightUp": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$straightUp"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "split": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$split"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "street": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$street"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "triangle": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$triangle"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "corner": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$corner"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "fourNumbers": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$fourNumbers"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "line": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$line"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "column": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$column"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "dozen": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$dozen"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "redBlack": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$redBlack"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "oddEven": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$oddEven"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
+                "bigSmall": {"$ifNull": [{"$reduce": {
+                  "input": {"$objectToArray": "$bigSmall"},
+                  "initialValue": 0,
+                  "in": {"$add": ["$$value", "$$this.v"]}
+                }}, 0]},
                 "totalAmount": 1, "betwin": 1, "thanhtoan": 1,
                 "currency": "$__archive.currency",
                 "isCash": "$__archive.isCash",
@@ -1445,6 +1505,19 @@
               Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet` }, type.bool ),
               Object.extend({mongo_name: `isCash`     , sql_name: `isCash`  }, type.bool ),
               Object.extend({mongo_name: `archived`   , sql_name: `archived`}, type.bool ),
+              /* Bet Choices */
+              Object.extend({mongo_name: `straightUp` , sql_name: `straightUp`  }, type.int64),
+              Object.extend({mongo_name: `split`      , sql_name: `split`       }, type.int64),
+              Object.extend({mongo_name: `street`     , sql_name: `street`      }, type.int64),
+              Object.extend({mongo_name: `triangle`   , sql_name: `triangle`    }, type.int64),
+              Object.extend({mongo_name: `corner`     , sql_name: `corner`      }, type.int64),
+              Object.extend({mongo_name: `fourNumbers`, sql_name: `fourNumbers` }, type.int64),
+              Object.extend({mongo_name: `line`       , sql_name: `line`        }, type.int64),
+              Object.extend({mongo_name: `column`     , sql_name: `column`      }, type.int64),
+              Object.extend({mongo_name: `dozen`      , sql_name: `dozen`       }, type.int64),
+              Object.extend({mongo_name: `redBlack`   , sql_name: `redBlack`    }, type.int64),
+              Object.extend({mongo_name: `oddEven`    , sql_name: `oddEven`     }, type.int64),
+              Object.extend({mongo_name: `bigSmall`   , sql_name: `bigSmall`    }, type.int64),
             ],
           },
           /** SICBO (G) */
