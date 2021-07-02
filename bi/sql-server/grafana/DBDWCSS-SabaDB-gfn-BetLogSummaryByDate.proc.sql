@@ -34,8 +34,9 @@ AS
 		@Var6				[optional]		- The system to be selected.
 				<DEFAULT>	NULL			- Treat as 1 - Cocos
 
-	Version:	1.0.0
+	Version:	1.1.0
 	Revision:
+		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
 		- [1.0.0]	20210531@Billy		Release gfn.BetLogSummaryByDate
 		- [0.0.1]	20210531@Billy		Initital
 */
@@ -86,15 +87,15 @@ BEGIN;
 			);
 
 	SELECT	@Value	=	CASE f.str
-							WHEN N'Request' THEN N'bs.`requestCount`'
-							WHEN N'Bet' THEN N'bs.`betCount`'
-							WHEN N'TurnOver' THEN N'bs.`totalAmount`'
+							WHEN N'Request' THEN N'bs.requestCount'
+							WHEN N'Bet' THEN N'bs.betCount'
+							WHEN N'TurnOver' THEN N'bs.totalAmount'
 							ELSE NULL
 						END
 		,	@Group	=	CASE gb.str
-							WHEN N'Game' THEN N'cfg.`name.en`'
-							WHEN N'Game Group' THEN N'cfg.`name.grp`'
-							WHEN N'Currency' THEN N'bs.`currency`'
+							WHEN N'Game' THEN N'cfg.nameEN'
+							WHEN N'Game Group' THEN N'cfg.groupName'
+							WHEN N'Currency' THEN N'bs.currency'
 							WHEN N'Summary' THEN N'"Summary"'
 							ELSE NULL
 						END

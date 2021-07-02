@@ -45,7 +45,7 @@ BEGIN;
 			,	gameTypeId			SMALLINT
 			,	ip					VARCHAR(128)
 			,	obCustId			INT
-			,	requestTimeStamp	DATETIME2
+			,	requestTS	DATETIME2
 			,	balance				MONEY
 			,	errCode				SMALLINT
 			,	errDesc				NVARCHAR(MAX)
@@ -56,10 +56,10 @@ BEGIN;
 	BEGIN;
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	`gameId`
-	,	`owGameTypeId`
-	,	`name.en`
-	,	`name.vi`
+SELECT	gameId
+	,	gameTypeId
+	,	nameEN
+	,	nameVI
 FROM	summary.game_summary_config;
 ';
 
@@ -71,31 +71,31 @@ FROM	summary.game_summary_config;
 	BEGIN;
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	`call._t`
-	,	`call.amount`
-	,	`call.choiceId`
-	,	`call.currency`
-	,	`call.gameRoundId`
-	,	`call.gameTypeId`
-	,	`call.ip`
-	,	`call.obCustId`
-	,	`requestTimeStamp`
-	,	`result.balance`
-	,	`result.errorCode`
-	,	`result.errorDescription`
-	,	`result.errorMessage`
-	,	`result.obTransId`
+SELECT	callType
+	,	amount
+	,	choiceId
+	,	currency
+	,	gameRoundId
+	,	gameTypeId
+	,	ip
+	,	obCustId
+	,	requestTS
+	,	balance
+	,	0
+	,	""
+	,	""
+	,	obTransId
 FROM	log.bets
-WHERE	`result.obTransId` = ' + CAST(@obTransId AS NVARCHAR(MAX)) + N'
+WHERE	obTransId = ' + CAST(@obTransId AS NVARCHAR(MAX)) + N'
 ';
 
-		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
+		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTS, balance, errCode, errDesc, errMsg, obTransId)
 		EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
 
-		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
+		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTS, balance, errCode, errDesc, errMsg, obTransId)
 		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 
-		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
+		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTS, balance, errCode, errDesc, errMsg, obTransId)
 		EXECUTE	base.ExecuteSabaQuery @Query, 3, 0;
 
 		SELECT	[API]			= bc.callAPI
@@ -105,7 +105,7 @@ WHERE	`result.obTransId` = ' + CAST(@obTransId AS NVARCHAR(MAX)) + N'
 			,	[CustId]		= bc.obCustId
 			,	[$]				= bc.currency
 			,	[TransId]		= bc.obTransId
-			,	[RequestTime]	= bc.requestTimeStamp
+			,	[RequestTime]	= bc.requestTS
 			,	[IP]			= bc.ip
 			,	[ChoiceId]		= bc.choiceId
 			,	[Amount]		= bc.amount
@@ -116,7 +116,7 @@ WHERE	`result.obTransId` = ' + CAST(@obTransId AS NVARCHAR(MAX)) + N'
 		FROM		@BetCall AS bc
 		LEFT JOIN	@Games AS g
 				ON	bc.gameTypeId = g.gameTypeId
-		ORDER BY	bc.requestTimeStamp ASC;
+		ORDER BY	bc.requestTS ASC;
 	END;
 	ELSE IF	ISNULL(@gameType, N'') <> N''
 		AND	ISNULL(@gameRoundId, 0) <> 0
@@ -129,10 +129,10 @@ WHERE	`result.obTransId` = ' + CAST(@obTransId AS NVARCHAR(MAX)) + N'
 		BEGIN;
 			SELECT	@Query = N'';
 			SELECT	@Query += N'\
-SELECT	`local.memberId`
-	,	`local.memberName`
+SELECT	memberId
+	,	memberName
 FROM	minigame.users
-WHERE	`local.memberName` = "' + @username + N'"
+WHERE	memberName = "' + @username + N'"
 ';
 
 			INSERT INTO	@Users (obCustId, username)
@@ -150,53 +150,52 @@ WHERE	`local.memberName` = "' + @username + N'"
 
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	`call._t`
-	,	`call.amount`
-	,	`call.choiceId`
-	,	`call.currency`
-	,	`call.gameRoundId`
-	,	`call.gameTypeId`
-	,	`call.ip`
-	,	`call.obCustId`
-	,	`requestTimeStamp`
-	,	`result.balance`
-	,	`result.errorCode`
-	,	`result.errorDescription`
-	,	`result.errorMessage`
-	,	`result.obTransId`
+SELECT	callType
+	,	amount
+	,	choiceId
+	,	currency
+	,	gameRoundId
+	,	gameTypeId
+	,	ip
+	,	obCustId
+	,	requestTS
+	,	balance
+	,	0
+	,	""
+	,	""
+	,	obTransId
 FROM	log.bets
-WHERE	`call.gameTypeId` = ' + LTRIM(@gameTypeId) + N'
-	AND	`call.gameRoundId` = ' + LTRIM(@gameRoundId) + ISNULL(N'
-	AND	`call.obCustId` = ' + LTRIM(NULLIF(@obCustId, 0)), N'') + N'
+WHERE	gameTypeId = ' + LTRIM(@gameTypeId) + N'
+	AND	gameRoundId = ' + LTRIM(@gameRoundId) + ISNULL(N'
+	AND	obCustId = ' + LTRIM(NULLIF(@obCustId, 0)), N'') + N'
 UNION ALL
-SELECT	`call._t`
-	,	`call.amount`
-	,	`call.choiceId`
-	,	`call.currency`
-	,	`call.gameRoundId`
-	,	`call.gameTypeId`
-	,	`call.ip`
-	,	`call.obCustId`
-	,	`requestTimeStamp`
-	,	`result.balance`
-	,	`result.errorCode`
-	,	`result.errorDescription`
-	,	`result.errorMessage`
-	,	`result.obTransId`
-FROM	log.failed_requests
-WHERE	`call._t` = "PlaceBetCall"
-	AND	`call.gameTypeId` = ' + LTRIM(@gameTypeId) + N'
-	AND	`call.gameRoundId` = ' + LTRIM(@gameRoundId) + ISNULL(N'
-	AND	`call.obCustId` = ' + LTRIM(NULLIF(@obCustId, 0)), N'') + N'
+SELECT	callType
+	,	amount
+	,	choiceId
+	,	currency
+	,	gameRoundId
+	,	gameTypeId
+	,	ip
+	,	obCustId
+	,	requestTS
+	,	0
+	,	errorCode
+	,	errorDesc
+	,	errorMsg
+	,	0
+FROM	log.bets_failed
+WHERE	gameTypeId = ' + LTRIM(@gameTypeId) + N'
+	AND	gameRoundId = ' + LTRIM(@gameRoundId) + ISNULL(N'
+	AND	obCustId = ' + LTRIM(NULLIF(@obCustId, 0)), N'') + N'
 ';
 
-		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
+		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTS, balance, errCode, errDesc, errMsg, obTransId)
 		EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
 
-		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
+		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTS, balance, errCode, errDesc, errMsg, obTransId)
 		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
 
-		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTimeStamp, balance, errCode, errDesc, errMsg, obTransId)
+		INSERT INTO	@BetCall (callAPI, amount, choiceId, currency, gameRoundId, gameTypeId, ip, obCustId, requestTS, balance, errCode, errDesc, errMsg, obTransId)
 		EXECUTE	base.ExecuteSabaQuery @Query, 3, 0;
 
 		SELECT	[API]			= bc.callAPI
@@ -206,7 +205,7 @@ WHERE	`call._t` = "PlaceBetCall"
 			,	[CustId]		= bc.obCustId
 			,	[$]				= bc.currency
 			,	[TransId]		= bc.obTransId
-			,	[RequestTime]	= bc.requestTimeStamp
+			,	[RequestTime]	= bc.requestTS
 			,	[IP]			= bc.ip
 			,	[ChoiceId]		= bc.choiceId
 			,	[Amount]		= bc.amount
@@ -217,7 +216,7 @@ WHERE	`call._t` = "PlaceBetCall"
 		FROM		@BetCall AS bc
 		LEFT JOIN	@Games AS g
 				ON	bc.gameTypeId = g.gameTypeId
-		ORDER BY	bc.requestTimeStamp ASC;
+		ORDER BY	bc.requestTS ASC;
 	END;
 	ELSE
 	BEGIN;

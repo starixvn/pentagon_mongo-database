@@ -25,11 +25,11 @@ BEGIN;
 		SELECT	@Query += N'\
 SELECT	'
 + CASE	CAST(@Var2 AS INT)
-		WHEN 1 THEN N'TRIM(`gameId`)'
-		WHEN 2 THEN N'TRIM(`owGameTypeId`)'
-		WHEN 3 THEN N'`name.en`'
-		WHEN 4 THEN N'`name.vi`'
-		ELSE N'`name.en`'
+		WHEN 1 THEN N'TRIM(gameId)'
+		WHEN 2 THEN N'TRIM(gameTypeId)'
+		WHEN 3 THEN N'nameEN'
+		WHEN 4 THEN N'nameVI'
+		ELSE N'nameEN'
   END
 +  N' AS "value"
 FROM	summary.game_summary_config;
@@ -44,7 +44,7 @@ FROM	summary.game_summary_config;
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
 SELECT	DISTINCT
-		`currency` AS "value"
+		currency AS "value"
 FROM	summary.daily_summaries;
 ';
 

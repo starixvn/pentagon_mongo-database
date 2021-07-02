@@ -113,10 +113,10 @@ SELECT	"Used sᴘɪɴ" AS `metric`
 	,	COUNT(1) AS `value`
 FROM		minigame.spin_results AS sr
 INNER JOIN	minigame.users AS u
-		ON	sr.memberId = u.`local.memberId`
+		ON	sr.memberId = u.memberId
 WHERE	sr.time >= "' + CONVERT(NVARCHAR(MAX), fromDate, 121) + N'"
 	AND	sr.time <= "' + CONVERT(NVARCHAR(MAX), toDate, 121) + N'"
-	AND	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+	AND	u.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 '
 		FROM	@RoundDate;
 
@@ -149,10 +149,10 @@ SELECT	"Spun sᴄᴏɪɴ" AS `metric`
 	,	SUM(result) AS `value`
 FROM		minigame.spin_results AS sr
 INNER JOIN	minigame.users AS u
-		ON	sr.memberId = u.`local.memberId`
+		ON	sr.memberId = u..memberId
 WHERE	sr.time >= "' + CONVERT(NVARCHAR(MAX), fromDate, 121) + N'"
 	AND	sr.time <= "' + CONVERT(NVARCHAR(MAX), toDate, 121) + N'"
-	AND	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+	AND	u.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 '
 		FROM	@RoundDate;
 
@@ -182,15 +182,15 @@ WHERE	roundId = ' + LTRIM(@RoundId) + ';
 		SELECT	TOP(1)
 				@Query += N'\
 SELECT	"Stake sᴄᴏɪɴ" AS `metric`
-	,	SUM(b.odd + b.even + b.red3 + b.red4 + b.white3 + b.white4) AS `value`
-FROM		minigame.xocxoc_cuocs AS b
+	,	SUM(b.stake) AS `value`
+FROM		minigame.xocxoc_tickets AS b
 INNER JOIN	minigame.users AS u
-		ON	b.memberId = u.`local.memberId`
+		ON	b.memberId = u.memberId
 WHERE	b.freeBet = true
 	AND	b.memberId > 0
 	AND	b.time >= "' + CONVERT(NVARCHAR(MAX), fromDate, 121) + N'"
 	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), toDate, 121) + N'"
-	AND	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+	AND	u.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 '
 		FROM	@RoundDate;
 
@@ -220,15 +220,15 @@ WHERE	roundId = ' + LTRIM(@RoundId) + ';
 		SELECT	TOP(1)
 				@Query += N'\
 SELECT	"Company WinLoss" AS `metric`
-	,	SUM(-b.betwin) AS `value`
-FROM		minigame.xocxoc_cuocs AS b
+	,	SUM(-b.payout) AS `value`
+FROM		minigame.xocxoc_tickets AS b
 INNER JOIN	minigame.users AS u
-		ON	b.memberId = u.`local.memberId`
+		ON	b.memberId = u.memberId
 WHERE	b.freeBet = true
 	AND	b.memberId > 0
 	AND	b.time > "' + CONVERT(NVARCHAR(MAX), d.fromDate, 121) + N'"
 	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), d.toDate, 121) + N'"
-	AND	u.`local.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+	AND	u.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 '
 		FROM	@RoundDate AS tmp
 		CROSS APPLY	(
@@ -243,13 +243,13 @@ WHERE	b.freeBet = true
 		SELECT	TOP(1)
 				@Query += N'\
 SELECT	"Company WinLoss" AS `metric`
-	,	SUM(-b.betwin) AS `value`
-FROM	minigame_arc.xocxoc_cuocs_bk AS b
+	,	SUM(-b.payout) AS `value`
+FROM	minigame_arc.xocxoc_tickets_bk AS b
 WHERE	b.freeBet = true
 	AND	b.memberId > 0
 	AND	b.time > "' + CONVERT(NVARCHAR(MAX), d.fromDate, 121) + N'"
 	AND	b.time <= "' + CONVERT(NVARCHAR(MAX), d.toDate, 121) + N'"
-	AND	b.`__archive.currency` IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
+	AND	b.currency IN ("' + REPLACE(ISNULL(@Currencies, N''), ',', '","') + N'");
 '
 		FROM	@RoundDate AS tmp
 		CROSS APPLY	(
@@ -319,7 +319,7 @@ SELECT	"Total ᴜsᴇʀ" AS `metric`
 	,	COUNT(1) AS `value`
 FROM		minigame.spin_logs AS sl
 LEFT JOIN	minigame.users AS u
-		ON	sl.memberId = u.`local.memberId`
+		ON	sl.memberId = u.memberId
 WHERE	sl.roundId = ' + LTRIM(@RoundId) + ';
 ';
 		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
@@ -336,13 +336,13 @@ WHERE	sl.roundId = ' + LTRIM(@RoundId) + ';
 
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	IFNULL(u.`local.currency`, "-- ɴᴏᴛ ʀᴇɢɪsᴛᴇʀᴇᴅ --") AS metric
+SELECT	IFNULL(u.currency, "-- ɴᴏᴛ ʀᴇɢɪsᴛᴇʀᴇᴅ --") AS metric
 	,	COUNT(1) AS value
 FROM		minigame.spin_logs AS sl
 LEFT JOIN	minigame.users AS u
-		ON	sl.memberId = u.`local.memberId`
+		ON	sl.memberId = u.memberId
 WHERE	sl.roundId = ' + LTRIM(@RoundId) + '
-GROUP BY u.`local.currency`
+GROUP BY u.currency
 ORDER BY 2 DESC
 ;';
 		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;

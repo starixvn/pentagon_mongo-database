@@ -17,8 +17,9 @@ AS
 		@Var2				[optional]		- The date of data that will be selected. The time is in UTC timezone.
 				<DEFAULT>	NULL			- Yesterday 00:00:00 AM
 
-	Version:	1.0.0
+	Version:	1.1.0
 	Revision:
+		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
 		- [1.0.0]	20210529@Billy		Release dbr.SB_DailySummary
 		- [0.0.1]	20210529@Billy		Initital
 */
@@ -56,9 +57,9 @@ BEGIN;
 
 	SELECT	@Query += N'\
 SELECT	' + CAST(@_L AS NVARCHAR(MAX)) + ' AS SC
-	,	cfg.owGameTypeId AS gameTypeId
+	,	cfg.gameTypeId AS gameTypeId
 	,	cfg.gameId AS gameId
-	,	cfg.`name.en` AS gameType
+	,	cfg.nameEN AS gameType
 	,	IFNULL(ds.currency, "null") AS currency
 	,	IFNULL(ds.isCash, 2) AS isCash
 	,	ds.tickets AS betCount
