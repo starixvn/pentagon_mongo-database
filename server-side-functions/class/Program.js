@@ -115,6 +115,7 @@ deploy: {
       };
       const _execute = () => {
         let cmd = Object.getOwnPropertyNames(_args).reduce(_reduceParam, []);
+
         _logger.info(`Execute`, `Starting ${cmd[0]}...`);
         const r = run(...cmd);
         if (_args.output[1] && fileExists(_args.output[1])) {
