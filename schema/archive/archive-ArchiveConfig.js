@@ -2,8 +2,8 @@ if ((2 ** Saba.env() & 14) > 0) {
   const filter = {
     memberId: {$gt: 0}
   };
-  dbs.archive.archive_config.remove({});
-  dbs.archive.archive_config.insertMany(
+  db.getSiblingDB('archive').archive_config.remove({});
+  db.getSiblingDB('archive').archive_config.insertMany(
     [
       { _id: 39001,
         from: {

@@ -8,6 +8,6 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.summary_arc.daily_summaries, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('summary_arc').daily_summaries, idx.idxKeys, idx.idxOpts);
     });
 }

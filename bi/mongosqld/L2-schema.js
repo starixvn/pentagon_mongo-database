@@ -3,7 +3,7 @@
   const _id = `L2BI-sch`;
   const version = `0.0.1`;
   const schema_id = ObjectId(`${Math.floor(time.valueOf()/1000).toString(16)}${String.split(_id, '').map(_ => _.charCodeAt(0).toString(16)).join('')}`);
-  dbs.schema.names.save({
+  db.getSiblingDB('schema').names.save({
     _id,
     schema_id,
     version,
@@ -24,7 +24,7 @@
     date  : {mongo_type: `date`         , sql_type: `timestamp` },
     _ : {mongo_type: ``, sql_type: ``},
   };
-  dbs.schema.schemas.save({
+  db.getSiblingDB('schema').schemas.save({
     _id: schema_id,
     created: time,
     version,

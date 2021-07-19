@@ -8,12 +8,12 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.summary.game_summary_config, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('summary').game_summary_config, idx.idxKeys, idx.idxOpts);
     });
 }
 
-dbs.summary.game_summary_config.remove({});
-dbs.summary.game_summary_config.insertMany([
+db.getSiblingDB('summary').game_summary_config.remove({});
+db.getSiblingDB('summary').game_summary_config.insertMany([
     {   gameId: 1
     ,   owGameTypeId: (
             (2 ** Saba.env() & 6) > 0 ? 1612

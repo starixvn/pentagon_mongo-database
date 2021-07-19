@@ -5,7 +5,7 @@ if ((2 ** Saba.env() & 4) > 0)
         ,   idxOpts : {unique: true}
         }
     ].forEach(idx => {
-        Maint.createIndex(dbs.minigame.spins, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('minigame').spins, idx.idxKeys, idx.idxOpts);
     });
 }
 
@@ -22,7 +22,7 @@ if ((2 ** Saba.env() & 4) > 0)
         ,   idxOpts : {}
         }
     ].forEach(idx => {
-        Maint.createIndex(dbs.minigame.spin_results, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('minigame').spin_results, idx.idxKeys, idx.idxOpts);
     });
 }
 
@@ -38,10 +38,10 @@ if ((2 ** Saba.env() & 4) > 0)
         ,   idxOpts : {}
         }
     ].forEach(idx => {
-        Maint.createIndex(dbs.minigame.spin_logs, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('minigame').spin_logs, idx.idxKeys, idx.idxOpts);
     });
 
-    dbs.minigame.runCommand({
+    db.getSiblingDB('minigame').runCommand({
         collMod: `spin_logs`
     ,   validator: { $jsonSchema: {
             bsonType: `object`

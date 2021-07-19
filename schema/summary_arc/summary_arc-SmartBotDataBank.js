@@ -17,8 +17,8 @@
     if ((2 ** Saba.env() & 6) > 0)
     {   // Data Bank
         [idxs.memberId_time, idxs.time_group].
-            forEach((idx) => {Maint.createIndex(dbs.summary_arc.smartbot_databank_patterns, idx.idxKeys, idx.idxOpts)});
+            forEach((idx) => {Maint.createIndex(db.getSiblingDB('summary_arc').smartbot_databank_patterns, idx.idxKeys, idx.idxOpts)});
         [idxs.patId_time].
-            forEach((idx) => {Maint.createIndex(dbs.summary_arc.smartbot_databank_bets, idx.idxKeys, idx.idxOpts)});
+            forEach((idx) => {Maint.createIndex(db.getSiblingDB('summary_arc').smartbot_databank_bets, idx.idxKeys, idx.idxOpts)});
     }
 }

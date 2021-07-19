@@ -5,7 +5,7 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.minigame.admins, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('minigame').admins, idx.idxKeys, idx.idxOpts);
     });
 }
 
@@ -16,6 +16,6 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.minigame.admin_users, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('minigame').admin_users, idx.idxKeys, idx.idxOpts);
     });
 }
