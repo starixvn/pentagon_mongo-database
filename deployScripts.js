@@ -7,7 +7,6 @@
     ,   'server-side-functions/script/Archive.js'
     ,   'server-side-functions/script/Security.js'
     ,   'server-side-functions/script/shellExtension.js'
-    ,   'server-side-functions/script/shellVariables.js'
     ].forEach((path) => {
         try {
             load(path);
