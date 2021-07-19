@@ -8,6 +8,6 @@
 
   if ((2 ** Saba.env() & 14) > 0) {
     [idxs.time].
-      forEach(idx => {Maint.createIndex(dbs.Proteus.betlogs, idx.idxKeys, idx.idxOpts)});
+      forEach(idx => {Maint.createIndex(db.getSiblingDB('Proteus').betlogs, idx.idxKeys, idx.idxOpts)});
   }
 }

@@ -8,12 +8,12 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.summary_arc.game_summary_config, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('summary_arc').game_summary_config, idx.idxKeys, idx.idxOpts);
     });
 }
 
-dbs.summary_arc.game_summary_config.remove({});
-dbs.summary_arc.game_summary_config.insertMany([
+db.getSiblingDB('summary_arc').game_summary_config.remove({});
+db.getSiblingDB('summary_arc').game_summary_config.insertMany([
     {   gameId: 1
     ,   owGameTypeId: (
         (2 ** Saba.env() & 6) > 0 ? 1612
@@ -990,6 +990,81 @@ dbs.summary_arc.game_summary_config.insertMany([
         ,   time: `$time`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
+,   {   gameId: 32
+    ,   owGameTypeId: 3832
+    ,   name: {
+            en: `Baccarat Diamond`
+        ,   vi: `Cào Baccarat Diamond`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `baccaratdiamond`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_cuocs_bk`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
+,   {   gameId: 33
+    ,   owGameTypeId: 3833
+    ,   name: {
+            en: `Baccarat Sapphire`
+        ,   vi: `Cào Baccarat Sapphire`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `baccaratsapphire`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_cuocs_bk`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
+,   {   gameId: 34
+    ,   owGameTypeId: 3834
+    ,   name: {
+            en: `Baccarat Ruby`
+        ,   vi: `Cào Baccarat Ruby`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `baccarat`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_cuocs_bk`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
         ,   payout: [`$betwin`]
         }
     ,   config: {

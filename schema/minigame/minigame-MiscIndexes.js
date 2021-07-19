@@ -7,8 +7,8 @@
   };
 
   if ((2 ** Saba.env() & 14) > 0) {   // archive_statuses
-    dbs.minigame.createCollection('archive_statuses', {collation: {locale: 'en', strength: 2}});
+    db.getSiblingDB('minigame').createCollection('archive_statuses', {collation: {locale: 'en', strength: 2}});
     [idxs.name].
-        forEach(idx => {Maint.createIndex(dbs.minigame.archive_statuses, idx.idxKeys, idx.idxOpts)});
+        forEach(idx => {Maint.createIndex(db.getSiblingDB('minigame').archive_statuses, idx.idxKeys, idx.idxOpts)});
   }
 }
