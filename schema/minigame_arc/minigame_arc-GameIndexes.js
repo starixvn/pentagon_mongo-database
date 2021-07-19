@@ -268,6 +268,27 @@
       forEach((idx) => {Maint.createIndex(dbs.minigame_arc.lottery_ones_bk, idx.idxKeys, idx.idxOpts)});
   }
 
+  if ((2 ** Saba.env() & 8) > 0) {   // 32 - Baccarat Diamond
+    [idxs.time, idxs.id].
+      forEach((idx) => {Maint.createIndex(dbs.minigame_arc.baccaratdiamond_phiens_bk, idx.idxKeys, idx.idxOpts)});
+    [idxs.time, idxs.phien, idxs.uid_phien_U].
+      forEach((idx) => {Maint.createIndex(dbs.minigame_arc.baccaratdiamond_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+  }
+
+  if ((2 ** Saba.env() & 8) > 0) {   // 33 - Baccarat Sapphire
+    [idxs.time, idxs.id].
+      forEach((idx) => {Maint.createIndex(dbs.minigame_arc.baccaratsapphire_phiens_bk, idx.idxKeys, idx.idxOpts)});
+    [idxs.time, idxs.phien, idxs.uid_phien_U].
+      forEach((idx) => {Maint.createIndex(dbs.minigame_arc.baccaratsapphire_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+  }
+
+  if ((2 ** Saba.env() & 8) > 0) {   // 34 - Baccarat Ruby
+    [idxs.time, idxs.id].
+      forEach((idx) => {Maint.createIndex(dbs.minigame_arc.baccaratruby_phiens_bk, idx.idxKeys, idx.idxOpts)});
+    [idxs.time, idxs.phien, idxs.uid_phien_U].
+      forEach((idx) => {Maint.createIndex(dbs.minigame_arc.baccaratruby_cuocs_bk, idx.idxKeys, idx.idxOpts)});
+  }
+
   if ((2 ** Saba.env() & 6) > 0) {   // 35 - Ba Lá
     [idxs.time, idxs.id].
       forEach((idx) => {Maint.createIndex(dbs.minigame_arc.threecards_phiens_bk, idx.idxKeys, idx.idxOpts)});

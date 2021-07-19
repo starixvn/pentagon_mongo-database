@@ -226,6 +226,171 @@
               Object.extend({mongo_name: `playerPair` , sql_name: `playerPair`}, type.int64),
             ],
           },
+          /** BACCARAT DIAMOND (G) */
+          { sql_name: `baccaratdiamond_rounds_bk`,
+            mongo_name: `baccaratdiamond_phiens_bk`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `archived` , sql_name: `archived`}, type.bool ),
+            ],
+          },
+          { sql_name: `baccaratdiamond_tickets_bk`,
+            mongo_name: `baccaratdiamond_cuocs_bk`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "banker": 1, "bankerPair": 1, "player": 1, "playerPair": 1, "tie": 1, "big": 1, "small": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$player", "$playerPair", "$tie", "$big", "$small"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              /* Metadata */
+              Object.extend({mongo_name: `time`       , sql_name: `time`      }, type.date ),
+              Object.extend({mongo_name: `phien`      , sql_name: `roundId`   }, type.int64),
+              /* Member */
+              Object.extend({mongo_name: `uid`        , sql_name: `uid`       }, type.str  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `name`       , sql_name: `nickname`  }, type.str  ),
+              Object.extend({mongo_name: `currency`   , sql_name: `currency`  }, type.str  ),
+              /* Summary */
+              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`     }, type.int64),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
+              /* Attributes */
+              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
+              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
+              Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
+              /* Bet Choices */
+              Object.extend({mongo_name: `big`        , sql_name: `big`       }, type.int64),
+              Object.extend({mongo_name: `small`      , sql_name: `small`     }, type.int64),
+              Object.extend({mongo_name: `banker`     , sql_name: `banker`    }, type.int64),
+              Object.extend({mongo_name: `tie`        , sql_name: `tie`       }, type.int64),
+              Object.extend({mongo_name: `player`     , sql_name: `player`    }, type.int64),
+              Object.extend({mongo_name: `bankerPair` , sql_name: `bankerPair`}, type.int64),
+              Object.extend({mongo_name: `playerPair` , sql_name: `playerPair`}, type.int64),
+            ],
+          },
+          /** BACCARAT RUBY (G) */
+          { sql_name: `baccaratruby_rounds_bk`,
+            mongo_name: `baccaratruby_phiens_bk`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `archived` , sql_name: `archived`}, type.bool ),
+            ],
+          },
+          { sql_name: `baccaratruby_tickets_bk`,
+            mongo_name: `baccaratruby_cuocs_bk`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "banker": 1, "bankerPair": 1, "player": 1, "playerPair": 1, "tie": 1, "big": 1, "small": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$player", "$playerPair", "$tie", "$big", "$small"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              /* Metadata */
+              Object.extend({mongo_name: `time`       , sql_name: `time`      }, type.date ),
+              Object.extend({mongo_name: `phien`      , sql_name: `roundId`   }, type.int64),
+              /* Member */
+              Object.extend({mongo_name: `uid`        , sql_name: `uid`       }, type.str  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `name`       , sql_name: `nickname`  }, type.str  ),
+              Object.extend({mongo_name: `currency`   , sql_name: `currency`  }, type.str  ),
+              /* Summary */
+              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`     }, type.int64),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
+              /* Attributes */
+              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
+              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
+              Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
+              /* Bet Choices */
+              Object.extend({mongo_name: `big`        , sql_name: `big`       }, type.int64),
+              Object.extend({mongo_name: `small`      , sql_name: `small`     }, type.int64),
+              Object.extend({mongo_name: `banker`     , sql_name: `banker`    }, type.int64),
+              Object.extend({mongo_name: `tie`        , sql_name: `tie`       }, type.int64),
+              Object.extend({mongo_name: `player`     , sql_name: `player`    }, type.int64),
+              Object.extend({mongo_name: `bankerPair` , sql_name: `bankerPair`}, type.int64),
+              Object.extend({mongo_name: `playerPair` , sql_name: `playerPair`}, type.int64),
+            ],
+          },
+          /** BACCARAT SAPPHIRE (G) */
+          { sql_name: `baccaratsapphire_rounds_bk`,
+            mongo_name: `baccaratsapphire_phiens_bk`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "time": 1, "id": 1,
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              Object.extend({mongo_name: `id`       , sql_name: `id`      }, type.int64),
+              Object.extend({mongo_name: `time`     , sql_name: `time`    }, type.date ),
+              Object.extend({mongo_name: `archived` , sql_name: `archived`}, type.bool ),
+            ],
+          },
+          { sql_name: `baccaratsapphire_tickets_bk`,
+            mongo_name: `baccaratsapphire_cuocs_bk`,
+            pipeline: `[
+              {"$project": {
+                "_id": 0, "freeBet": 1, "phien": 1, "uid": 1, "memberId": 1, "name": 1, "time": 1,
+                "banker": 1, "bankerPair": 1, "player": 1, "playerPair": 1, "tie": 1, "big": 1, "small": 1,
+                "betwin": 1, "thanhtoan": 1,
+                "totalAmount": {"$sum": ["$banker", "$bankerPair", "$player", "$playerPair", "$tie", "$big", "$small"]},
+                "currency": "$__archive.currency",
+                "isCash": "$__archive.isCash",
+                "archived": {"$ifNull": [{"$toBool": "$__archive.eventtime"}, false]}
+              }}
+            ]`,
+            columns: [
+              /* Metadata */
+              Object.extend({mongo_name: `time`       , sql_name: `time`      }, type.date ),
+              Object.extend({mongo_name: `phien`      , sql_name: `roundId`   }, type.int64),
+              /* Member */
+              Object.extend({mongo_name: `uid`        , sql_name: `uid`       }, type.str  ),
+              Object.extend({mongo_name: `memberId`   , sql_name: `memberId`  }, type.int64),
+              Object.extend({mongo_name: `name`       , sql_name: `nickname`  }, type.str  ),
+              Object.extend({mongo_name: `currency`   , sql_name: `currency`  }, type.str  ),
+              /* Summary */
+              Object.extend({mongo_name: `totalAmount`, sql_name: `stake`     }, type.int64),
+              Object.extend({mongo_name: `betwin`     , sql_name: `payout`    }, type.float),
+              /* Attributes */
+              Object.extend({mongo_name: `thanhtoan`  , sql_name: `settled`   }, type.bool ),
+              Object.extend({mongo_name: `freeBet`    , sql_name: `freeBet`   }, type.bool ),
+              Object.extend({mongo_name: `isCash`     , sql_name: `isCash`    }, type.bool ),
+              Object.extend({mongo_name: `archived`   , sql_name: `archived`  }, type.bool ),
+              /* Bet Choices */
+              Object.extend({mongo_name: `big`        , sql_name: `big`       }, type.int64),
+              Object.extend({mongo_name: `small`      , sql_name: `small`     }, type.int64),
+              Object.extend({mongo_name: `banker`     , sql_name: `banker`    }, type.int64),
+              Object.extend({mongo_name: `tie`        , sql_name: `tie`       }, type.int64),
+              Object.extend({mongo_name: `player`     , sql_name: `player`    }, type.int64),
+              Object.extend({mongo_name: `bankerPair` , sql_name: `bankerPair`}, type.int64),
+              Object.extend({mongo_name: `playerPair` , sql_name: `playerPair`}, type.int64),
+            ],
+          },
           /** BAUCUA (G) */
           { sql_name: `baucua_rounds_bk`,
             mongo_name: `baucua_phiens_bk`,

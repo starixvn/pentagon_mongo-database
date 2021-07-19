@@ -997,6 +997,81 @@ dbs.summary.game_summary_config.insertMany([
         }
     }
 
+,   {   gameId: 32
+    ,   owGameTypeId: 3832
+    ,   name: {
+            en: `Baccarat Diamond`
+        ,   vi: `Cào Baccarat Diamond`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `baccaratdiamond`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 33
+    ,   owGameTypeId: 3833
+    ,   name: {
+            en: `Baccarat Sapphire`
+        ,   vi: `Cào Baccarat Sapphire`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `baccaratsapphire`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 34
+    ,   owGameTypeId: 3834
+    ,   name: {
+            en: `Baccarat Ruby`
+        ,   vi: `Cào Baccarat Ruby`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `baccaratruby`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            map: `phien`
+        ,   time: `$time`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
     ,   {   gameId: 35
         ,   owGameTypeId: 1643
         ,   name: {
