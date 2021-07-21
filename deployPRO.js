@@ -13,7 +13,7 @@
 
     const logger = new Shell.Log(`DEPLOY-PRO`);
 
-    [ 'deployClasses.js',
+    [ 'deployFactories.js',
       'deployScripts.js',
       'deployIndexes.js',
       'deployBI.js',
@@ -42,7 +42,7 @@
 
     const logger = new Shell.Log(`DEPLOY-PRO-ARC`);
 
-    [ 'deployClasses.js',
+    [ 'deployFactories.js',
       'deployScripts.js',
       'deployIndexesArc.js',
       'deployBIArc.js',

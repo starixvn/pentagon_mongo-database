@@ -13,7 +13,7 @@
 
     const logger = new Shell.Log(`DEPLOY-SIT`);
 
-    [ 'deployClasses.js',
+    [ 'deployFactories.js',
       'deployScripts.js',
       'deployIndexes.js',
       'deployIndexesArc.js',

@@ -13,7 +13,7 @@
 
     const logger = new Shell.Log(`DEPLOY-UAT`);
 
-    [ 'deployClasses.js',
+    [ 'deployFactories.js',
       'deployScripts.js',
       'deployIndexes.js',
       'deployIndexesArc.js',

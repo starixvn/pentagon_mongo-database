@@ -9,7 +9,7 @@
 
         const logger = new Shell.Log(`DEPLOY-LOCAL`);
 
-        [   'deployClasses.js'
+        [   'deployFactories.js'
         ,   'deployScripts.js'
         ,   'deployIndexes.js'
         ,   'deployIndexesArc.js'
