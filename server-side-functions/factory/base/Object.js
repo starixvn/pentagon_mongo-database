@@ -38,10 +38,13 @@ deploy: {
       return !$Object.isFunction(obj);
     },
     isArray: (obj) => {
-      return obj instanceof Array;
+      return Array.isArray(obj);
     },
     isNotArray: (obj) => {
-      return !$Object.isArray(obj);
+      return !Array.isArray(obj);
+    },
+    typeof: (obj) => {
+      return typeof obj;
     },
   };
 
