@@ -1,13 +1,39 @@
 deploy: {
-  const $Object = {
+  const $Object = function () {
+    /** Self construct */
+    if (!(this instanceof $Object)) return new $Object();
+
+    /** Basic function */
+    const _toString = () => {
+      return this.help();
+    };
+
+    const _descriptor = {
+      writable: false,
+      enumerable: true,
+    };
+    Object.defineProperties(this, {
+      toString: Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
+      tojson  : Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
+    });
+
+    Object.extend(this, $Object);
+    $Object.deepFreeze(this);
+    return this;
+  };
+  const __$Object__ = {
     help: () => {
       return `\
 [$Object]
   .deepFreeze(obj)
+  .sortProperties(obj)
+  .typeof(obj)
 `;
     },
+  };
+  const $ObjectExt = {
     deepFreeze: (obj) => {
-      if ($Object.isObject(obj) + $Object.isFunction(obj) > 0) {
+      if ((typeof obj == "object") + (typeof obj == "function") > 0) {
         Object.getOwnPropertyNames(obj).forEach(k => {
           if (k !== "constructor") {
             $Object.deepFreeze(obj[k]);
@@ -25,26 +51,26 @@ deploy: {
         {},
       );
     },
-    isObject: (obj) => {
-      return typeof obj == "object";
-    },
-    isNotObject: (obj) => {
-      return !$Object.isObject(obj);
-    },
-    isFunction: (obj) => {
-      return typeof obj == "function";
-    },
-    isNotFunction: (obj) => {
-      return !$Object.isFunction(obj);
-    },
-    isArray: (obj) => {
-      return Array.isArray(obj);
-    },
-    isNotArray: (obj) => {
-      return !Array.isArray(obj);
-    },
     typeof: (obj) => {
       return typeof obj;
+    },
+    toArrayIfNot: (obj) => {
+      return Array.isArray(obj) ? obj : [obj];
+    },
+    valueOf: (obj) => {
+      return obj.valueOf();
+    },
+    filterEqualUsingValueOf: function (obj) {
+      if (obj == null) {
+        return false;
+      }
+      return this.arr.map($Object.valueOf).indexOf(obj.valueOf()) >= 0;
+    },
+    filterNotEqualUsingValueOf: function (obj) {
+      if (obj == null) {
+        return false;
+      }
+      return this.arr.map($Object.valueOf).indexOf(obj.valueOf()) < 0;
     },
   };
 
@@ -58,8 +84,10 @@ deploy: {
   };
   const value = new Code(`\
 (() => {
-  const $Object = ${tojson($Object)};
-  $Object.toString = $Object.tojson = () => {return this.help()};
+  const $Object = Object.extend(${tojson($Object)}, ${tojson($ObjectExt)});
+  $Object.prototype = ${tojson(__$Object__)};
+  $Object.toString = $Object.tojson = () => {return this.prototype.help()};
+  $Object.prototype.toString = $Object.prototype.tojson = () => {return this.help()};
   $Object.deepFreeze($Object);
   return $Object;
 })()`);

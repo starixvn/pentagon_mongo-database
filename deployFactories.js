@@ -19,6 +19,7 @@
 
   [ 'server-side-functions/factory/base/Object.js',
     'server-side-functions/factory/base/Deploy.js',
+    'server-side-functions/factory/base/Check.js',
     'server-side-functions/factory/base/Schema.js',
   ].forEach(deploy);
 

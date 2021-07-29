@@ -141,5 +141,5 @@
 })()`);
 
   /** Deploy */
-  $Deploy(`PROGRAM`).run(_id, version, changelog, value);
+  $Deploy(`PROG`).run(_id, version, changelog, value);
 }

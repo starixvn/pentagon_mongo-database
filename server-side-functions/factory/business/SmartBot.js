@@ -278,8 +278,8 @@
       _assert.setTitle(_title);
       _assert.try(
         `Data is not loaded properly`,
-        _data.every($Object.isArray),
-        _data.every(data => data.every($Object.isObject)),
+        _data.every($Check.isArray),
+        _data.every(data => data.every($Check.isObject)),
         _data.every(data => data.every(obj => obj.hasOwnProperty(`missingBankMems`))),
       );
       return !_assert.hasError();

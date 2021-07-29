@@ -26,10 +26,10 @@
       });
     };
     const _parseSchemaObject = function (obj) {
-      if ($Object.isArray(obj)) {
+      if ($Check.isArray(obj)) {
         return obj.map(_parseSchemaObject);
       }
-      if ($Object.isObject(obj)) {
+      if ($Check.isObject(obj)) {
         const schObj = {};
         Object.keys(obj).forEach(_parseSchemaObjectField, {input: obj, result: schObj});
         return schObj;
@@ -46,24 +46,25 @@
       return `${key}: ${_getSchemaString(this.obj[key])}`;
     };
     const _getSchemaString = (sch) => {
-      if ($Object.isArray(sch)) {
+      if ($Check.isArray(sch)) {
         return `[${sch.map($Object.typeof).join(', ')}]`;
       }
-      if ($Object.isObject(sch)) {
+      if ($Check.isObject(sch)) {
         return `{${Object.keys(sch).map(_mapKeyObjectToString, {obj: sch}).join(', ')}}`;
       }
-      if ($Object.isFunction(sch)) {
+      if ($Check.isFunction(sch)) {
         return `class ${sch.name}`;
       }
       return tojsononeline(sch);
     };
     const _verbostTestField = (key, thisObj) => {
-      const keyLen = [...Object.keys(thisObj.sch), ...Object.keys(thisObj.obj)].reduce(_reduceMaxLength, 0);
+      const obj = thisObj.obj || {};
+      const keyLen = [...Object.keys(thisObj.sch), ...Object.keys(obj)].reduce(_reduceMaxLength, 0);
       if (isVerbose) {
         const mandatory = thisObj.sch[key].mandatory ? '!' : ' ';
         let schema = _getSchemaString(thisObj.sch[key].value);
         _logger.verbose(`Test ${key.pad(keyLen, 1)}`, `[${mandatory}] - ${schema}`);
-        _logger.verbose(`Test ${key.pad(keyLen, 1)}`, `      » ${tojsononeline(thisObj.obj[key])}`);
+        _logger.verbose(`Test ${key.pad(keyLen, 1)}`, `      » ${tojsononeline(obj[key])}`);
       }
     };
     const _testFieldSchemaArray = function (sch) {
@@ -78,10 +79,21 @@
       return !!result.value;
     };
     const _testField = function (key) {
-      _verbostTestField(key, this);
-
       /** [NG] No need to check if failed */
       if (!this.result.value) return this.result.value;
+
+      /** Print verbose info */
+      _verbostTestField(key, this);
+
+      /** [NG] Cannot test null object */
+      if ($Check.isNull(this.obj)) {
+        return this.result.value &= 0;
+      }
+
+      /** If tested object is an Array, combine result of every items */
+      if ($Check.isArray(this.obj[key])) {
+        return this.result.value &= this.obj[key].every(item => _testSchema({[key]: item}, {[key]: this.sch[key]}));
+      }
 
       /** [OK] Value can be null if the field is not mandatory */
       if ((!this.sch[key].mandatory) && (this.obj[key] == null)) {
@@ -96,14 +108,14 @@
         return this.result.value &= 1;
       }
       /** If defined schema is array, only need one OK */
-      if ($Object.isArray(this.sch[key].value)) {
+      if ($Check.isArray(this.sch[key].value)) {
         return this.result.value &= this.sch[key].value.some(_testFieldSchemaArray, {obj: this.obj, sch: this.sch, key: key});
       }
       /** If defined schema is object, need nested check */
-      if ($Object.isObject(this.sch[key].value)) {
+      if ($Check.isObject(this.sch[key].value)) {
         return this.result.value &= _testSchema(this.obj[key], this.sch[key].value);
       }
-      return this.result.value &= false;
+      return this.result.value &= 0;
     };
     const _testSchema = (obj, sch) => {
       const result = {value: 1};
@@ -114,7 +126,7 @@
       return !!result.value;
     };
     const _test = (obj) => {
-      if (!obj) return false;
+      if ($Check.isNotObject(obj) && $Check.isNotFunction(obj)) return false;
       return _testSchema(obj, schObj);
     };
 

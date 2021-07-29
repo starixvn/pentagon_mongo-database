@@ -109,6 +109,17 @@
       backwards: false,
     }
   };
+  const $CollationExt = {
+    toSimple: (obj) => {
+      if ($Collation.is$Collation(obj)) {
+        return obj.toSimple();
+      }
+      return null;
+    },
+    is$Collation: (obj) => {
+      return $Schema({'!data': $Collation}).test({data: obj});
+    },
+  };
 
   /** Define deploy object */
   const _id = `$Collation`;
@@ -120,7 +131,7 @@
   };
   const value = new Code(`\
 (() => {
-  const $Collation = ${tojson($Collation)};
+  const $Collation = Object.extend(${tojson($Collation)}, ${tojson($CollationExt)});
   $Collation.prototype = ${tojson(__$Collation__)};
   $Collation.toString = $Collation.tojson = function () {return this.prototype.help()};
   $Collation.prototype.toString = $Collation.prototype.tojson = function () { return this.help(); }
@@ -130,5 +141,5 @@
 })()`);
 
   /** Deploy */
-  $Deploy(`SERVER`).run(_id, version, changelog, value);
+  $Deploy(`SRV`).run(_id, version, changelog, value);
 }

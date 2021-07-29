@@ -63,7 +63,7 @@
     Object.defineProperties(this, {
       toString: Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
       tojson  : Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
-      run     : Object.extend({value: function (...p) { return _run(...p) }}, _descriptor),
+      run     : Object.extend({value: function (...p) { return _run     (...p) }}, _descriptor),
     });
 
     $Object.deepFreeze(this);

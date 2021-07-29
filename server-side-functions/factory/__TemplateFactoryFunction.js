@@ -37,6 +37,11 @@
 `;
     },
   };
+  const $ClassExt = {
+    is$Class: (obj) => {
+      return $Schema({'!data': $Class}).test({data: obj});
+    },
+  };
 
   /** Define deploy object */
   const _id = `$Class`;
@@ -48,7 +53,7 @@
   };
   const value = new Code(`\
 (() => {
-  const $Class = ${tojson($Class)};
+  const $Class = Object.extend(${tojson($Class)}, ${tojson($ClassExt)});
   $Class.prototype = ${tojson(__$Class__)};
   $Class.toString = $Class.tojson = function () {return this.prototype.help()};
   $Class.prototype.toString = $Class.prototype.tojson = function () { return this.help(); }

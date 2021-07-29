@@ -96,5 +96,5 @@
 })()`);
 
   /** Deploy */
-  $Deploy(`SERVER`).run(_id, version, changelog, value);
+  $Deploy(`SRV`).run(_id, version, changelog, value);
 }

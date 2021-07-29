@@ -8,7 +8,7 @@
     const _assert = $Assert();
     _assert.setLogger(_logger);
 
-    const idxSch = $Schema({
+    const indexSchema = $Schema({
       '!key': "object",
       'name': "string",
       'unique': "boolean",
@@ -43,7 +43,7 @@
     };
     const _parseIndexObject = (obj) => {
       const title = ` Audit  `;
-      if (!idxSch.test(obj)) {
+      if (!indexSchema.test(obj)) {
         _logger.err(title, `[${coll._shortName}] • [${tojsononeline(obj)}]`);
         _logger.err(title, `Index object is invalid`);
         return null;
@@ -108,7 +108,7 @@
       }
     };
     const _dropIndexes = (...idxNames) => {
-      const idxs = $Object.isArray(idxNames[0]) ? idxNames[0] : idxNames;
+      const idxs = $Check.isArray(idxNames[0]) ? idxNames[0] : idxNames;
       if (idxs.length == 0) return;
 
       _logger.info(`  Drop  `, `[${coll._shortName}] • [${idxs.join('] [')}]`);
@@ -150,11 +150,11 @@
       _usrIdxs[_generateIndexName(_idx)] = _idx;
     };
     const _addUserIndexes = (...idxs) => {
-      const idxObjs = $Object.isArray(idxs[0]) ? idxs[0] : idxs;
+      const idxObjs = $Check.isArray(idxs[0]) ? idxs[0] : idxs;
       idxObjs.forEach(_addUserIndex);
     };
     const _removeUserIndexes = (...idxNames) => {
-      const idxs = $Object.isArray(idxNames[0]) ? idxNames[0] : idxNames;
+      const idxs = $Check.isArray(idxNames[0]) ? idxNames[0] : idxNames;
       idxs.forEach(_ => {
         delete _usrIdxs[_];
       });
@@ -255,5 +255,5 @@
 })()`);
 
   /** Deploy */
-  $Deploy(`SERVER`).run(_id, version, changelog, value);
+  $Deploy(`SRV`).run(_id, version, changelog, value);
 }
