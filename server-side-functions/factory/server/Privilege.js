@@ -22,8 +22,7 @@
       if (privObj == null) {
         return `Invalid [$Privilege]`;
       }
-      return `\
-[$Privilege] ${privObj.resource.db}.${privObj.resource.collection || '*'}`;
+      return `[$Privilege] ${privObj.resource.db}.${privObj.resource.collection || '*'}`;
     };
     const _valueOf = () => {
       if (privObj == null) {
