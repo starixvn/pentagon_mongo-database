@@ -7,10 +7,15 @@
     const _logger = $Log(`PRIVILEGE`);
 
     const privSchema = $Schema({
-      '!resource': {
-        '!db': "string",
-        '!collection': "string",
-      },
+      '!resource': [
+        { '!db'         : "string",
+          '!collection' : "string",
+        },
+        { '!anyResource': "boolean",
+        },
+        { '!cluster'    : "boolean",
+        },
+      ],
       '!actions': "string",
     });
 
@@ -19,13 +24,23 @@
 
     /** Basic function */
     const _toString = () => {
-      if (privObj == null) {
-        return `Invalid [$Privilege]`;
+      let str = `[$Privilege]`;
+      if (!privObj) {
+        str = `Invalid [$Privilege]`;
       }
-      return `[$Privilege] ${privObj.resource.db}.${privObj.resource.collection || '*'}`;
+      if ($Check.isNotNull(privObj.resource.db) + $Check.isNotNull(privObj.resource.collection)) {
+        str = `[$Privilege] ${privObj.resource.db || '*'}.${privObj.resource.collection || '*'}`;
+      }
+      if ($Check.isNotNull(privObj.resource.anyResource)) {
+        str = `[$Privilege] anyResource`;
+      }
+      if ($Check.isNotNull(privObj.resource.cluster)) {
+        str = `[$Privilege] cluster`;
+      }
+      return str;
     };
     const _valueOf = () => {
-      if (privObj == null) {
+      if (!privObj) {
         return null;
       }
       return `\
@@ -48,7 +63,7 @@ ${privObj.resource.db}.${privObj.resource.collection || '*'}
     }
     const _genData = () => {
       if ($Privilege.is$Privilege(db)) {
-        return _genDataObj(db.getData());
+        return _genDataObj(db.getDef());
       }
       if (privSchema.test(db)) {
         return _genDataObj(db);
@@ -66,7 +81,13 @@ ${privObj.resource.db}.${privObj.resource.collection || '*'}
       }
       return _genDataObj(data);
     };
-    const _getData = () => {
+    const _getRaw = () => {
+      return privObj;
+    };
+    const _getRef = () => {
+      return privObj;
+    };
+    const _getDef = () => {
       return privObj;
     };
 
@@ -78,7 +99,9 @@ ${privObj.resource.db}.${privObj.resource.collection || '*'}
       toString: Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
       tojson  : Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
       valueOf : Object.extend({value: function (...p) { return _valueOf (...p) }}, _descriptor),
-      getData : Object.extend({value: function (...p) { return _getData (...p) }}, _descriptor),
+      getRaw  : Object.extend({value: function (...p) { return _getRaw  (...p) }}, _descriptor),
+      getRef  : Object.extend({value: function (...p) { return _getRef  (...p) }}, _descriptor),
+      getDef  : Object.extend({value: function (...p) { return _getDef  (...p) }}, _descriptor),
     });
 
     _genData();
@@ -89,7 +112,9 @@ ${privObj.resource.db}.${privObj.resource.collection || '*'}
     help: function () {
       return `\
 [$Privilege](db, collection, ...actions) - Privilege object helper
-  .getData() - Return the privilege object
+  .getRaw() - Return raw privilege object
+  .getRef() - Return the privilege object used for reference
+  .getDef() - Return the privilege object used for definition
 `;
     },
   };
@@ -100,9 +125,15 @@ ${privObj.resource.db}.${privObj.resource.collection || '*'}
       read    : [`find`, `listIndexes`],
       list    : [`listCollections`],
     },
-    getData: (obj) => {
+    getRef: (obj) => {
       if ($Privilege.is$Privilege(obj)) {
-        return obj.getData();
+        return obj.getRef();
+      }
+      return null;
+    },
+    getDef: (obj) => {
+      if ($Privilege.is$Privilege(obj)) {
+        return obj.getDef();
       }
       return null;
     },

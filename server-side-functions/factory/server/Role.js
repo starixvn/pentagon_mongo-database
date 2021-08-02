@@ -20,13 +20,13 @@
 
     /** Basic function */
     const _toString = () => {
-      if (roleObj == null) {
+      if (!roleObj) {
         return `Invalid [$Role]`;
       }
       return `[$Role] ${roleObj.db._name}.${roleObj.role}`;
     };
     const _valueOf = () => {
-      if (srvRoleObj == null) {
+      if (!srvRoleObj) {
         return null;
       }
       return `\
@@ -81,7 +81,7 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       return {
         role      : roleObj.role,
         roles     : roleObj.roles.map($Role.getRef).filter($Check.isNotNull),
-        privileges: roleObj.privileges.map($Privilege.getData).filter($Check.isNotNull),
+        privileges: roleObj.privileges.map($Privilege.getDef).filter($Check.isNotNull),
       };
     };
     const _mapRoleDB = (obj) => {
@@ -89,19 +89,20 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       return obj;
     }
     const _loadServerRole = () => {
-      if (roleObj == null) return;
+      const title = `ServerRole`;
+      if (!roleObj) return;
       const cmd = {
         rolesInfo: _getRef(),
         showPrivileges: true,
       };
       const res = roleObj.db.runCommand(cmd);
       if (!res.ok) {
-        _logger.err(`ServerRole`, res.errmsg);
+        _logger.err(title, res.errmsg);
         srvRoleObj = null;
         return;
       }
       if (res.roles.length == 0) {
-        _logger.warn(`ServerRole`, `[${roleObj.role}] role does not exist on server.`);
+        _logger.warn(title, `[${roleObj.role}] role does not exist on server.`);
         srvRoleObj = null;
         return;
       }
@@ -118,13 +119,14 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       return srvRoleObj;
     };
     const _syncRole = () => {
+      const title = `Sync`;
       _loadServerRole();
       if (!srvRoleObj) {
-        _logger.warn(`Sync`, `Error loading server role. Local role is not synced.`);
+        _logger.warn(title, `Error loading server role. Local role is not synced.`);
         return;
       }
       if (roleObj == srvRoleObj) {
-        _logger.info(`Sync`, `Local role has already matched with server.`);
+        _logger.info(title, `Local role has already matched with server.`);
         return;
       }
       roleObj = srvRoleObj;
@@ -137,10 +139,11 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       };
       const granting = roleObj.roles.filter($Object.filterNotEqualUsingValueOf, {arr: srvRoleObj.roles});
       if (granting.length > 0) {
-        cmd.roles = granting.map($Role.getRef);
+        cmd.roles = granting.map($Role.getRef).filter($Check.isNotNull);
         const res = srvRoleObj.db.runCommand(cmd);
         if (!res.ok) {
           _logger.err(title, res.errmsg);
+          return;
         }
         _logger.info(title, `${cmd.roles.length} roles granted to [${cmd.grantRolesToRole}]`);
       }
@@ -153,17 +156,18 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       };
       const granting = roleObj.privileges.filter($Object.filterNotEqualUsingValueOf, {arr: srvRoleObj.privileges});
       if (granting.length > 0) {
-        cmd.privileges = granting.map($Privilege.getData);
+        cmd.privileges = granting.map($Privilege.getDef).filter($Check.isNotNull);
         const res = srvRoleObj.db.runCommand(cmd);
         if (!res.ok) {
           _logger.err(title, res.errmsg);
+          return;
         }
         _logger.info(title, `${cmd.privileges.length} privileges granted to [${cmd.grantRolesToRole}]`);
       }
     };
     const _deployGrantedRole = () => {
       _loadServerRole();
-      if (srvRoleObj.isBuiltin) return;
+      if (!srvRoleObj || srvRoleObj.isBuiltin) return;
       _deployGrantedRoles();
       _deployGrantedPrivileges();
     };
@@ -175,10 +179,11 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       };
       const revoking = srvRoleObj.roles.filter($Object.filterNotEqualUsingValueOf, {arr: roleObj.roles});
       if (revoking.length > 0) {
-        cmd.roles = revoking.map($Role.getRef);
+        cmd.roles = revoking.map($Role.getRef).filter($Check.isNotNull);
         const res = srvRoleObj.db.runCommand(cmd);
         if (!res.ok) {
           _logger.err(title, res.errmsg);
+          return;
         }
         _logger.info(title, `${cmd.roles.length} roles revoked from [${cmd.revokeRolesFromRole}]`);
       }
@@ -191,32 +196,35 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       };
       const revoking = srvRoleObj.privileges.filter($Object.filterNotEqualUsingValueOf, {arr: roleObj.privileges});
       if (revoking.length > 0) {
-        cmd.privileges = revoking.map($Privilege.getData);
+        cmd.privileges = revoking.map($Privilege.getRef).filter($Check.isNotNull);
         const res = srvRoleObj.db.runCommand(cmd);
         if (!res.ok) {
           _logger.err(title, res.errmsg);
+          return;
         }
         _logger.info(title, `${cmd.privileges.length} privileges granted to [${cmd.grantRolesToRole}]`);
       }
     };
     const _deployRevokedRole = () => {
       _loadServerRole();
-      if (srvRoleObj.isBuiltin) return;
+      if (!srvRoleObj || srvRoleObj.isBuiltin) return;
       _deployRevokedRoles();
       _deployRevokedPrivileges();
     };
     const _deploy = () => {
       const title = `CreateRole`;
-      if (srvRoleObj == null) {
+      _loadServerRole();
+      if (!srvRoleObj) {
         const cmd = {
           createRole: roleObj.role,
-          privileges: roleObj.privileges.map($Privilege.getData),
-          roles: roleObj.roles.map($Role.getRef),
+          privileges: roleObj.privileges.map($Privilege.getRef).filter($Check.isNotNull),
+          roles: roleObj.roles.map($Role.getRef).filter($Check.isNotNull),
           writeConcern: {w: `majority`},
         };
         const res = roleObj.db.runCommand(cmd);
         if (!res.ok) {
           _logger.err(title, res.errmsg);
+          return;
         }
         _logger.info(title, `[${cmd.createRole}] role created`);
       }
@@ -230,7 +238,7 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
         return;
       }
       _loadServerRole();
-      if (srvRoleObj == null) {
+      if (!srvRoleObj) {
         _logger.warn(title, `Cannot confirm role's status on server. Aborting...`);
         return;
       }
@@ -241,6 +249,7 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
       const res = roleObj.db.runCommand(cmd);
       if (!res.ok) {
         _logger.err(title, res.errmsg);
+        return;
       }
       _logger.info(title, `[${cmd.dropRole}] role dropped`);
     };
@@ -303,7 +312,7 @@ ${srvRoleObj.db._name}.${srvRoleObj.role}
     });
 
     _genData();
-    if (roleObj == null) return null;
+    if (!roleObj) return null;
     if (roleObj.roles.length + roleObj.privileges.length == 0) {
       _syncRole();
     } else {
