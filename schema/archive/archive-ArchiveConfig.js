@@ -1022,6 +1022,24 @@ if ((2 ** Saba.env() & 14) > 0) {
           },
         ],
       },
+      { _id: 39099,
+        from: {
+          db: 'minigame',
+          coll: 'jackpots',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'jackpots_bk',
+        },
+        config: {
+          timeField: 'hitTime',
+          cutOffsetHours: -24,
+          join: 'hitAt',
+          logField: '',
+          logValue: 'hitAt',
+        },
+        childs: [],
+      },
       { _id: 25001,
         from: {
           db: 'minigame',

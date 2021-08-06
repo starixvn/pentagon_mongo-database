@@ -32,8 +32,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -76,8 +78,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$multiply: [
                 {$add: [
@@ -113,8 +117,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [
                 {$ifNull: [`$stag`      , `$0`]}
@@ -149,8 +155,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -193,8 +201,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -237,8 +247,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -281,8 +293,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$dragon`, `$tie`, `$tiger`]
         ,   payout: [`$betwin`]
@@ -310,8 +324,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -339,8 +355,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$even`, `$odd`, `$red3`, `$red4`, `$white3`, `$white4`]
         ,   payout: [`$betwin`]
@@ -368,8 +386,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
         ,   payout: [`$betwin`]
@@ -396,8 +416,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -425,8 +447,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -454,8 +478,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -483,8 +509,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -512,8 +540,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -541,8 +571,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -570,8 +602,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -599,8 +633,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -628,8 +664,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -653,8 +691,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_rounds_bk`
         }
     ,   fields: {
-            map: `id`
+            local: `id`
+        ,   map: `id`
         ,   time: `$startTime`
+        ,   memberId: `memberId`
         ,   settled: `$settled`
         ,   stake: [`$totalBet`]
         ,   payout: [`$win`]
@@ -682,8 +722,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
@@ -711,8 +753,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$odd`, `$even`, `$white4`, `$white3`, `$red2`, `$red3`, `$red4`]
         ,   payout: [`$betwin`]
@@ -740,8 +784,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$bet`]
         ,   payout: [`$betwin`]
@@ -769,8 +815,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$amount`]
         ,   payout: [
@@ -806,8 +854,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
             )
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: (
                 (2 ** Saba.env() & 6) > 0 ? [`$totalAmount`]
@@ -839,8 +889,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$stag`, `$gourd`, `$rooster`, `$fish`, `$crab`, `$prawn`, `$mountain`, `$ocean`, `$anyTriple`]
         ,   payout: [`$betwin`]
@@ -868,8 +920,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$player`, `$banker`, `$tie`, `$big`, `$small`, `$playerPair`, `$bankerPair`]
         ,   payout: [`$betwin`]
@@ -897,8 +951,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
@@ -926,8 +982,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_rounds_bk`
         }
     ,   fields: {
-            map: `id`
+            local: `id`
+        ,   map: `id`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$paid`
         ,   stake: [
                 {$multiply: [`$totalAmount`, {$toInt: {$not: `$freeSpin`}}]}
@@ -957,8 +1015,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalBet`]
         ,   payout: [`$betwin`]
@@ -986,8 +1046,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_ones_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
@@ -1011,8 +1073,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
         ,   payout: [`$betwin`]
@@ -1036,8 +1100,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
         ,   payout: [`$betwin`]
@@ -1061,8 +1127,10 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
         ,   payout: [`$betwin`]
@@ -1086,11 +1154,46 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         ,   postfix: `_cuocs_bk`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$red`, `$black`, `$diamonds`, `$hearts`, `$spades`, `$clubs`]
         ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
+,   {   gameId: 99
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 2) > 0 ? 1699
+    :   (2 ** Saba.env() & 12) > 0 ? 3899
+    :   null
+    )
+    ,   name: {
+            en: `Jackpot Prize`
+        ,   vi: `Jackpot Prize`
+        ,   grp: `Slots`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `jackpots_bk`
+        ,   round: ``
+        ,   postfix: ``
+        }
+    ,   fields: {
+            local: `hitAt`
+        ,   map: `hitAt`
+        ,   time: `$hitTime`
+        ,   memberId: `winnerId`
+        ,   settled: `$winnerId`
+        ,   stake: [0]
+        ,   payout: [
+                {$multiply: [`$amount`, `$winningRatio`]}
+            ]
         }
     ,   config: {
             hasCurrency: true
