@@ -1142,7 +1142,11 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
     }
 
 ,   {   gameId: 35
-    ,   owGameTypeId: 1643
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 2) > 0 ? 1643
+    :   (2 ** Saba.env() & 12) > 0 ? 3831
+    :   null
+    )
     ,   name: {
             en: `Three Cards`
         ,   vi: `Ba Lá Đỏ Đen`
