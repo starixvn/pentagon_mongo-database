@@ -92,31 +92,23 @@ deploy: {
         const _to = _getTime(_from.valueOf() + _roundDuration, round);
         const agg = [];
 
-        let tmpArr, tmpObj;
-
-        tmpArr = [];
-        (tmpObj = {})[conf.fields.time.replace('$', '')] = {$gte: _from};
-        tmpArr.push(tmpObj);
-        (tmpObj = {})[conf.fields.time.replace('$', '')] = {$lt: _to};
-        tmpArr.push(tmpObj);
-        agg.push({$match: {$and: tmpArr}});
-
-        agg.push({$project: {_id: 0, id: 1}});
+        agg.push({$match: {$and: [
+          {[conf.fields.time.replace('$', '')]: {$gte: _from}},
+          {[conf.fields.time.replace('$', '')]: {$lt: _to}},
+        ]}});
+        agg.push({$project: {_id: 0, [conf.fields.local]: 1}});
         agg.push({$lookup: {
           from: conf.coll.group + conf.coll.postfix,
-          localField: `id`,
+          localField: conf.fields.local,
           foreignField: conf.fields.map,
           as: `bets`,
         }});
         agg.push({$unwind: `$bets`});
         agg.push({$replaceWith: `$bets`});
-
-        tmpArr = [];
-        tmpArr.push({memberId: {$gt: 0}});
-        (tmpObj = {})[conf.fields.settled.replace('$', '')] = true;
-        tmpArr.push(tmpObj);
-        agg.push({$match: {$and: tmpArr}});
-
+        agg.push({$match: {$and: [
+          {[conf.fields.memberId]: {$gt: 0}},
+          {$expr: {$gt: [{$toInt: conf.fields.settled}, 0]}},
+        ]}});
         agg.push({$project: {
           _id: 0,
           stake: {$sum: conf.fields.stake},
@@ -126,7 +118,7 @@ deploy: {
         }});
         agg.push({$group: {
           _id: {
-            currency: `$__archive.currency`,
+            currency: {$ifNull: [`$__archive.currency`, null]},
             isCash: {$ifNull: [`$__archive.isCash`, null]},
           },
           stake: {$sum: `$stake`},
@@ -141,11 +133,11 @@ deploy: {
 
         return agg;
       };
-      const _insertCurrency = (conf) => {
+      const _insertCurrencyByUID = (conf) => {
         const timer = new Tool.Timer();
         const uidsCurrency = [];
         mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
-          {$match: {'__archive.currency': {$exists: false}, memberId: {$gt: 0}}},
+          {$match: {'__archive.currency': {$exists: false}, [conf.fields.memberId]: {$gt: 0}}},
           {$project: {_id: 0, uid: 1}},
           {$group: {_id: `$uid`}},
         ]).forEach(doc => {
@@ -154,7 +146,7 @@ deploy: {
 
         const uidsCash = [];
         mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
-          {$match: {'__archive.isCash': {$exists: false}, memberId: {$gt: 0}}},
+          {$match: {'__archive.isCash': {$exists: false}, [conf.fields.memberId]: {$gt: 0}}},
           {$project: {_id: 0, uid: 1}},
           {$group: {_id: `$uid`}},
         ]).forEach(doc => {
@@ -181,8 +173,58 @@ deploy: {
         const res = mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].bulkWrite(updCurrencyPipe, {ordered: false});
 
         if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
-          _logger.info(`${conf.name.en} Insert User's Info`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
-          _logger.info(`${conf.name.en} Insert User's Info`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
+          _logger.info(`${conf.name.en} InsInfo uid`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
+          _logger.info(`${conf.name.en} InsInfo uid`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
+        }
+      };
+      const _insertCurrencyByMemberId = (conf) => {
+        const timer = new Tool.Timer();
+        const memberIdsCurrency = [];
+        mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
+          {$match: {'__archive.currency': {$exists: false}, [conf.fields.memberId]: {$gt: 0}}},
+          {$project: {_id: 0, [conf.fields.memberId]: 1}},
+          {$group: {_id: `$${conf.fields.memberId}`}},
+        ]).forEach(doc => {
+          memberIdsCurrency.push(doc._id);
+        });
+
+        const memberIdsCash = [];
+        mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].aggregate([
+          {$match: {'__archive.isCash': {$exists: false}, [conf.fields.memberId]: {$gt: 0}}},
+          {$project: {_id: 0, [conf.fields.memberId]: 1}},
+          {$group: {_id: `$${conf.fields.memberId}`}},
+        ]).forEach(doc => {
+          memberIdsCash.push(doc._id);
+        });
+
+        const updCurrencyPipe = [];
+        mongo.getDB(conf.coll.db).users.find(
+          {'local.memberId': {$in: memberIdsCurrency}},
+          {_id: 0, 'local.memberId': 1, 'local.currency': 1},
+        ).forEach(doc => {
+          updCurrencyPipe.push({updateMany: {
+            filter: {[conf.fields.memberId]: doc.local.memberId, '__archive.currency': {$exists: false}},
+            update: [
+              {$set: {'__archive.currency': {$literal: doc.local.currency}}}
+            ],
+          }});
+        });
+        mongo.getDB(conf.coll.db).users.find(
+          {'local.memberId': {$in: memberIdsCash}},
+          {_id: 0, 'local.memberId': 1, 'local.isCash': 1},
+        ).forEach(doc => {
+          updCurrencyPipe.push({updateMany: {
+            filter: {[conf.fields.memberId]: doc.local.memberId, '__archive.isCash': {$exists: false}},
+            update: [
+              {$set: {'__archive.isCash': {$literal: doc.local.isCash == null ? null : doc.local.isCash}}}
+            ],
+          }});
+        });
+        const res = mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.postfix}`].bulkWrite(updCurrencyPipe, {ordered: false});
+
+        if (res.deletedCount + res.insertedCount + res.matchedCount + res.upsertedCount > 0) {
+          _logger.info(`${conf.name.en} InsInfo memberId`, `Added into [${conf.coll.group + conf.coll.postfix}] collection in ${timer.getTimerDuration()} ms.`);
+          _logger.info(`${conf.name.en} InsInfo memberId`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
         }
       };
       const _getOldSummary = (time, round, conf) => {
@@ -201,18 +243,19 @@ deploy: {
 
         return summaries;
       };
-      const _runConfSummary = (time, round, conf) => {
+      const _runConfSummary = (time, round, conf, force = false) => {
         const _time = _getTime(time, round);
         const timer = new Tool.Timer();
         const coll = _getSummaryColl(round);
 
-        if (!_checkSummaryTime(_time, round)) {
+        if (!force && !_checkSummaryTime(_time, round)) {
           return;
         }
 
         // If tickets do not have currency field, insert currency for them
         if (!conf.config.hasCurrency) {
-          _insertCurrency(conf);
+          _insertCurrencyByUID(conf);
+          _insertCurrencyByMemberId(conf);
         }
 
         timer.register(`start`);
@@ -221,7 +264,7 @@ deploy: {
         const oldSums = _getOldSummary(_time, round, conf);
         timer.register(`oldSums`);
         // _logger.info(conf.name.en, `Got old summaries in ${timer.getDifferent(`agg`, `oldSums`)} ms.`);
-        const summaries = mongo.getDB(conf.coll.db)[conf.coll.group + conf.coll.round].aggregate(agg).toArray();
+        const summaries = mongo.getDB(conf.coll.db)[`${conf.coll.group}${conf.coll.round}`].aggregate(agg).toArray();
         timer.register(`summaries`);
         // _logger.info(conf.name.en, `Calculated summaries in ${timer.getDifferent(`oldSums`, `summaries`)} ms.`);
 
@@ -262,17 +305,17 @@ deploy: {
         });
         _logger.info(conf.name.en, `Done summarize data in ${timer.getTimerDuration()} ms`);
       };
-      const _runSummary = (time, round) => {
+      const _runSummary = (time, round, force = false) => {
         const _time = _getTime(time || (Date.now() - _getRoundDuration(round)), round);
         _logger.info(summaryDB, `Summary for ${_getTimeStr(_time, round)} started.`);
-        mongo.getDB(summaryDB).game_summary_config.find().forEach(conf => _runConfSummary(_time, round, conf));
+        mongo.getDB(summaryDB).game_summary_config.find().forEach(conf => _runConfSummary(_time, round, conf, force));
         _logger.info(summaryDB, `Data summary for ${_getTimeStr(_time, round)} finished.`);
       };
-      const _runDailySummary = (time) => {
-        return _runSummary(time, 'DAY');
+      const _runDailySummary = (time, force = false) => {
+        return _runSummary(time, 'DAY', force);
       };
-      const _runHourlySummary = (time) => {
-        return _runSummary(time, 'HOUR');
+      const _runHourlySummary = (time, force = false) => {
+        return _runSummary(time, 'HOUR', force);
       };
 
       const _descriptor = {
@@ -280,10 +323,10 @@ deploy: {
         enumerable: true,
       };
       Object.defineProperties(this, {
-        toString          : Object.extend({value: function () { return _toString() }}, _descriptor),
-        tojson            : Object.extend({value: function () { return _toString() }}, _descriptor),
-        runDailySummary   : Object.extend({value: function (time) { return _runDailySummary(time) }}, _descriptor),
-        runHourlySummary  : Object.extend({value: function (time) { return _runHourlySummary(time) }}, _descriptor),
+        toString          : Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
+        tojson            : Object.extend({value: function (...p) { return _toString(...p) }}, _descriptor),
+        runDailySummary   : Object.extend({value: function (...p) { return _runDailySummary(...p) }}, _descriptor),
+        runHourlySummary  : Object.extend({value: function (...p) { return _runHourlySummary(...p) }}, _descriptor),
       });
     }
   };
@@ -994,8 +1037,12 @@ deploy: {
 
   // SabaClub class
   const _id = `SabaClub`;
-  const version = `1.1.1`;
+  const version = `1.1.2`;
   const changelog = {
+    '1.1.2': [
+      `[SabaClub.Summary] Add force parameter to bypass time checking`,
+      `[SabaClub.Summary] Remove temporary object generation in aggregate`,
+    ],
     '1.1.1': [
       `[SabaClub.BetLogSummary] Add betCount to summary data`,
       `[SabaClub.BetLogProcessor] Fix missing system in data project`
