@@ -21,10 +21,11 @@ AS
 		@Var2:				[optional]		- Is this testing execution?
 				<DEFAULT>	NULL			- Treat as if testing
 
-	Version:	1.1.0
+	Version:	1.2.0
 	Revision:
+		- [1.2.0]	20210806@Billy		Migrate SC2 to vG2
 		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
-		- [1.0.0]	20210324@Billy		Release dbr.SB_BetLogSummary
+		- [1.0.0]	20210324@Billy		Release Noti.JackpotContributionReport
 		- [0.0.1]	20210324@Billy		Initital
 */
 /*
@@ -63,7 +64,8 @@ BEGIN;
 		,	@isTest			= ISNULL(@isTest, 1)
 		;
 
-	DECLARE	@VendorId		INT 			= 42
+	DECLARE	@VendorId		INT 			= 66
+		,	@Bettype		INT				= 3898
 		,	@Status			NVARCHAR(128)	= N'OK'
 		;
 
@@ -140,7 +142,7 @@ FROM		dbo.bettransRnG AS b WITH (NOLOCK)
 INNER JOIN	dbo.bettype AS g WITH (NOLOCK)
 		ON	b.gameId = g.typeid
 WHERE	b.vendorID = @VendorId
-	AND	b.gameID = 1698
+	AND	b.gameID = @Bettype
 	AND	b.Transdate3rd >= @ReportDate
 	AND	b.Transdate3rd < DATEADD(DAY, 1, @ReportDate)
 	AND	b.statusID NOT IN (101, 102, 0) -- Reject, Void, running
@@ -150,10 +152,10 @@ OPTION (RECOMPILE);
 ';
 
 		SELECT	@OW_Param = N'';
-		SELECT	@OW_Param += N'@VendorId INT, @ReportDate DATETIME';
+		SELECT	@OW_Param += N'@VendorId INT, @Bettype INT, @ReportDate DATETIME';
 
 		INSERT INTO	#OW_JPContribution (gameTypeId, gameType, currency, JPCont)
-		EXECUTE	DB061KBT.bodb02.sys.sp_executesql @OW_Query, @OW_Param, @VendorId, @ReportDate;
+		EXECUTE	DB061KBT.bodb02.sys.sp_executesql @OW_Query, @OW_Param, @VendorId, @Bettype, @ReportDate;
 
 		RAISERROR('', 0, 0) WITH NOWAIT;
 	END;
@@ -161,7 +163,7 @@ OPTION (RECOMPILE);
 	SELECT	@DS_Query = N'';
 	SELECT	@DS_Query += N'\
 SELECT	0 AS SC
-	,	1698 AS gameTypeId
+	,	' + CAST(@Bettype AS NVARCHAR(MAX)) + N' AS gameTypeId
 	,	cfg.gameId AS gameId
 	,	cfg.nameEN AS gameType
 	,	IFNULL(ds.currency, "null") AS currency
@@ -188,7 +190,7 @@ WHERE	cfg.groupName = "Slots"
 
 			DELETE	@Tmp_JPContribution;
 			INSERT INTO	@Tmp_JPContribution (SC, gameTypeId, gameId, gameType, currency, JPCont)
-			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0;
+			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0, 1;
 
 			MERGE INTO	#DS_JPContribution AS ds
 			USING		@Tmp_JPContribution AS tmp

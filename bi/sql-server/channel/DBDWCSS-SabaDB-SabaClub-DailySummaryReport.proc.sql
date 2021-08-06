@@ -188,7 +188,7 @@ BEGIN;
 				AND	ow.currency = sb.currency
 				AND	ow.isCash = sb.isCash
 	WHERE	COALESCE(ow.currency, sb.currency, N'') <> 'UUS'
-		AND	ISNULL(ow.gameTypeId, sb.gameTypeId) BETWEEN 1611 AND 1697
+		AND	ISNULL(ow.gameTypeId, sb.gameTypeId) NOT IN (1698)
 		AND	(	ISNULL(ow.betCount, 0) <> ISNULL(sb.betCount, 0)
 			OR	ISNULL(ow.stake, 0) <> ISNULL(sb.stake, 0)
 			OR	ISNULL(ow.payOut, 0) <> ISNULL(sb.payOut, 0)
