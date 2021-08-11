@@ -20,8 +20,10 @@ AS
 				<DEFAULT>	NULL			- Treat as if testing
 
 
-	Version:	2.0.0
+	Version:	2.1.0
 	Revision:
+		- [2.1.0]	20210806@Billy		Migrate SC2 to vG2
+		- [2.0.1]	20210722@Billy		Base SP updated for SIT environment support
 		- [2.0.0]	20210531@Billy		Split into SabaClub & vGaming report
 		- [1.0.2]	20210423@Billy		Update message format - [Gitlab: #060]
 		- [1.0.1]	20210218@Billy		Report by currency for SC3 - [Gitlab: #058]
@@ -123,7 +125,8 @@ BEGIN;
 	-- List of SCs --
 	INSERT INTO	@SCs
 			(SC, isExpanded, isCash, isDone)
-	VALUES	( 3,          1,   NULL,      0)
+	VALUES	( 2,          1,      1,      0)
+		,	( 3,          1,   NULL,      0)
 		;
 
 	BEGIN;	-- OW --
@@ -147,7 +150,7 @@ BEGIN;
 
 			DELETE	@Tmp_DailySummary;
 			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, payOut)
-			EXECUTE	dbr.SB_DailySummary @SC, @ReportDate;
+			EXECUTE	dbr.SB_DailySummary @SC, 1, @ReportDate;
 
 			MERGE INTO	#DS_DailySummary AS ds
 			USING		@Tmp_DailySummary AS tmp
@@ -186,6 +189,7 @@ BEGIN;
 				AND	ow.currency = sb.currency
 				AND	ow.isCash = sb.isCash
 	WHERE	COALESCE(ow.currency, sb.currency) <> 'UUS'
+		AND	ISNULL(ow.gameTypeId, sb.gameTypeId) NOT IN (3898)
 		AND	(	ISNULL(ow.betCount, 0) <> ISNULL(sb.betCount, 0)
 			OR	ISNULL(ow.stake, 0) <> ISNULL(sb.stake, 0)
 			OR	ISNULL(ow.payOut, 0) <> ISNULL(sb.payOut, 0)
