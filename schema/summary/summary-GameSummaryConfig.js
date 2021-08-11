@@ -8,16 +8,16 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {unique: true}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.summary.game_summary_config, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('summary').game_summary_config, idx.idxKeys, idx.idxOpts);
     });
 }
 
-dbs.summary.game_summary_config.remove({});
-dbs.summary.game_summary_config.insertMany([
+db.getSiblingDB('summary').game_summary_config.remove({});
+db.getSiblingDB('summary').game_summary_config.insertMany([
     {   gameId: 1
     ,   owGameTypeId: (
-            (2 ** Saba.env() & 6) > 0 ? 1612
-        :   (2 ** Saba.env() & 8) > 0 ? 3802
+            (2 ** Saba.env() & 2) > 0 ? 1612
+        :   (2 ** Saba.env() & 12) > 0 ? 3802
         :   null
         )
     ,   name: {
@@ -32,8 +32,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -60,8 +62,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 2
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1613
-    :   (2 ** Saba.env() & 8) > 0 ? 3803
+        (2 ** Saba.env() & 2) > 0 ? 1613
+    :   (2 ** Saba.env() & 12) > 0 ? 3803
     :   null
     )
     ,   name: {
@@ -76,8 +78,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$multiply: [
                 {$add: [
@@ -97,8 +101,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 3
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1614
-    :   (2 ** Saba.env() & 8) > 0 ? 3804
+        (2 ** Saba.env() & 2) > 0 ? 1614
+    :   (2 ** Saba.env() & 12) > 0 ? 3804
     :   null
     )
     ,   name: {
@@ -113,8 +117,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [
                 {$ifNull: [`$stag`      , `$0`]}
@@ -133,8 +139,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 4
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1615
-    :   (2 ** Saba.env() & 8) > 0 ? 3805
+        (2 ** Saba.env() & 2) > 0 ? 1615
+    :   (2 ** Saba.env() & 12) > 0 ? 3805
     :   null
     )
     ,   name: {
@@ -149,8 +155,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -177,8 +185,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 5
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1616
-    :   (2 ** Saba.env() & 8) > 0 ? 3806
+        (2 ** Saba.env() & 2) > 0 ? 1616
+    :   (2 ** Saba.env() & 12) > 0 ? 3806
     :   null
     )
     ,   name: {
@@ -193,8 +201,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -221,8 +231,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 6
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1617
-    :   (2 ** Saba.env() & 8) > 0 ? 3807
+        (2 ** Saba.env() & 2) > 0 ? 1617
+    :   (2 ** Saba.env() & 12) > 0 ? 3807
     :   null
     )
     ,   name: {
@@ -237,8 +247,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [{$ifNull: [`$totalAmount`, `$bet`]}]
         ,   payout: (
@@ -265,8 +277,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 7
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1618
-    :   (2 ** Saba.env() & 8) > 0 ? 3808
+        (2 ** Saba.env() & 2) > 0 ? 1618
+    :   (2 ** Saba.env() & 12) > 0 ? 3808
     :   null
     )
     ,   name: {
@@ -281,8 +293,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$dragon`, `$tie`, `$tiger`]
         ,   payout: [`$betwin`]
@@ -294,8 +308,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 8
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1619
-    :   (2 ** Saba.env() & 8) > 0 ? 3809
+        (2 ** Saba.env() & 2) > 0 ? 1619
+    :   (2 ** Saba.env() & 12) > 0 ? 3809
     :   null
     )
     ,   name: {
@@ -310,8 +324,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -323,8 +339,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 9
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1620
-    :   (2 ** Saba.env() & 8) > 0 ? 3823
+        (2 ** Saba.env() & 2) > 0 ? 1620
+    :   (2 ** Saba.env() & 12) > 0 ? 3823
     :   null
     )
     ,   name: {
@@ -339,8 +355,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$even`, `$odd`, `$red3`, `$red4`, `$white3`, `$white4`]
         ,   payout: [`$betwin`]
@@ -352,8 +370,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 10
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1621
-    :   (2 ** Saba.env() & 8) > 0 ? 3810
+        (2 ** Saba.env() & 2) > 0 ? 1621
+    :   (2 ** Saba.env() & 12) > 0 ? 3810
     :   null
     )
     ,   name: {
@@ -368,8 +386,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
         ,   payout: [`$betwin`]
@@ -381,7 +401,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 11
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1622
+        (2 ** Saba.env() & 2) > 0 ? 1622
+    :   (2 ** Saba.env() & 12) > 0 ? null
     :   null
     )
     ,   name: {
@@ -396,8 +417,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -409,8 +432,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 12
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1623
-    :   (2 ** Saba.env() & 8) > 0 ? 3811
+        (2 ** Saba.env() & 2) > 0 ? 1623
+    :   (2 ** Saba.env() & 12) > 0 ? 3811
     :   null
     )
     ,   name: {
@@ -425,8 +448,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -438,8 +463,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 13
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1624
-    :   (2 ** Saba.env() & 8) > 0 ? 3812
+        (2 ** Saba.env() & 2) > 0 ? 1624
+    :   (2 ** Saba.env() & 12) > 0 ? 3812
     :   null
     )
     ,   name: {
@@ -454,8 +479,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -467,8 +494,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 14
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1625
-    :   (2 ** Saba.env() & 8) > 0 ? 3813
+        (2 ** Saba.env() & 2) > 0 ? 1625
+    :   (2 ** Saba.env() & 12) > 0 ? 3813
     :   null
     )
     ,   name: {
@@ -483,8 +510,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -496,8 +525,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 15
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1626
-    :   (2 ** Saba.env() & 8) > 0 ? 3814
+        (2 ** Saba.env() & 2) > 0 ? 1626
+    :   (2 ** Saba.env() & 12) > 0 ? 3814
     :   null
     )
     ,   name: {
@@ -512,8 +541,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -525,8 +556,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 16
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1627
-    :   (2 ** Saba.env() & 8) > 0 ? 3815
+        (2 ** Saba.env() & 2) > 0 ? 1627
+    :   (2 ** Saba.env() & 12) > 0 ? 3815
     :   null
     )
     ,   name: {
@@ -541,8 +572,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -554,8 +587,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 17
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1628
-    :   (2 ** Saba.env() & 8) > 0 ? 3816
+        (2 ** Saba.env() & 2) > 0 ? 1628
+    :   (2 ** Saba.env() & 12) > 0 ? 3816
     :   null
     )
     ,   name: {
@@ -570,8 +603,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -583,8 +618,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 18
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1629
-    :   (2 ** Saba.env() & 8) > 0 ? 3817
+        (2 ** Saba.env() & 2) > 0 ? 1629
+    :   (2 ** Saba.env() & 12) > 0 ? 3817
     :   null
     )
     ,   name: {
@@ -599,8 +634,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -612,8 +649,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 19
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1630
-    :   (2 ** Saba.env() & 8) > 0 ? 3818
+        (2 ** Saba.env() & 2) > 0 ? 1630
+    :   (2 ** Saba.env() & 12) > 0 ? 3818
     :   null
     )
     ,   name: {
@@ -628,8 +665,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$big`, `$small`, `$even`, `$odd`, `$gold`, `$wood`, `$fire`, `$water`, `$earth`]
         ,   payout: [`$betwin`]
@@ -653,8 +692,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_rounds`
         }
     ,   fields: {
-            map: `id`
+            local: `id`
+        ,   map: `id`
         ,   time: `$startTime`
+        ,   memberId: `memberId`
         ,   settled: `$settled`
         ,   stake: [`$totalBet`]
         ,   payout: [`$win`]
@@ -666,8 +707,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 21
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1632
-    :   (2 ** Saba.env() & 8) > 0 ? 3819
+        (2 ** Saba.env() & 2) > 0 ? 1632
+    :   (2 ** Saba.env() & 12) > 0 ? 3819
     :   null
     )
     ,   name: {
@@ -682,8 +723,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
@@ -695,8 +738,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 22
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1633
-    :   (2 ** Saba.env() & 8) > 0 ? 3824
+        (2 ** Saba.env() & 2) > 0 ? 1633
+    :   (2 ** Saba.env() & 12) > 0 ? 3824
     :   null
     )
     ,   name: {
@@ -711,8 +754,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$odd`, `$even`, `$white4`, `$white3`, `$red2`, `$red3`, `$red4`]
         ,   payout: [`$betwin`]
@@ -724,8 +769,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 23
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1634
-    :   (2 ** Saba.env() & 8) > 0 ? 3820
+        (2 ** Saba.env() & 2) > 0 ? 1634
+    :   (2 ** Saba.env() & 12) > 0 ? 3820
     :   null
     )
     ,   name: {
@@ -740,8 +785,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$bet`]
         ,   payout: [`$betwin`]
@@ -753,8 +800,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 24
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1635
-    :   (2 ** Saba.env() & 8) > 0 ? 3825
+        (2 ** Saba.env() & 2) > 0 ? 1635
+    :   (2 ** Saba.env() & 12) > 0 ? 3825
     :   null
     )
     ,   name: {
@@ -769,8 +816,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$amount`]
         ,   payout: [
@@ -786,8 +835,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 25
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1636
-    :   (2 ** Saba.env() & 8) > 0 ? 3821
+        (2 ** Saba.env() & 2) > 0 ? 1636
+    :   (2 ** Saba.env() & 12) > 0 ? 3821
     :   null
     )
     ,   name: {
@@ -806,8 +855,10 @@ dbs.summary.game_summary_config.insertMany([
             )
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: (
                 (2 ** Saba.env() & 6) > 0 ? [`$totalAmount`]
@@ -823,8 +874,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 26
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1637
-    :   (2 ** Saba.env() & 8) > 0 ? 3826
+        (2 ** Saba.env() & 2) > 0 ? 1637
+    :   (2 ** Saba.env() & 12) > 0 ? 3826
     :   null
     )
     ,   name: {
@@ -839,8 +890,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$stag`, `$gourd`, `$rooster`, `$fish`, `$crab`, `$prawn`, `$mountain`, `$ocean`, `$anyTriple`]
         ,   payout: [`$betwin`]
@@ -852,8 +905,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 27
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1638
-    :   (2 ** Saba.env() & 8) > 0 ? 3827
+        (2 ** Saba.env() & 2) > 0 ? 1638
+    :   (2 ** Saba.env() & 12) > 0 ? 3827
     :   null
     )
     ,   name: {
@@ -868,8 +921,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$player`, `$banker`, `$tie`, `$big`, `$small`, `$playerPair`, `$bankerPair`]
         ,   payout: [`$betwin`]
@@ -881,8 +936,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 28
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1639
-    :   (2 ** Saba.env() & 8) > 0 ? 3828
+        (2 ** Saba.env() & 2) > 0 ? 1639
+    :   (2 ** Saba.env() & 12) > 0 ? 3828
     :   null
     )
     ,   name: {
@@ -897,8 +952,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
@@ -910,8 +967,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 29
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1640
-    :   (2 ** Saba.env() & 8) > 0 ? 3829
+        (2 ** Saba.env() & 2) > 0 ? 1640
+    :   (2 ** Saba.env() & 12) > 0 ? 3829
     :   null
     )
     ,   name: {
@@ -926,8 +983,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_rounds`
         }
     ,   fields: {
-            map: `id`
+            local: `id`
+        ,   map: `id`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$paid`
         ,   stake: [
                 {$multiply: [`$totalAmount`, {$toInt: {$not: `$freeSpin`}}]}
@@ -941,8 +1000,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 30
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1641
-    :   (2 ** Saba.env() & 8) > 0 ? 3822
+        (2 ** Saba.env() & 2) > 0 ? 1641
+    :   (2 ** Saba.env() & 12) > 0 ? 3822
     :   null
     )
     ,   name: {
@@ -957,8 +1016,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_cuocs`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalBet`]
         ,   payout: [`$betwin`]
@@ -970,8 +1031,8 @@ dbs.summary.game_summary_config.insertMany([
 
 ,   {   gameId: 31
     ,   owGameTypeId: (
-        (2 ** Saba.env() & 6) > 0 ? 1642
-    :   (2 ** Saba.env() & 8) > 0 ? 3830
+        (2 ** Saba.env() & 2) > 0 ? 1642
+    :   (2 ** Saba.env() & 12) > 0 ? 3830
     :   null
     )
     ,   name: {
@@ -986,8 +1047,10 @@ dbs.summary.game_summary_config.insertMany([
         ,   postfix: `_ones`
         }
     ,   fields: {
-            map: `phien`
+            local: `id`
+        ,   map: `phien`
         ,   time: `$time`
+        ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$totalAmount`]
         ,   payout: [`$betwin`]
@@ -997,30 +1060,150 @@ dbs.summary.game_summary_config.insertMany([
         }
     }
 
-    ,   {   gameId: 35
-        ,   owGameTypeId: 1643
-        ,   name: {
-                en: `Three Cards`
-            ,   vi: `Ba Lá Đỏ Đen`
-            ,   grp: `Card Games`
-            }
-        ,   coll: {
-                db: `minigame`
-            ,   group: `threecards`
-            ,   round: `_phiens`
-            ,   postfix: `_cuocs`
-            }
-        ,   fields: {
-                map: `phien`
-            ,   time: `$time`
-            ,   settled: `$thanhtoan`
-            ,   stake: [`$red`, `$black`, `$diamonds`, `$hearts`, `$spades`, `$clubs`]
-            ,   payout: [`$betwin`]
-            }
-        ,   config: {
-                hasCurrency: false
-            }
+,   {   gameId: 32
+    ,   owGameTypeId: 3832
+    ,   name: {
+            en: `Baccarat Diamond`
+        ,   vi: `Cào Baccarat Diamond`
+        ,   grp: `Baccarat`
         }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `baccaratdiamond`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            local: `id`
+        ,   map: `phien`
+        ,   time: `$time`
+        ,   memberId: `memberId`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 33
+    ,   owGameTypeId: 3833
+    ,   name: {
+            en: `Baccarat Sapphire`
+        ,   vi: `Cào Baccarat Sapphire`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `baccaratsapphire`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            local: `id`
+        ,   map: `phien`
+        ,   time: `$time`
+        ,   memberId: `memberId`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 34
+    ,   owGameTypeId: 3834
+    ,   name: {
+            en: `Baccarat Ruby`
+        ,   vi: `Cào Baccarat Ruby`
+        ,   grp: `Baccarat`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `baccaratruby`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            local: `id`
+        ,   map: `phien`
+        ,   time: `$time`
+        ,   memberId: `memberId`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$banker`, `$bankerPair`, `$player`, `$playerPair`, `$tie`, `$big`, `$small`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 35
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 2) > 0 ? 1643
+    :   (2 ** Saba.env() & 12) > 0 ? 3831
+    :   null
+    )
+    ,   name: {
+            en: `Three Cards`
+        ,   vi: `Ba Lá Đỏ Đen`
+        ,   grp: `Card Games`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `threecards`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            local: `id`
+        ,   map: `phien`
+        ,   time: `$time`
+        ,   memberId: `memberId`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$red`, `$black`, `$diamonds`, `$hearts`, `$spades`, `$clubs`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 99
+    ,   owGameTypeId: (
+        (2 ** Saba.env() & 2) > 0 ? 1699
+    :   (2 ** Saba.env() & 12) > 0 ? 3899
+    :   null
+    )
+    ,   name: {
+            en: `Jackpot Prize`
+        ,   vi: `Jackpot Prize`
+        ,   grp: `Slots`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `jackpots`
+        ,   round: ``
+        ,   postfix: ``
+        }
+    ,   fields: {
+            local: `hitAt`
+        ,   map: `hitAt`
+        ,   time: `$hitTime`
+        ,   memberId: `winnerId`
+        ,   settled: `$winnerId`
+        ,   stake: [0]
+        ,   payout: [
+                {$multiply: [`$amount`, `$winningRatio`]}
+            ]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
 ]
 ,   {ordered: false}
 );

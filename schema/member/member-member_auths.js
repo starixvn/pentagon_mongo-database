@@ -11,6 +11,6 @@ if ((2 ** Saba.env() & 14) > 0)
         ,   idxOpts : {expireAfterSeconds: 3600*24*8}
         }
     ].forEach((idx) => {
-        Maint.createIndex(dbs.member.member_auths, idx.idxKeys, idx.idxOpts);
+        Maint.createIndex(db.getSiblingDB('member').member_auths, idx.idxKeys, idx.idxOpts);
     });
 }

@@ -10,7 +10,7 @@ if ((2 ** Saba.env() & 14) > 0) {   // users
       idxOpts : {},
     },
   ].forEach((idx) => {
-    Maint.createIndex(dbs.minigame.users, idx.idxKeys, idx.idxOpts);
+    Maint.createIndex(db.getSiblingDB('minigame').users, idx.idxKeys, idx.idxOpts);
   });
 }
 
@@ -35,7 +35,7 @@ if ((2 ** Saba.env() & 14) > 0) {   // userinfos
      idxOpts : {},
    },
   ].forEach((idx) => {
-    Maint.createIndex(dbs.minigame.userinfos, idx.idxKeys, idx.idxOpts);
+    Maint.createIndex(db.getSiblingDB('minigame').userinfos, idx.idxKeys, idx.idxOpts);
   });
 }
 
@@ -54,6 +54,6 @@ if ((2 ** Saba.env() & 14) > 0) {   // usersessions
       idxOpts : {expireAfterSeconds: 3600*24*8},
     },
   ].forEach((idx) => {
-    Maint.createIndex(dbs.minigame.usersessions, idx.idxKeys, idx.idxOpts);
+    Maint.createIndex(db.getSiblingDB('minigame').usersessions, idx.idxKeys, idx.idxOpts);
   });
 }

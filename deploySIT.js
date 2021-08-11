@@ -1,15 +1,14 @@
 {
   const global = Function('return this;')();
-  const login = {user: 'billy.bui', pwd: passwordPrompt()};
-  const readonly = sit_readonly;
 
   run('git', 'pull', '--rebase');
 
   sit.forEach(instance => {
     const oldDB = global.db;
-    global.db = instance;
+    global.db = instance.admin;
+    const oldUser = global.loadDBs()._getUser();
     try { db.runCommand({ping: 1}) } catch { db.runCommand({ping: 1}) };
-    db.getSiblingDB('admin').auth(login);
+    global.auth();
     load(`server-side-functions/class/Shell.js`);
 
     const logger = new Shell.Log(`DEPLOY-SIT`);
@@ -28,7 +27,9 @@
       }
     });
 
-    db.getSiblingDB('admin').auth(readonly);
+    if (oldUser[0]) {
+      global.auth(global.db, oldUser[0].user);
+    }
     global.db = oldDB;
   });
 }

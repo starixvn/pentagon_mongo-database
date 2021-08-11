@@ -37,68 +37,68 @@
         }
     };
 
-    [   dbs.minigame.baccarat_cuocs
-    ,   dbs.minigame.baccarat_tmpcuocs
-    ,   dbs.minigame.baucua_cuocs
-    ,   dbs.minigame.chanle_cuocs
-    ,   dbs.minigame.chanle_ones
-    ,   dbs.minigame.chanleturbo_cuocs
-    ,   dbs.minigame.chanleturbo_ones
-    ,   dbs.minigame.kenopromax_cuocs
-    ,   dbs.minigame.kenopromax_tmpcuocs
-    ,   dbs.minigame.minidragontiger_cuocs
-    ,   dbs.minigame.minisedie_cuocs
-    ,   dbs.minigame.taixiu_cuocs
-    ,   dbs.minigame.taixiu_ones
-    ,   dbs.minigame.txturbo_cuocs
-    ,   dbs.minigame.txturbo_ones
-    ,   dbs.minigame.xocxoc_cuocs
+    [   db.getSiblingDB('minigame').baccarat_cuocs
+    ,   db.getSiblingDB('minigame').baccarat_tmpcuocs
+    ,   db.getSiblingDB('minigame').baucua_cuocs
+    ,   db.getSiblingDB('minigame').chanle_cuocs
+    ,   db.getSiblingDB('minigame').chanle_ones
+    ,   db.getSiblingDB('minigame').chanleturbo_cuocs
+    ,   db.getSiblingDB('minigame').chanleturbo_ones
+    ,   db.getSiblingDB('minigame').kenopromax_cuocs
+    ,   db.getSiblingDB('minigame').kenopromax_tmpcuocs
+    ,   db.getSiblingDB('minigame').minidragontiger_cuocs
+    ,   db.getSiblingDB('minigame').minisedie_cuocs
+    ,   db.getSiblingDB('minigame').taixiu_cuocs
+    ,   db.getSiblingDB('minigame').taixiu_ones
+    ,   db.getSiblingDB('minigame').txturbo_cuocs
+    ,   db.getSiblingDB('minigame').txturbo_ones
+    ,   db.getSiblingDB('minigame').xocxoc_cuocs
     ].forEach((coll) => {
         coll.dropIndexes(idxs.phien.oldName);
         Maint.createIndex(coll, idxs.phien.idxKeys, idxs.phien.idxOpts);
     });
 
-    [   dbs.minigame.chanle_cuocs
-    ,   dbs.minigame.chanleturbo_cuocs
-    ,   dbs.minigame.taixiu_cuocs
-    ,   dbs.minigame.txturbo_cuocs
+    [   db.getSiblingDB('minigame').chanle_cuocs
+    ,   db.getSiblingDB('minigame').chanleturbo_cuocs
+    ,   db.getSiblingDB('minigame').taixiu_cuocs
+    ,   db.getSiblingDB('minigame').txturbo_cuocs
     ].forEach((coll) => {
         coll.dropIndexes(idxs.uid_thanhtoan.oldName);
         Maint.createIndex(coll, idxs.uid_thanhtoan.idxKeys, idxs.uid_thanhtoan.idxOpts);
     });
 
-    [   dbs.minigame.chanle_cuocs
-    ,   dbs.minigame.chanleturbo_cuocs
+    [   db.getSiblingDB('minigame').chanle_cuocs
+    ,   db.getSiblingDB('minigame').chanleturbo_cuocs
     ].forEach((coll) => {
         coll.dropIndexes(idxs.phien_red.oldName);
         Maint.createIndex(coll, idxs.phien_red.idxKeys, idxs.phien_red.idxOpts);
     });
 
-    [   dbs.minigame.chanle_ones
-    ,   dbs.minigame.chanleturbo_ones
-    ,   dbs.minigame.taixiu_ones
-    ,   dbs.minigame.txturbo_ones
+    [   db.getSiblingDB('minigame').chanle_ones
+    ,   db.getSiblingDB('minigame').chanleturbo_ones
+    ,   db.getSiblingDB('minigame').taixiu_ones
+    ,   db.getSiblingDB('minigame').txturbo_ones
     ].forEach((coll) => {
         coll.dropIndexes(idxs.uid.oldName);
         Maint.createIndex(coll, idxs.uid.idxKeys, idxs.uid.idxOpts);
     });
 
-    [   dbs.minigame.chanle_ones
-    ,   dbs.minigame.chanleturbo_ones
+    [   db.getSiblingDB('minigame').chanle_ones
+    ,   db.getSiblingDB('minigame').chanleturbo_ones
     ].forEach((coll) => {
         coll.dropIndexes(idxs.uid_phien_red.oldName);
         Maint.createIndex(coll, idxs.uid_phien_red.idxKeys, idxs.uid_phien_red.idxOpts);
     });
 
-    [   dbs.minigame.taixiu_cuocs
-    ,   dbs.minigame.txturbo_cuocs
+    [   db.getSiblingDB('minigame').taixiu_cuocs
+    ,   db.getSiblingDB('minigame').txturbo_cuocs
     ].forEach((coll) => {
         coll.dropIndexes(idxs.phien_taixiu_red.oldName);
         Maint.createIndex(coll, idxs.phien_taixiu_red.idxKeys, idxs.phien_taixiu_red.idxOpts);
     });
 
-    [   dbs.minigame.taixiu_ones
-    ,   dbs.minigame.txturbo_ones
+    [   db.getSiblingDB('minigame').taixiu_ones
+    ,   db.getSiblingDB('minigame').txturbo_ones
     ].forEach((coll) => {
         coll.dropIndexes(idxs.uid_phien_taixiu_red.oldName);
         Maint.createIndex(coll, idxs.uid_phien_taixiu_red.idxKeys, idxs.uid_phien_taixiu_red.idxOpts);

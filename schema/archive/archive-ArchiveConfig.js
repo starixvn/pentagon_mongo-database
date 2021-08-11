@@ -2,8 +2,8 @@ if ((2 ** Saba.env() & 14) > 0) {
   const filter = {
     memberId: {$gt: 0}
   };
-  dbs.archive.archive_config.remove({});
-  dbs.archive.archive_config.insertMany(
+  db.getSiblingDB('archive').archive_config.remove({});
+  db.getSiblingDB('archive').archive_config.insertMany(
     [
       { _id: 39001,
         from: {
@@ -918,6 +918,84 @@ if ((2 ** Saba.env() & 14) > 0) {
           },
         ],
       },
+      { _id: 39032,
+        from: {
+          db: 'minigame',
+          coll: 'baccaratdiamond_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'baccaratdiamond_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'baccaratdiamond_cuocs',
+            to: 'baccaratdiamond_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+        ],
+      },
+      { _id: 39033,
+        from: {
+          db: 'minigame',
+          coll: 'baccaratsapphire_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'baccaratsapphire_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'baccaratsapphire_cuocs',
+            to: 'baccaratsapphire_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+        ],
+      },
+      { _id: 39034,
+        from: {
+          db: 'minigame',
+          coll: 'baccaratruby_phiens',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'baccaratruby_phiens_bk',
+        },
+        config: {
+          timeField: 'time',
+          cutOffsetHours: -24,
+          join: 'id',
+          logField: '_phiens',
+          logValue: 'id',
+        },
+        childs: [
+          { from: 'baccaratruby_cuocs',
+            to: 'baccaratruby_cuocs_bk',
+            join: 'phien',
+            updateOnly: false,
+            filter: filter,
+            exCols: [],
+          },
+        ],
+      },
       { _id: 39035,
         from: {
           db: 'minigame',
@@ -943,6 +1021,24 @@ if ((2 ** Saba.env() & 14) > 0) {
             exCols: [],
           },
         ],
+      },
+      { _id: 39099,
+        from: {
+          db: 'minigame',
+          coll: 'jackpots',
+        },
+        to: {
+          db: 'minigame_arc',
+          coll: 'jackpots_bk',
+        },
+        config: {
+          timeField: 'hitTime',
+          cutOffsetHours: -24,
+          join: 'hitAt',
+          logField: '',
+          logValue: 'hitAt',
+        },
+        childs: [],
       },
       { _id: 25001,
         from: {
