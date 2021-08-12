@@ -57,6 +57,7 @@ deploy: {
         if (String.toLowerCase(round) == 'hour') {
           return `${_time.toISOString().substr(0,10)} ${_time.toISOString().substr(11,8)}`;
         };
+
       };
       const _getSummaryColl = (round) => {
         let coll = `summaries`;
@@ -227,6 +228,7 @@ deploy: {
           _logger.info(`${conf.name.en} InsInfo memberId`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
         }
       };
+
       const _getOldSummary = (time, round, conf) => {
         const summaries = [];
         const coll = _getSummaryColl(round);
