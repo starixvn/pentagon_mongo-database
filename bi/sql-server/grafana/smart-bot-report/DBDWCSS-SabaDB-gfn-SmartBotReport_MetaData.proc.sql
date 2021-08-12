@@ -58,7 +58,7 @@ FROM	(
 ) AS tbl
 LIMIT ' + CAST(@_Limit AS NVARCHAR(MAX)) + N';
 ';
-		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 		RETURN;
 	END;
 
@@ -75,7 +75,7 @@ WHERE	cfg.gameId = ' + CAST(@_GameId AS NVARCHAR(MAX)) + N'
 LIMIT 1;
 ';
 		INSERT INTO	@GameType (gameId, db, base, postfix)
-		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
@@ -95,7 +95,7 @@ FROM	(
 		FROM	@GameType AS g;
 
 		INSERT INTO	@String (str)
-		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
@@ -107,7 +107,7 @@ ORDER BY COUNT(1) DESC, "group" ASC;
 '
 		FROM	@String;
 
-		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 0, 1;
 		RETURN;
 	END;
 END;

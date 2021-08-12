@@ -40,7 +40,7 @@ WHERE	sl.roundId = ' + LTRIM(@roundId) + N'
 ';
 
 		INSERT INTO	@RoundTime (importDate)
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 
 		SELECT	TOP(1)
 				@fromDate = importDate
@@ -70,7 +70,7 @@ GROUP BY b.memberId
 ORDER BY WinLoss ASC, `Available sᴄᴏɪɴ` DESC
 ';
 
-	EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+	EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 END;
 GO
 EXECUTE	gfn.FreeSpinsPromotion_WinLoss

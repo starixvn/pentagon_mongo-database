@@ -55,7 +55,7 @@ WHERE	cfg.gameId = ' + CAST(@_GameId AS NVARCHAR(MAX)) + N'
 LIMIT 1;
 ';
 	INSERT INTO	@GameType (gameId, db, base, postfix)
-	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 
 	SELECT	@Query = N'';
 	SELECT	@Query += N'\
@@ -75,7 +75,7 @@ FROM	(
 	FROM	@GameType AS g;
 
 	INSERT INTO	@String (str)
-	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 
 	SELECT	@Query = N'';
 	SELECT	@Query += N'\
@@ -88,7 +88,7 @@ WHERE	u.`local.memberId` IN (' + str + N')
 
 	DELETE	@String;
 	INSERT INTO	@String (str)
-	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 0;
+	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 0, 1;
 
 	SELECT	@Query = N'';
 	SELECT	@Query += N'\
@@ -105,7 +105,7 @@ ORDER BY time;
 '
 	FROM	@String;
 
-	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+	EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 END;
 GO
 

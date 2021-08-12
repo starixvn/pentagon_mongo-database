@@ -60,7 +60,7 @@ WHERE	roundId = ' + LTRIM(@RoundId) + '
 LIMIT 1
 ';
 
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Total given spins
@@ -84,7 +84,7 @@ WHERE	sl.roundId = ' + LTRIM(@RoundId) + '
 		OR	u.`local.currency` IS NULL
 		);
 ';
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Total used spins
@@ -120,7 +120,7 @@ WHERE	sr.time >= "' + CONVERT(NVARCHAR(MAX), fromDate, 121) + N'"
 '
 		FROM	@RoundDate;
 
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Total scoin spun
@@ -140,7 +140,7 @@ WHERE	sl.roundId = ' + LTRIM(@RoundId) + ';
 ';
 
 		INSERT INTO @RoundDate (fromDate, toDate)
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 
 		SELECT	@Query = N'';
 		SELECT	TOP(1)
@@ -156,7 +156,7 @@ WHERE	sr.time >= "' + CONVERT(NVARCHAR(MAX), fromDate, 121) + N'"
 '
 		FROM	@RoundDate;
 
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Total scoin stake
@@ -176,7 +176,7 @@ WHERE	roundId = ' + LTRIM(@RoundId) + ';
 ';
 
 		INSERT INTO @RoundDate (fromDate, toDate)
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 
 		SELECT	@Query = N'';
 		SELECT	TOP(1)
@@ -194,7 +194,7 @@ WHERE	b.freeBet = true
 '
 		FROM	@RoundDate;
 
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Total company winloss
@@ -214,7 +214,7 @@ WHERE	roundId = ' + LTRIM(@RoundId) + ';
 ';
 
 		INSERT INTO @RoundDate (fromDate, toDate)
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 
 		SELECT	@Query = N'';
 		SELECT	TOP(1)
@@ -237,7 +237,7 @@ WHERE	b.freeBet = true
 		) AS d;
 
 		INSERT INTO	@Result (metric, value)
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 
 		SELECT	@Query = N'';
 		SELECT	TOP(1)
@@ -282,7 +282,7 @@ SELECT	"Start" AS `metric`
 FROM	minigame.spin_logs
 WHERE	roundId = ' + LTRIM(@RoundId) + ';
 ';
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Round End
@@ -301,7 +301,7 @@ SELECT	"End" AS `metric`
 FROM	minigame.spin_logs
 WHERE	roundId = ' + LTRIM(@RoundId) + ';
 ';
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- Total given users
@@ -322,7 +322,7 @@ LEFT JOIN	minigame.users AS u
 		ON	sl.memberId = u.memberId
 WHERE	sl.roundId = ' + LTRIM(@RoundId) + ';
 ';
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 
 	-- User groups
@@ -345,7 +345,7 @@ WHERE	sl.roundId = ' + LTRIM(@RoundId) + '
 GROUP BY u.currency
 ORDER BY 2 DESC
 ;';
-		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 	END;
 END;
 GO

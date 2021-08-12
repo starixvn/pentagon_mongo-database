@@ -129,7 +129,7 @@ WHERE	sl.roundId = ' + CAST(@RoundID AS NVARCHAR(MAX)) + N'
 ';
 
 		INSERT INTO	@SB_FreeSpins (roundId, memberId, spinCnt)
-		EXECUTE	base.ExecuteSabaQuery @DS_Query, 2, 0;
+		EXECUTE	base.ExecuteSabaQuery @DS_Query, 2, 0, 1;
 	END;
 
 	INSERT INTO	@Diff (roundId, memberId, spinDiff)

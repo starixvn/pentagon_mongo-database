@@ -120,7 +120,7 @@ ORDER BY q.time, q.value DESC;
 		BEGIN TRY;
 			DELETE	@Temporary;
 			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	base.ExecuteSabaQuery @Query, @L, 0;
+			EXECUTE	base.ExecuteSabaQuery @Query, @L, 0, 1;
 			MERGE INTO	@Return AS r
 			USING	@Temporary AS t
 				ON	r.time = t.time
@@ -163,7 +163,7 @@ ORDER BY q.time, q.value DESC;
 		BEGIN TRY;
 			DELETE	@Temporary;
 			INSERT INTO	@Temporary (time, metric, value)
-			EXECUTE	base.ExecuteSabaQuery @Query, @L, 1;
+			EXECUTE	base.ExecuteSabaQuery @Query, @L, 1, 1;
 			MERGE INTO	@Return AS r
 			USING	@Temporary AS t
 				ON	r.time = t.time

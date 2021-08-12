@@ -20,8 +20,9 @@ AS
 				<DEFAULT>	NULL			- Treat as if testing
 
 
-	Version:	1.0.0
+	Version:	1.0.1
 	Revision:
+		- [1.0.1]	20210722@Billy		Base SP updated for SIT environment support
 		- [1.0.0]	20210601@Billy		Release Noti.BetLogSummaryReport - [Gitlab: #058]
 		- [0.0.1]	20210601@Billy		Initital - [Gitlab: #058]
 */
@@ -103,7 +104,7 @@ BEGIN;
 			WHERE	isDone = 0;
 
 			INSERT INTO	#DS_DailySummary (SC, gameId, gameType, currency, sys, requestCount, betCount, turnOver)
-			EXECUTE	dbr.SB_BetLogSummary @SC, @ReportDate;
+			EXECUTE	dbr.SB_BetLogSummary @SC, 1, @ReportDate;
 			RAISERROR('Executed on L%d.', 0, 0, @SC) WITH NOWAIT;
 		END;
 	END;	-- SB --
