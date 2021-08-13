@@ -1,13 +1,47 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'ExecuteSabaQuery', N'base';
+DECLARE	@Object		SYSNAME		= N'base.ExecuteSabaQuery'
+	,	@Version	SYSNAME		= N'1.1.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Object;
+EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
 GO
 ALTER PROCEDURE	base.ExecuteSabaQuery
 					@Query			NVARCHAR(MAX)	= NULL
-				,	@Var1			SQL_VARIANT		= NULL		-- SC
+				,	@Var1			SQL_VARIANT		= NULL		-- L
 				,	@Var2			SQL_VARIANT		= NULL		-- Type
 				,	@Var3			SQL_VARIANT		= NULL		-- Env
 WITH ENCRYPTION
 AS
+/*
+	Creator:		20210208@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Execute query on Luminet system
+
+	Parameters:
+		@Query:				[optional]		- The query to be executed.
+				<DEFAULT>	NULL			- Do nothing
+
+		@Var1:				[optional]		- The Luminet system to be executed on.
+				<DEFAULT>	NULL			- Do nothing
+
+		@Var2:				[optional]		- Is the system active?
+				<DEFAULT>	NULL			- Active
+							1				- Archive
+
+		@Var3:				[optional]		- The environment of system.
+				<DEFAULT>	NULL			- Do nothing
+							1				- Production
+							2				- Do nothing (UAT reserved)
+							3				- SIT
+
+	Version:	1.1.0
+	Revision:
+		- [1.1.0]	20210722@Billy		Support SIT Environment
+		- [1.0.2]	20210419@Billy		Do nothing if query is empty - [Gitlab: #060]
+		- [1.0.1]	20210322@Billy		Apply code convention - [Gitlab: #059]
+		- [1.0.0]	20210208@Billy		Release base.ExecuteSabaQuery - [Gitlab: #058]
+		- [0.0.1]	20210208@Billy		Initital - [Gitlab: #058]
+*/
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;

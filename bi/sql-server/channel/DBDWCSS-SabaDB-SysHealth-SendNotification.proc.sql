@@ -1,5 +1,9 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'SendNotification', N'SysHealth';
+DECLARE	@Procedure	SYSNAME		= N'SysHealth.SendNotification'
+	,	@Version	SYSNAME		= N'1.0.1'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	SysHealth.SendNotification
 					@Var1			NVARCHAR(MAX)	= NULL

@@ -1,8 +1,9 @@
 USE	SabaDB;
-IF	OBJECT_ID('SysHealth.FreeSpinPromotion_SpinLogs') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE SysHealth.FreeSpinPromotion_SpinLogs AS';
-END;
+DECLARE	@Procedure	SYSNAME		= N'SysHealth.FreeSpinPromotion_SpinLogs'
+	,	@Version	SYSNAME		= N'1.0.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	SysHealth.FreeSpinPromotion_SpinLogs
 					@Var1			SQL_VARIANT		= NULL
@@ -10,19 +11,22 @@ ALTER PROCEDURE	SysHealth.FreeSpinPromotion_SpinLogs
 WITH ENCRYPTION
 AS
 /*
-	Creator:	20210331@Billy
-	Task:		Compare FreeSpins Promotion - Spin Logs data between OW and SB then send result via Notification Channel - [Gitlab: #059]
-	Database:	DBDWCSS.SabaDB
+	Creator:		20210331@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Compare FreeSpins Promotion
+					Spin Logs data between OW and SB then send result via Notification Channel
 
-	Revisions:
-		- 20210331@Billy:	Initial - [Gitlab: #059]
+	Parameters:
+		@Var1:				[optional]		- Round that being checked
+				<DEFAULT>	NULL			- Latest round
 
-	Developer's Notes:
-		- @Var1:				[optional]		- Round that being checked
-					<DEFAULT>	NULL			- Latest round
-		- @Var2:				[optional]		- Is this testing execution?
-					<DEFAULT>	NULL			- Treat as if testing
+		@Var2:				[optional]		- Is this testing execution?
+				<DEFAULT>	NULL			- Treat as if testing
 
+	Version:	1.0.0
+	Revision:
+		- [1.0.0]	20210331@Billy		Release SysHealth.FreeSpinPromotion_SpinLogs - [Gitlab: #059]
+		- [0.0.1]	20210331@Billy		Initital - [Gitlab: #059]
 */
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;

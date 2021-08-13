@@ -1,5 +1,9 @@
 USE SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'OW_DailySummary_SIT', N'dbr';
+DECLARE	@Procedure	SYSNAME		= N'dbr.OW_DailySummary_SIT'
+	,	@Version	SYSNAME		= N'1.0.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	dbr.OW_DailySummary_SIT
 					@Var1			SQL_VARIANT		= NULL
@@ -14,12 +18,13 @@ AS
 	Parameters:
 		@Var1				[optional]		- The id of vendor that will be selected
 				<DEFAULT>	NULL			- No data
+
 		@Var2				[optional]		- The date of data that will be selected. The time is in UTC timezone.
 				<DEFAULT>	NULL			- Yesterday 00:00:00 AM
 
 	Version:	1.0.0
 	Revision:
-		- [1.0.0]	20210529@Billy		Release dbr.OW_DailySummary
+		- [1.0.0]	20210529@Billy		Release dbr.OW_DailySummary_SIT
 		- [0.0.1]	20210529@Billy		Initital
 */
 BEGIN;
