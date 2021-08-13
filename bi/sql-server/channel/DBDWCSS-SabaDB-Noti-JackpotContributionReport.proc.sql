@@ -1,8 +1,9 @@
 USE	SabaDB;
-IF	OBJECT_ID('Noti.JackpotContributionReport') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE Noti.JackpotContributionReport AS';
-END;
+DECLARE	@Object		SYSNAME		= N'Noti.JackpotContributionReport'
+	,	@Version	SYSNAME		= N'1.2.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Object;
+EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
 GO
 ALTER PROCEDURE	Noti.JackpotContributionReport
 					@Var1			SQL_VARIANT		= NULL
@@ -27,18 +28,6 @@ AS
 		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
 		- [1.0.0]	20210324@Billy		Release Noti.JackpotContributionReport
 		- [0.0.1]	20210324@Billy		Initital
-*/
-/*
-	Creator:	20210324@Billy
-	Task:		Compare Jackpot related result between OW and SB then send result via Notification Channel - [Gitlab: #059]
-	Database:	DBDWCSS.SabaDB
-
-	Revisions:
-		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
-		- 20210324@Billy:	Initial - [Gitlab: #059]
-
-	Developer's Notes:
-
 */
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
@@ -77,7 +66,7 @@ BEGIN;
 		,	@DS_Query		NVARCHAR(MAX)
 		;
 
-	DECLARE	@SC				INT
+	DECLARE	@L				INT
 		,	@GameId			INT
 		,	@GameType		NVARCHAR(128)
 		,	@GameTypeId		INT
@@ -85,21 +74,21 @@ BEGIN;
 		,	@Title			NVARCHAR(512)
 		;
 
-	DECLARE	@SCs AS TABLE (
-				SC				TINYINT
+	DECLARE	@Ls AS TABLE (
+				L				TINYINT
 			,	isExpanded		BIT
 			,	isDone			BIT
-			,	PRIMARY KEY CLUSTERED (SC)
+			,	PRIMARY KEY CLUSTERED (L)
 			);
 
 	DECLARE	@Tmp_JPContribution AS TABLE (
-				SC				TINYINT
+				L				TINYINT
 			,	gameTypeId		INT
 			,	gameId			INT
 			,	gameType		NVARCHAR(128)
 			,	currency		VARCHAR(10)
 			,	JPCont			DECIMAL(19,4)
-			,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
+			,	PRIMARY KEY CLUSTERED (L, gameTypeId, currency)
 			);
 
 	CREATE TABLE	#OW_JPContribution (
@@ -112,18 +101,18 @@ BEGIN;
 					);
 
 	CREATE TABLE	#DS_JPContribution (
-						SC				TINYINT
+						L				TINYINT
 					,	gameId			INT
 					,	gameTypeId		INT
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
 					,	JPCont			DECIMAL(19,4)
-					,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency)
+					,	PRIMARY KEY CLUSTERED (L, gameTypeId, currency)
 					);
 
-	-- List of SCs --
-	INSERT INTO	@SCs
-			(SC, isExpanded, isDone)
+	-- List of Ls --
+	INSERT INTO	@Ls
+			(L, isExpanded, isDone)
 	VALUES	( 2,          0,      0)
 		;
 
@@ -162,7 +151,7 @@ OPTION (RECOMPILE);
 
 	SELECT	@DS_Query = N'';
 	SELECT	@DS_Query += N'\
-SELECT	0 AS SC
+SELECT	0 AS L
 	,	' + CAST(@Bettype AS NVARCHAR(MAX)) + N' AS gameTypeId
 	,	cfg.gameId AS gameId
 	,	cfg.nameEN AS gameType
@@ -177,41 +166,41 @@ WHERE	cfg.groupName = "Slots"
 ';
 
 	BEGIN;
-		UPDATE	@SCs
+		UPDATE	@Ls
 		SET		isDone = 0;
 
-		WHILE	EXISTS (SELECT 1 FROM @SCs WHERE isDone = 0)
+		WHILE	EXISTS (SELECT 1 FROM @Ls WHERE isDone = 0)
 		BEGIN;
 			UPDATE	TOP(1)
-					@SCs
-			SET		@SC = SC
+					@Ls
+			SET		@L = L
 				,	isDone = 1
 			WHERE	isDone = 0;
 
 			DELETE	@Tmp_JPContribution;
-			INSERT INTO	@Tmp_JPContribution (SC, gameTypeId, gameId, gameType, currency, JPCont)
-			EXECUTE	base.ExecuteSabaQuery @DS_Query, @SC, 0, 1;
+			INSERT INTO	@Tmp_JPContribution (L, gameTypeId, gameId, gameType, currency, JPCont)
+			EXECUTE	base.ExecuteSabaQuery @DS_Query, @L, 0, 1;
 
 			MERGE INTO	#DS_JPContribution AS ds
 			USING		@Tmp_JPContribution AS tmp
-					ON	ds.SC = @SC
+					ON	ds.L = @L
 					AND	ds.gameTypeId = tmp.gameTypeId
 					AND	ds.currency = tmp.currency
 			WHEN MATCHED THEN
 				UPDATE
 				SET	ds.JPCont += tmp.JPCont
 			WHEN NOT MATCHED THEN
-				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,     JPCont)
-				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.JPCont)
+				INSERT	( L,     gameTypeId,     gameId,     gameType,     currency,     JPCont)
+				VALUES	(@L, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, tmp.JPCont)
 			;
-			RAISERROR('Executed on SC%d.', 0, 0, @SC) WITH NOWAIT;
+			RAISERROR('Executed on L%d.', 0, 0, @L) WITH NOWAIT;
 		END;
 	END;
 
 	-- Reuse @Tmp_JPContribution for checking mismatch --
 	DELETE	@Tmp_JPContribution;
-	INSERT INTO	@Tmp_JPContribution (SC, gameTypeId, gameId, gameType, currency, JPCont)
-	SELECT	[SC]			= ISNULL(sb.SC, 0)
+	INSERT INTO	@Tmp_JPContribution (L, gameTypeId, gameId, gameType, currency, JPCont)
+	SELECT	[L]			= ISNULL(sb.L, 0)
 		,	[gameTypeId]	= ISNULL(ow.gameTypeId, sb.gameTypeId)
 		,	[gameId]		= ISNULL(sb.gameId, 0)
 		,	[gameType]		= ISNULL(ow.gameType, sb.gameType)
@@ -233,21 +222,21 @@ WHERE	cfg.groupName = "Slots"
 		WHILE	EXISTS (SELECT 1 FROM @Tmp_JPContribution)
 		BEGIN;
 			SELECT	TOP(1)
-					@SC			= SC
+					@L			= L
 				,	@GameId		= gameId
 				,	@GameType	= gameType
 				,	@GameTypeId	= gameTypeId
 			FROM	@Tmp_JPContribution
-			ORDER BY SC, gameId;
+			ORDER BY L, gameId;
 
 			SELECT	@Title		= @Status + N'] [Jackpot Contribution ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23)
-				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (JC)' + msg.str
+				,	@Message	= N'[L' + CONVERT(NVARCHAR(MAX), @L) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (JC)' + msg.str
 			FROM	(
 				SELECT	N'
 [' + currency + N']'
 + N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(JPCont AS MONEY), 2), '.0000', '')
 				FROM	@Tmp_JPContribution
-				WHERE	SC = @SC
+				WHERE	L = @L
 					AND	gameId = @GameId
 				ORDER BY currency
 				FOR XML PATH ('')
@@ -259,14 +248,14 @@ WHERE	cfg.groupName = "Slots"
 			EXECUTE	Letstalk.SendNotification @Message, @Title, @isTest;
 
 			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[Jackpot Contribution ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23) + N'\]  
-\\\[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(JC\)'
+\\\[L' + CONVERT(NVARCHAR(MAX), @L) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(JC\)'
 							 + msg.str
 			FROM	(
 				SELECT	N'  
 \\\[' + currency + N'\]'
 + N' ' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(JPCont AS MONEY), 2), '.0000', '')
 				FROM	@Tmp_JPContribution
-				WHERE	SC = @SC
+				WHERE	L = @L
 					AND	gameId = @GameId
 				ORDER BY currency
 				FOR XML PATH ('')
@@ -278,7 +267,7 @@ WHERE	cfg.groupName = "Slots"
 			EXECUTE	Noti.SendNotification @Message, @isTest;
 
 			DELETE	@Tmp_JPContribution
-			WHERE	SC = @SC
+			WHERE	L = @L
 				AND	gameId = @GameId;
 		END;
 	END;
@@ -290,10 +279,10 @@ WHERE	cfg.groupName = "Slots"
 		FROM	(
 			SELECT	N'
 
-SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+L' + CONVERT(NVARCHAR(MAX), dsb.L) + N':' + c.str
 			FROM	(
-				SELECT	SC, isExpanded
-				FROM	@SCs
+				SELECT	L, isExpanded
+				FROM	@Ls
 			) AS dsb
 			CROSS APPLY	(
 				SELECT	N'
@@ -304,7 +293,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
 				) AS grp
 				WHERE	sb.currency <> 'UUS'
-					AND	sb.SC = dsb.SC
+					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
 				FOR XML PATH ('')
@@ -313,7 +302,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			CROSS APPLY	(
 				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 			) AS c(str)
-			ORDER BY dsb.SC
+			ORDER BY dsb.L
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
@@ -327,10 +316,10 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			SELECT	N'  
 
 ---
-SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+L' + CONVERT(NVARCHAR(MAX), dsb.L) + N':' + c.str
 			FROM	(
-				SELECT	SC, isExpanded
-				FROM	@SCs
+				SELECT	L, isExpanded
+				FROM	@Ls
 			) AS dsb
 			CROSS APPLY	(
 				SELECT	N'  
@@ -341,7 +330,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 					SELECT	[CurGrp]	= CASE dsb.isExpanded WHEN 1 THEN UPPER(sb.currency) ELSE N'Total' END
 				) AS grp
 				WHERE	sb.currency <> 'UUS'
-					AND	sb.SC = dsb.SC
+					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
 				FOR XML PATH ('')
@@ -350,7 +339,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			CROSS APPLY	(
 				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 			) AS c(str)
-			ORDER BY dsb.SC
+			ORDER BY dsb.L
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)

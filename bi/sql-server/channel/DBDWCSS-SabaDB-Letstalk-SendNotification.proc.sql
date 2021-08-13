@@ -1,5 +1,9 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'SendNotification', N'Letstalk';
+DECLARE	@Object		SYSNAME		= N'Letstalk.SendNotification'
+	,	@Version	SYSNAME		= N'1.0.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Object;
+EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
 GO
 ALTER PROCEDURE	Letstalk.SendNotification
 					@Var1			NVARCHAR(MAX)	= NULL

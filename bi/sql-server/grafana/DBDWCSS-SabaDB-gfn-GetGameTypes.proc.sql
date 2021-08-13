@@ -35,7 +35,7 @@ FROM	summary.game_summary_config;
 ';
 
 	INSERT INTO	@Games (gameId, gameTypeId, nameEN, nameVI)
-	EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
+	EXECUTE	base.ExecuteSabaQuery @Query, 1, 0, 1;
 
 	SELECT	[value]	=	CASE @Type
 							WHEN 1 THEN LTRIM(gameId)

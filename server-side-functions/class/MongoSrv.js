@@ -25,12 +25,21 @@ deploy: {
         });
         cnt = databases.length;
       };
+      const _isDB = (name) => {
+        return this[name] instanceof DB;
+      };
+      const _getStringLen = (str) => {
+        return typeof str === "string" ? str.length : -1;
+      };
+      const _getDBInfo = (name, maxLen) => {
+        return `  ${name.pad(maxLen)} : ${this[name]}\n`;
+      };
       const _list = () => {
         _update();
-        const prop = Object.getOwnPropertyNames(this).filter(_ => this[_] instanceof DB);
-        const propLen = Math.max(...prop.map(_ => _.length));
+        const prop = Object.getOwnPropertyNames(this).filter(_isDB);
+        const propLen = Math.max(...prop.map(_getStringLen));
         if (prop.length == 0) return '{ }';
-        return `${prop.map(_ => `  ${_.pad(propLen)} : ${this[_]}\n`).join('')}`;
+        return `${prop.map(_getDBInfo).join('')}`;
       };
 
       const _descriptor = {writable: false, enumerable: true,};
@@ -61,8 +70,11 @@ deploy: {
 
   // MongoSrv class
   const _id = `MongoSrv`;
-  const version = `1.1.0`;
+  const version = `1.2.0`;
   const changelog = {
+    '1.2.0': [
+      `[${_id}] Refactor code`,
+    ],
     '1.1.0': [
       `[${_id}.DBs] Proxify instance to access non-existing DB`,
       `[${_id}.DBs] Add list() function`,

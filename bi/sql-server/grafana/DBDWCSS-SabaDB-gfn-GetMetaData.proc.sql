@@ -35,7 +35,7 @@ SELECT	'
 FROM	summary.game_summary_config;
 ';
 
-		EXECUTE	base.ExecuteSabaQuery @Query, @Var1, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, @Var1, 0, 1;
 		RETURN;
 	END;
 
@@ -48,7 +48,7 @@ SELECT	DISTINCT
 FROM	summary.daily_summaries;
 ';
 
-		EXECUTE	base.ExecuteSabaQuery @Query, @Var1, 0;
+		EXECUTE	base.ExecuteSabaQuery @Query, @Var1, 0, 1;
 		RETURN;
 	END;
 END;

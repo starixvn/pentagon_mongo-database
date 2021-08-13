@@ -37,7 +37,7 @@ WHERE	bs.time >= "' + CONVERT(NVARCHAR(MAX), @FromDate, 121) + '"
 	AND	bs.time < "' + CONVERT(NVARCHAR(MAX), @ToDate, 121) + '"
 GROUP BY bs.gameId, bs.system
 ';
-	EXECUTE	base.ExecuteSabaQuery @Query, 1, 0;
+	EXECUTE	base.ExecuteSabaQuery @Query, 1, 0, 1;
 END;
 GO
 EXECUTE	gfn.TestGrafana

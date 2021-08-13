@@ -1,5 +1,9 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'DailySummaryReport', N'vGaming';
+DECLARE	@Procedure	SYSNAME		= N'vGaming.DailySummaryReport'
+	,	@Version	SYSNAME		= N'2.1.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	vGaming.DailySummaryReport
 					@Var1			SQL_VARIANT		= NULL
@@ -31,7 +35,6 @@ AS
 		- [0.0.1]	20201008@Billy		Initital - [Gitlab: #058]
 */
 BEGIN;
-	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
 	DECLARE	@ReportDate		DATETIME

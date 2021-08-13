@@ -1,7 +1,11 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'BetLogSummaryReport', N'SabaClub';
+DECLARE	@Procedure	SYSNAME		= N'Noti.BetLogSummaryReport'
+	,	@Version	SYSNAME		= N'1.1.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
-ALTER PROCEDURE	SabaClub.BetLogSummaryReport
+ALTER PROCEDURE	Noti.BetLogSummaryReport
 					@Var1			SQL_VARIANT		= NULL
 				,	@Var2			SQL_VARIANT		= NULL
 WITH ENCRYPTION
@@ -19,14 +23,14 @@ AS
 		@Var2:				[optional]		- Is this testing execution?
 				<DEFAULT>	NULL			- Treat as if testing
 
-
-	Version:	1.0.0
+	Version:	1.1.0
 	Revision:
+		- [1.1.0]	20210812@Billy		Support instant system
+		- [1.0.1]	20210722@Billy		Base SP updated for SIT environment support
 		- [1.0.0]	20210601@Billy		Release Noti.BetLogSummaryReport - [Gitlab: #058]
 		- [0.0.1]	20210601@Billy		Initital - [Gitlab: #058]
 */
 BEGIN;
-	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
 	DECLARE	@ReportDate		DATETIME
@@ -56,22 +60,29 @@ BEGIN;
 		RETURN;
 	END;
 
-	DECLARE	@SC				INT
+	DECLARE	@L				INT
 		,	@GameId			INT
 		,	@GameType		NVARCHAR(128)
 		,	@Message		NVARCHAR(MAX)
 		,	@Title			NVARCHAR(512)
 		;
 
-	DECLARE	@SCs AS TABLE (
-				SC				TINYINT
+	DECLARE	@Ls AS TABLE (
+				L				TINYINT
+			,	name			NVARCHAR(128)
 			,	isExpanded		BIT
 			,	isDone			BIT
-			,	PRIMARY KEY CLUSTERED (SC)
+			,	PRIMARY KEY CLUSTERED (L)
+			);
+
+	DECLARE	@Systems AS TABLE (
+				id				TINYINT
+			,	name			NVARCHAR(128)
+			,	PRIMARY KEY CLUSTERED (id)
 			);
 
 	CREATE TABLE	#DS_DailySummary (
-						SC				TINYINT
+						L				TINYINT
 					,	gameId			INT
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
@@ -79,32 +90,40 @@ BEGIN;
 					,	requestCount	INT
 					,	betCount		INT
 					,	turnOver		DECIMAL(19,4)
-					,	PRIMARY KEY CLUSTERED (SC, gameId, currency, sys)
+					,	PRIMARY KEY CLUSTERED (L, gameId, currency, sys)
 					);
 
-	-- List of SCs --
-	INSERT INTO	@SCs
-			(SC, isExpanded, isDone)
-	VALUES	( 1,          0,      0)
-		, 	( 2,          0,      0)
-		, 	( 3,          1,      0)
+	-- List of Ls --
+	INSERT INTO	@Ls
+			(L,  name, isExpanded, isDone)
+	VALUES	(1, N'SC',          0,      0)
+		,	(2, N'vG',          0,      0)
+		,	(3, N'vG',          1,      0)
+		;
+
+	-- List of systems --
+	INSERT INTO	@Systems
+			(id, name)
+	VALUES	( 1, N'ᴄᴏᴄᴏs')
+		,	( 2, N'ᴍᴏʙɪ')
+		,	( 3, N'ɪɴsᴛᴀɴᴛ')
 		;
 
 	BEGIN;	-- SB --
-		UPDATE	@SCs
+		UPDATE	@Ls
 		SET		isDone = 0;
 
-		WHILE	EXISTS (SELECT 1 FROM @SCs WHERE isDone = 0)
+		WHILE	EXISTS (SELECT 1 FROM @Ls WHERE isDone = 0)
 		BEGIN;
 			UPDATE	TOP(1)
-					@SCs
-			SET		@SC		= SC
+					@Ls
+			SET		@L		= L
 				,	isDone	= 1
-			WHERE	isDone = 0;
+			WHERE	isDone	= 0;
 
-			INSERT INTO	#DS_DailySummary (SC, gameId, gameType, currency, sys, requestCount, betCount, turnOver)
-			EXECUTE	dbr.SB_BetLogSummary @SC, @ReportDate;
-			RAISERROR('Executed on L%d.', 0, 0, @SC) WITH NOWAIT;
+			INSERT INTO	#DS_DailySummary (L, gameId, gameType, currency, sys, requestCount, betCount, turnOver)
+			EXECUTE	dbr.SB_BetLogSummary @L, 1, @ReportDate;
+			RAISERROR('Executed on L%d.', 0, 0, @L) WITH NOWAIT;
 		END;
 	END;	-- SB --
 
@@ -114,10 +133,10 @@ BEGIN;
 		FROM	(
 			SELECT	N'
 
-' + CASE dsb.SC WHEN 3 THEN N'VG' ELSE 'SC' END + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+' + dsb.name + CONVERT(NVARCHAR(MAX), dsb.L) + N':' + c.str
 			FROM	(
-				SELECT	SC, isExpanded
-				FROM	@SCs
+				SELECT	L, name, isExpanded
+				FROM	@Ls
 			) AS dsb
 			CROSS APPLY	(
 				SELECT	N'
@@ -127,14 +146,22 @@ BEGIN;
       - TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.turnOver AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
 				CROSS APPLY	(
-					SELECT	[CurGrp]	= CASE dsb.isExpanded
-											WHEN 1 THEN N'(' + _sys.str + N') ' +  UPPER(sb.currency)
-											ELSE N'(' + _sys.str + N') Total'
+					SELECT	TOP(1)
+							[CurGrp]	= CASE dsb.isExpanded
+											WHEN 1 THEN N'(' + _sys.name + N') ' +  UPPER(sb.currency)
+											ELSE N'(' + _sys.name + N') Total'
 										  END
-					FROM	(VALUES (CASE sb.sys WHEN 1 THEN N'ᴄᴏᴄᴏs' WHEN 2 THEN N'ᴍᴏʙɪ' ELSE N'***' END)) AS _sys(str)
+					FROM	(
+						SELECT	id, name
+						FROM	@Systems
+						WHERE	id = sb.sys
+						UNION
+						SELECT	NULL, N'***'
+					) AS _sys
+					ORDER BY id DESC
 				) AS grp
 				WHERE	sb.currency <> 'UUS'
-					AND	sb.SC = dsb.SC
+					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
 				FOR XML PATH ('')
@@ -143,7 +170,7 @@ BEGIN;
 			CROSS APPLY	(
 				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 			) AS c(str)
-			ORDER BY dsb.SC
+			ORDER BY dsb.L
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
@@ -157,10 +184,10 @@ BEGIN;
 			SELECT	N'  
 
 ---
-' + CASE dsb.SC WHEN 3 THEN N'VG' ELSE 'SC' END + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+' + dsb.name + CONVERT(NVARCHAR(MAX), dsb.L) + N':' + c.str
 			FROM	(
-				SELECT	SC, isExpanded
-				FROM	@SCs
+				SELECT	L, name, isExpanded
+				FROM	@Ls
 			) AS dsb
 			CROSS APPLY	(
 				SELECT	N'  
@@ -170,14 +197,22 @@ BEGIN;
       \- TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.turnOver AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
 				CROSS APPLY	(
-					SELECT	[CurGrp]	= CASE dsb.isExpanded
-											WHEN 1 THEN N'(' + _sys.str + N') ' +  UPPER(sb.currency)
-											ELSE N'(' + _sys.str + N') Total'
+					SELECT	TOP(1)
+							[CurGrp]	= CASE dsb.isExpanded
+											WHEN 1 THEN N'(' + _sys.name + N') ' +  UPPER(sb.currency)
+											ELSE N'(' + _sys.name + N') Total'
 										  END
-					FROM	(VALUES (CASE sb.sys WHEN 1 THEN N'ᴄᴏᴄᴏs' WHEN 2 THEN N'ᴍᴏʙɪ' ELSE N'***' END)) AS _sys(str)
+					FROM	(
+						SELECT	id, name
+						FROM	@Systems
+						WHERE	id = sb.sys
+						UNION ALL
+						SELECT	NULL, N'***'
+					) AS _sys
+					ORDER BY id DESC
 				) AS grp
 				WHERE	sb.currency <> 'UUS'
-					AND	sb.SC = dsb.SC
+					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
 				FOR XML PATH ('')
@@ -186,7 +221,7 @@ BEGIN;
 			CROSS APPLY	(
 				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 			) AS c(str)
-			ORDER BY dsb.SC
+			ORDER BY dsb.L
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
@@ -197,5 +232,5 @@ BEGIN;
 	END;	-- Summary --
 END;
 GO
-EXECUTE	SabaClub.BetLogSummaryReport;
+EXECUTE	Noti.BetLogSummaryReport;
 GO

@@ -168,7 +168,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 
 		DELETE	@Tmp_DailySummary;
 		INSERT INTO	@Tmp_DailySummary (gameTypeId, currency, betCount, stake, payOut)
-		EXECUTE	base.ExecuteSabaQuery @DS_Query, @L, 0;
+		EXECUTE	base.ExecuteSabaQuery @DS_Query, @L, 0, 1;
 
 		MERGE INTO	#DS_DailySummary AS ds
 		USING		@Tmp_DailySummary AS tmp
@@ -186,7 +186,7 @@ WHERE	ds.time >= ''' + CONVERT(NVARCHAR(MAX), @ReportDate, 127) + N'''
 
 		DELETE	@Tmp_DailySummary;
 		INSERT INTO	@Tmp_DailySummary (gameTypeId, currency, betCount, stake, payOut)
-		EXECUTE	base.ExecuteSabaQuery @DS_Arc_Query, @L, 1;
+		EXECUTE	base.ExecuteSabaQuery @DS_Arc_Query, @L, 1, 1;
 
 		MERGE INTO	#DS_Arc_DailySummary AS ds
 		USING		@Tmp_DailySummary AS tmp

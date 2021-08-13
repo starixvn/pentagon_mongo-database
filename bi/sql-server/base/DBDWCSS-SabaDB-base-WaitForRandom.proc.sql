@@ -1,35 +1,43 @@
 USE	SabaDB;
-SET NOCOUNT ON;
-GO
-IF	OBJECT_ID('base.WaitForRandom') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE base.WaitForRandom AS';
-END;
+DECLARE	@Object		SYSNAME		= N'base.WaitForRandom'
+	,	@Version	SYSNAME		= N'1.0.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Object;
+EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
 GO
 ALTER PROCEDURE	base.WaitForRandom
-					@Var1			SQL_VARIANT		= NULL		-- Sec
+					@Var1			SQL_VARIANT		= NULL
 WITH ENCRYPTION
 AS
+/*
+	Creator:		20210208@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Wait for random period of time before continue
+
+	Parameters:
+		@Var1:				[optional]		- The maximum number of seconds that we have to wait
+				<DEFAULT>	NULL			- 3 seconds
+
+	Version:	1.0.0
+	Revision:
+		- [1.0.0]	20210208@Billy		Release base.WaitForRandom - [Gitlab: #058]
+		- [0.0.1]	20210208@Billy		Initital - [Gitlab: #058]
+*/
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
-	DECLARE	@_Sec		INT
+	DECLARE	@Sec		INT
+		,	@WaitFor	VARCHAR(16)
 		;
 
-	BEGIN TRY;
-		SELECT	@_Sec = ABS(ISNULL(CAST(@Var1 AS INT), 3))
-			;
-	END TRY
-	BEGIN CATCH;
-		SELECT	@_Sec = 3
-			;
-	END CATCH;
+	BEGIN TRY SELECT @Sec = CAST(@Var1 AS INT) END TRY BEGIN CATCH SELECT @Sec = NULL END CATCH;
 
-	DECLARE	@WaitFor	VARCHAR(16)		= '00:00:0'
-										+ CAST(ABS(CHECKSUM(NEWID())) % @_Sec AS CHAR(1))
-										+ '.'
-										+ CAST(ABS(CHECKSUM(NEWID())) % 1000 AS CHAR(3))
+	SELECT	@Sec		= ISNULL(ABS(@Sec), 3);
+	SELECT	@WaitFor	= '00:00:0'
+						+ CAST(ABS(CHECKSUM(NEWID())) % @Sec AS CHAR(1))
+						+ '.'
+						+ CAST(ABS(CHECKSUM(NEWID())) % 1000 AS CHAR(3))
 		;
 
 	WAITFOR DELAY @WaitFor;

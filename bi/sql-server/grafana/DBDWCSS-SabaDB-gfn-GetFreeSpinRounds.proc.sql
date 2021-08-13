@@ -29,7 +29,7 @@ WHERE	roundId > 0
 ORDER BY roundId DESC
 ';
 
-	EXECUTE	base.ExecuteSabaQuery @Query, 2, 0;
+	EXECUTE	base.ExecuteSabaQuery @Query, 2, 0, 1;
 END;
 GO
 EXECUTE	gfn.GetFreeSpinRounds

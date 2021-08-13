@@ -1,10 +1,9 @@
 USE	SabaDB;
-SET NOCOUNT ON;
-GO
-IF	OBJECT_ID('base.tf_DecodeURL') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE FUNCTION base.tf_DecodeURL() RETURNS TABLE AS RETURN (SELECT a = 0)';
-END;
+DECLARE	@Object		SYSNAME		= N'base.tf_DecodeURL'
+	,	@Version	SYSNAME		= N'1.0.0'
+	;
+EXECUTE	dbo.sp_MSR_InitInlineTableFunction @Object;
+EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
 GO
 ALTER FUNCTION	base.tf_DecodeURL (
 					@string		NVARCHAR(MAX)
@@ -13,15 +12,17 @@ RETURNS TABLE
 WITH ENCRYPTION
 AS
 /*
-	Creator:	20210416@Billy
-	Task:		URL Decode Function - Inline Table Value Version
+	Creator:		20210416@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	URL Decode Function - Inline Table-valued Version
 
-	Revisions:
-		- 20210416@Billy:	Initial
+	Parameters:
+		@string:			[REQUIRED]		- Input string that need to be decoded.
 
-	Developer's Notes:
-		- @string:		Input string that need to be decoded
-
+	Version:	1.0.0
+	Revision:
+		- [1.0.0]	20210416@Billy		Release base.tf_DecodeURL
+		- [0.0.1]	20210416@Billy		Initital - [Gitlab: #058]
 */
 RETURN (
 	WITH cte AS (

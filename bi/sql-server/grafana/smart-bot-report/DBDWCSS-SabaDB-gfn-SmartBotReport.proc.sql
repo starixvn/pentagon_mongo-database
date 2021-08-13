@@ -62,7 +62,7 @@ WHERE	cfg.gameId = ' + CAST(@_GameId AS NVARCHAR(MAX)) + N'
 LIMIT 1;
 ';
 		INSERT INTO	@GameType (gameId, db, base, postfix)
-		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
@@ -78,7 +78,7 @@ ORDER BY gameId, stake DESC
 LIMIT 10;
 ';
 		INSERT INTO	@TopDay (gameId, time, stake, tickets, isDone)
-		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+		EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 
 		WHILE	0 = 0
 		BEGIN;
@@ -108,7 +108,7 @@ LIMIT 10;
 			FROM	@GameType AS g;
 
 			INSERT INTO	@TopMem (time, memberId, currency, stake)
-			EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1;
+			EXECUTE	base.ExecuteSabaQuery @Query, @_SC, 1, 1;
 		END;
 
 		SELECT	*

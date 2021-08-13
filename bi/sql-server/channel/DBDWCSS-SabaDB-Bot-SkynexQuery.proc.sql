@@ -1,8 +1,9 @@
 USE	SabaDB;
-IF	OBJECT_ID('Bot.SkynexQuery') IS NULL
-BEGIN;
-	EXECUTE	sys.sp_executesql N'CREATE PROCEDURE Bot.SkynexQuery AS';
-END;
+DECLARE	@Object		SYSNAME		= N'Bot.SkynexQuery'
+	,	@Version	SYSNAME		= N'0.0.1'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Object;
+EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
 GO
 ALTER PROCEDURE	Bot.SkynexQuery
 					@Var1			SQL_VARIANT		= NULL
@@ -10,35 +11,37 @@ ALTER PROCEDURE	Bot.SkynexQuery
 WITH ENCRYPTION
 AS
 /*
-	Creator:	20210411@Billy
-	Task:		Query Saba information via Skynex commands - [Gitlab: #060]
-	Database:	DBDWCSS.SabaDB
+	Creator:		20210411@Billy
+	Location:		DBDWCSS.SabaDB
+	Description:	Query Saba information via Skynex commands
 
-	Revisions:
-		- 20210411@Billy:	Initial - [Gitlab: #060]
+	Parameters:
+		@Var1:				[optional]		- The id that identified the channel that issuing the query.
+				<DEFAULT>	NULL			- Invalid
 
-	Developer's Notes:
-		- @Var1:					[optional]		- aka @ConversationId - the id that identified the channel that issuing the query
-						<DEFAULT>	NULL			- Invalid
-		- @Var2:					[optional]		- aka @Command - the query string
-						<DEFAULT>	NULL			- Invalid
+		@Var2:				[optional]		- The query string.
+				<DEFAULT>	NULL			- Invalid
+
+	Version:	0.0.1
+	Revision:
+		- [0.0.1]	20210411@Billy		Initital - [Gitlab: #060]
 */
 BEGIN;
-	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
 
-	DECLARE	@_ConversationId		VARCHAR(256)
-		,	@_Command				NVARCHAR(MAX)
+	DECLARE	@ConversationId			VARCHAR(256)
+		,	@Command				NVARCHAR(MAX)
 		;
 
 	BEGIN TRY;
-		SELECT	@_ConversationId	= CONVERT(VARCHAR(256), @Var1)
-			,	@_Command			= @Var2
+		SELECT	@ConversationId		= CONVERT(VARCHAR(256), @Var1)
+			,	@Command			= @Var2
 			;
 
-		IF	@_ConversationId IS NULL
-		OR	@_Command IS NULL
-		OR	@_Command NOT LIKE N'saba %'
+		IF	@ConversationId IS NULL
+		OR	@Command IS NULL
+		OR	LTRIM(RTRIM(@Command)) = N'saba'
+		OR	@Command NOT LIKE N'saba %'
 			GOTO InvalidResponse;
 
 		TODO:
@@ -49,10 +52,10 @@ BEGIN;
 				);
 		INSERT INTO	@Commands (id, cmd)
 		SELECT	id, val
-		FROM	base.f_SplitString(@_Command, N' ', NULL)
+		FROM	base.f_SplitString(@Command, N' ', NULL)
 		WHERE	id > 1;
 
-		SELECT	[result] = @_ConversationId + N' - ' + CAST(COUNT(1) AS NVARCHAR(MAX)) + N'_' + CAST(CHECKSUM_AGG(BINARY_CHECKSUM(*)) AS NVARCHAR(MAX))
+		SELECT	[result] = @ConversationId + N' - ' + CAST(COUNT(1) AS NVARCHAR(MAX)) + N'_' + CAST(CHECKSUM_AGG(BINARY_CHECKSUM(*)) AS NVARCHAR(MAX))
 		FROM	@Commands;
 		RETURN;
 	END TRY BEGIN CATCH;

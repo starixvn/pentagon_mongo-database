@@ -57,6 +57,7 @@ deploy: {
         if (String.toLowerCase(round) == 'hour') {
           return `${_time.toISOString().substr(0,10)} ${_time.toISOString().substr(11,8)}`;
         };
+
       };
       const _getSummaryColl = (round) => {
         let coll = `summaries`;
@@ -227,6 +228,7 @@ deploy: {
           _logger.info(`${conf.name.en} InsInfo memberId`, ` • D-${res.deletedCount} • I-${res.insertedCount} • M-${res.matchedCount} • U-${res.upsertedCount}`);
         }
       };
+
       const _getOldSummary = (time, round, conf) => {
         const summaries = [];
         const coll = _getSummaryColl(round);
@@ -963,6 +965,12 @@ deploy: {
         const timer = new Tool.Timer();
         const _coll = `betlog_summaries`;
 
+        const system = {
+          [1]: 'Cocos',
+          [2]: 'Mobi',
+          [3]: 'Instant'
+        };
+
         timer.register(`start`);
         const agg = _buildSummaryAgg(_time, _round);
         timer.register(`agg`);
@@ -977,9 +985,9 @@ deploy: {
         summaries.forEach(doc => {
           const res = dbsDst.summary.betlog_summaries.updateOne(doc.key, {$set: doc.value}, {upsert: true});
           if (res.upsertedId) {
-            _logger.info(_coll, `- Inserted new summary record for G${doc.key.gameId} ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
+            _logger.info(_coll, `- Inserted new summary record for G${doc.key.gameId} ${doc.key.currency} ${system[doc.key.system]}`);
           } else if (res.modifiedCount > 0) {
-            _logger.info(_coll, `- Modified summary record for G${doc.key.gameId} ${doc.key.currency} ${doc.key.system == 1 ? 'Cocos' : doc.key.system == 2 ? 'Mobi' : 'null'}`);
+            _logger.info(_coll, `- Modified summary record for G${doc.key.gameId} ${doc.key.currency} ${system[doc.key.system]}`);
           }
 
           const _doc = {};
@@ -1001,9 +1009,9 @@ deploy: {
             }
             const res = dbsDst.summary.betlog_summaries.deleteOne(_doc);
             if (res.deletedCount > 0) {
-              _logger.warn(_coll, `- Deleted summary record for G${_doc.gameId} ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
+              _logger.warn(_coll, `- Deleted summary record for G${_doc.gameId} ${_doc.currency} ${system[_doc.system]}`);
             } else {
-              _logger.info(_coll, `- No summary record deleted for G${_doc.gameId} ${_doc.currency} ${_doc.system == 1 ? 'Cocos' : _doc.system == 2 ? 'Mobi' : 'null'}`);
+              _logger.info(_coll, `- No summary record deleted for G${_doc.gameId} ${_doc.currency} ${system[_doc.system]}`);
             }
           } catch (e) {
             _logger.err(_coll, `- Something is WRONG while deleting summary record for ${doc}`);
@@ -1037,37 +1045,40 @@ deploy: {
 
   // SabaClub class
   const _id = `SabaClub`;
-  const version = `1.1.2`;
+  const version = `1.1.3`;
   const changelog = {
+    '1.1.3' : [
+      `[${_id}.BetLogSummary] Enumerize system value`
+    ],
     '1.1.2': [
-      `[SabaClub.Summary] Add force parameter to bypass time checking`,
-      `[SabaClub.Summary] Remove temporary object generation in aggregate`,
+      `[${_id}.Summary] Add force parameter to bypass time checking`,
+      `[${_id}.Summary] Remove temporary object generation in aggregate`,
     ],
     '1.1.1': [
-      `[SabaClub.BetLogSummary] Add betCount to summary data`,
-      `[SabaClub.BetLogProcessor] Fix missing system in data project`
+      `[${_id}.BetLogSummary] Add betCount to summary data`,
+      `[${_id}.BetLogProcessor] Fix missing system in data project`
     ],
     '1.1.0': [
-      `Release [SabaClub.BetLogProcessor]`,
-      `Release [SabaClub.BetLogSummary]`,
+      `Release [${_id}.BetLogProcessor]`,
+      `Release [${_id}.BetLogSummary]`,
     ],
     '1.0.3': [
-      `[SabaClub.SmartBot] Add parameter for input userinfo source`,
+      `[${_id}.SmartBot] Add parameter for input userinfo source`,
     ],
     '1.0.2': [
-      `[SabaClub.Summary] Add isCash field to summary`,
+      `[${_id}.Summary] Add isCash field to summary`,
     ],
     '1.0.1': [
       `Hide internal variables & constants`,
       `Add method descriptor for enumerability`,
-      `[SabaClub.Summary] Set last day/hour as default time`,
-      `[SabaClub.Summary] Fix getTimeStr() error when input is not Date`,
-      `[SabaClub.Summary] Fix input time being moved to 1 day prior`,
-      `Release [SabaClub.SmartBot]`,
+      `[${_id}.Summary] Set last day/hour as default time`,
+      `[${_id}.Summary] Fix getTimeStr() error when input is not Date`,
+      `[${_id}.Summary] Fix input time being moved to 1 day prior`,
+      `Release [${_id}.SmartBot]`,
       `Add descriptor to class' universal methods`,
     ],
     '1.0.0': [
-      `Release [SabaClub.Summary]`,
+      `Release [${_id}.Summary]`,
     ],
   };
   const value = new Code(`(() => {
