@@ -1,5 +1,9 @@
 USE SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'SB_DailySummary', N'dbr';
+DECLARE	@Procedure	SYSNAME		= N'dbr.SB_DailySummary'
+	,	@Version	SYSNAME		= N'1.1.1'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	dbr.SB_DailySummary
 					@Var1			SQL_VARIANT		= NULL
@@ -15,12 +19,14 @@ AS
 	Parameters:
 		@Var1				[optional]		- The id of Luminet system that will be selected
 				<DEFAULT>	NULL			- No data
+
 		@Var2				[optional]		- The id of environment that will be selected
 				<DEFAULT>	NULL			- No data
+
 		@Var3				[optional]		- The date of data that will be selected. The time is in UTC timezone.
 				<DEFAULT>	NULL			- Yesterday 00:00:00 AM
 
-	Version:	1.1.0
+	Version:	1.1.1
 	Revision:
 		- [1.1.1]	20210722@Billy		Add option to query SIT environment
 		- [1.1.0]	20210617@Billy		Update query to match with new BI schema

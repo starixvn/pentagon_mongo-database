@@ -129,7 +129,6 @@ BEGIN;
 	INSERT INTO	@SCs
 			(SC, isExpanded, isCash, isDone)
 	VALUES	( 1,          0,      0,      0)
-
 		;
 
 	BEGIN;	-- OW --
