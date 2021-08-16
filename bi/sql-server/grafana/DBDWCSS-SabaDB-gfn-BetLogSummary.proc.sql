@@ -1,5 +1,9 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'BetLogSummary', N'gfn';
+DECLARE	@Procedure	SYSNAME		= N'gfn.BetLogSummary'
+	,	@Version	SYSNAME		= N'1.1.1'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	gfn.BetLogSummary
 					@Var1				SQL_VARIANT
@@ -34,6 +38,7 @@ AS
 
 	Version:	1.1.0
 	Revision:
+		- [1.1.0]	20210816@Billy		Add ɪɴsᴛᴀɴᴛ value
 		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
 		- [1.0.0]	20210531@Billy		Release gfn.BetLogSummaryByDate
 		- [0.0.1]	20210531@Billy		Initital
@@ -110,7 +115,7 @@ BEGIN;
 SELECT	time, metric, value
 FROM	(
 	SELECT	DATE(bs.time) AS time
-		,	CONCAT(CASE bs.system WHEN 1 THEN "ᴄᴏᴄᴏs " WHEN 2 THEN "ᴍᴏʙɪ " ELSE "" END, ' + @Group + N') AS metric
+		,	CONCAT(CASE bs.system WHEN 1 THEN "ᴄᴏᴄᴏs " WHEN 2 THEN "ᴍᴏʙɪ " WHEN 3 THEN "ɪɴsᴛᴀɴᴛ " ELSE "" END, ' + @Group + N') AS metric
 		,	SUM(' + @Value + N') AS value
 	FROM		summary.game_summary_config AS cfg
 	INNER JOIN	summary.betlog_summaries AS bs

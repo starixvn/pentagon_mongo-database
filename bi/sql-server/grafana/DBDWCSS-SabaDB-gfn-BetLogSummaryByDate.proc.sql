@@ -1,5 +1,9 @@
 USE	SabaDB;
-EXECUTE	dbo.sp_MSR_InitProcedure N'BetLogSummaryByDate', N'gfn';
+DECLARE	@Procedure	SYSNAME		= N'gfn.BetLogSummaryByDate'
+	,	@Version	SYSNAME		= N'1.1.0'
+	;
+EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
+EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
 GO
 ALTER PROCEDURE	gfn.BetLogSummaryByDate
 					@Var1				SQL_VARIANT		= NULL
