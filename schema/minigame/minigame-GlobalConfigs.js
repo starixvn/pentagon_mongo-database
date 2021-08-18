@@ -8,10 +8,10 @@ if ((2 ** Saba.env() & 2) > 0) {  // global_configs
 }
 
 dbs.minigame.global_configs.updateOne(
-  { type: `kenosoccer_liveodds`},
+  { type: `kenomatch_liveodds`},
   { $set: {
-    time: ISODate('2021-06-29 07:00:00'),
-    homeAway: {
+    time: ISODate('2021-07-18T00:00:00Z'),
+    blueRed: {
       '-150': {
         liveFTBlue: 11.36,
         liveFTRed: 1.1,
