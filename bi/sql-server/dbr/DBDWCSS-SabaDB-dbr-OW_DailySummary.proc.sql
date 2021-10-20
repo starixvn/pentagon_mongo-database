@@ -34,23 +34,14 @@ BEGIN;
 	DECLARE	@Timer			DATETIME2		= SYSUTCDATETIME()
 		;
 
-	DECLARE	@_ReportDate	DATETIME
-		,	@_VendorId		INT
+	DECLARE	@ReportDate		DATETIME
+		,	@VendorId		INT
 		;
 
-	BEGIN TRY;
-		SELECT	@_VendorId = CONVERT(INT, @Var1);
-	END TRY BEGIN CATCH;
-		SELECT	@_VendorId = NULL;
-	END CATCH;
+	BEGIN TRY; SELECT @VendorId   = CONVERT(INT     , @Var1); END TRY BEGIN CATCH; SELECT @VendorId   = NULL; END CATCH;
+	BEGIN TRY; SELECT @ReportDate = CONVERT(DATETIME, @Var2); END TRY BEGIN CATCH; SELECT @ReportDate = NULL; END CATCH;
 
-	BEGIN TRY;
-		SELECT	@_ReportDate = CONVERT(DATETIME, @Var2);
-	END TRY BEGIN CATCH;
-		SELECT	@_ReportDate = NULL;
-	END CATCH;
-
-	SELECT	@_ReportDate	= ISNULL(@_ReportDate, CONVERT(DATE, DATEADD(DAY, -1, GETUTCDATE())))
+	SELECT	@ReportDate	= CONVERT(DATE, ISNULL(@ReportDate, DATEADD(DAY, -1, GETUTCDATE())))
 		;
 
 	DECLARE	@Query		NVARCHAR(MAX)
@@ -89,7 +80,7 @@ OPTION (RECOMPILE);
 		,	@Param = N'@VendorId INT, @ReportDate DATETIME'
 		;
 
-	EXECUTE	DB061KBT.bodb02.sys.sp_executesql @Query, @Param, @_VendorId, @_ReportDate;
+	EXECUTE	DB061KBT.bodb02.sys.sp_executesql @Query, @Param, @VendorId, @ReportDate;
 
 	RETURN	DATEDIFF(MILLISECOND, @Timer, SYSUTCDATETIME());
 END;

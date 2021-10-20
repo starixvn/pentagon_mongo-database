@@ -1,6 +1,6 @@
 USE	SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'Noti.BetLogSummaryReport'
-	,	@Version	SYSNAME		= N'1.1.0'
+	,	@Version	SYSNAME		= N'1.1.1'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -23,8 +23,9 @@ AS
 		@Var2:				[optional]		- Is this testing execution?
 				<DEFAULT>	NULL			- Treat as if testing
 
-	Version:	1.1.0
+	Version:	1.1.1
 	Revision:
+		- [1.1.1]	20211018@Billy		Group by currency code
 		- [1.1.0]	20210812@Billy		Support instant system
 		- [1.0.1]	20210722@Billy		Base SP updated for SIT environment support
 		- [1.0.0]	20210601@Billy		Release Noti.BetLogSummaryReport - [Gitlab: #058]
@@ -81,6 +82,12 @@ BEGIN;
 			,	PRIMARY KEY CLUSTERED (id)
 			);
 
+	DECLARE	@Exchanges AS TABLE (
+				currency		NVARCHAR(50)
+			,	code			VARCHAR(3)
+			,	PRIMARY KEY CLUSTERED (currency)
+			)
+
 	CREATE TABLE	#DS_DailySummary (
 						L				TINYINT
 					,	gameId			INT
@@ -108,6 +115,10 @@ BEGIN;
 		,	( 2, N'ᴍᴏʙɪ')
 		,	( 3, N'ɪɴsᴛᴀɴᴛ')
 		;
+
+	-- List of currencies --
+	INSERT INTO	@Exchanges (currency, code)
+	EXECUTE	dbr.OW_Exchanges;
 
 	BEGIN;	-- SB --
 		UPDATE	@Ls
@@ -145,10 +156,15 @@ BEGIN;
       - BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'
       - TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.turnOver AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
+				LEFT JOIN	@Exchanges AS e
+						ON	sb.currency = e.currency
+				CROSS APPLY	(
+					SELECT	[currency]	= ISNULL(e.code, sb.currency)
+				) AS ex
 				CROSS APPLY	(
 					SELECT	TOP(1)
 							[CurGrp]	= CASE dsb.isExpanded
-											WHEN 1 THEN N'(' + _sys.name + N') ' +  UPPER(sb.currency)
+											WHEN 1 THEN N'(' + _sys.name + N') ' +  UPPER(ex.currency)
 											ELSE N'(' + _sys.name + N') Total'
 										  END
 					FROM	(
@@ -160,7 +176,7 @@ BEGIN;
 					) AS _sys
 					ORDER BY id DESC
 				) AS grp
-				WHERE	sb.currency <> 'UUS'
+				WHERE	ex.currency <> 'UUS'
 					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
@@ -196,10 +212,15 @@ BEGIN;
       \- BC: ' + REPLACE(CONVERT(NVARCHAR(MAX), SUM(CAST(sb.betCount AS MONEY)), 1), '.00', '') + N'  
       \- TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.turnOver AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
+				LEFT JOIN	@Exchanges AS e
+						ON	sb.currency = e.currency
+				CROSS APPLY	(
+					SELECT	[currency]	= ISNULL(e.code, sb.currency)
+				) AS ex
 				CROSS APPLY	(
 					SELECT	TOP(1)
 							[CurGrp]	= CASE dsb.isExpanded
-											WHEN 1 THEN N'(' + _sys.name + N') ' +  UPPER(sb.currency)
+											WHEN 1 THEN N'(' + _sys.name + N') ' +  UPPER(ex.currency)
 											ELSE N'(' + _sys.name + N') Total'
 										  END
 					FROM	(
@@ -211,7 +232,7 @@ BEGIN;
 					) AS _sys
 					ORDER BY id DESC
 				) AS grp
-				WHERE	sb.currency <> 'UUS'
+				WHERE	ex.currency <> 'UUS'
 					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp

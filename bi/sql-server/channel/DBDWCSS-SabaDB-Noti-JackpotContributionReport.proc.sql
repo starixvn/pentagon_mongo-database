@@ -1,6 +1,6 @@
 USE	SabaDB;
 DECLARE	@Object		SYSNAME		= N'Noti.JackpotContributionReport'
-	,	@Version	SYSNAME		= N'1.2.0'
+	,	@Version	SYSNAME		= N'1.2.1'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Object;
 EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
@@ -22,8 +22,9 @@ AS
 		@Var2:				[optional]		- Is this testing execution?
 				<DEFAULT>	NULL			- Treat as if testing
 
-	Version:	1.2.0
+	Version:	1.2.1
 	Revision:
+		- [1.2.1]	20211015@Billy		Configure jackpot contribution rate value
 		- [1.2.0]	20210806@Billy		Migrate SC2 to vG2
 		- [1.1.0]	20210617@Billy		Update query to match with new BI schema
 		- [1.0.0]	20210324@Billy		Release Noti.JackpotContributionReport
@@ -88,7 +89,7 @@ BEGIN;
 			,	gameType		NVARCHAR(128)
 			,	currency		VARCHAR(10)
 			,	JPCont			DECIMAL(19,4)
-			,	PRIMARY KEY CLUSTERED (L, gameTypeId, currency)
+			,	PRIMARY KEY CLUSTERED (L, gameTypeId, gameId, currency)
 			);
 
 	CREATE TABLE	#OW_JPContribution (
@@ -107,7 +108,7 @@ BEGIN;
 					,	gameType		NVARCHAR(128)
 					,	currency		VARCHAR(10)
 					,	JPCont			DECIMAL(19,4)
-					,	PRIMARY KEY CLUSTERED (L, gameTypeId, currency)
+					,	PRIMARY KEY CLUSTERED (L, gameTypeId, gameId, currency)
 					);
 
 	-- List of Ls --
@@ -156,7 +157,7 @@ SELECT	0 AS L
 	,	cfg.gameId AS gameId
 	,	cfg.nameEN AS gameType
 	,	IFNULL(ds.currency, "null") AS currency
-	,	ds.stake * 0.025 AS JPCont
+	,	ds.stake * IFNULL(cfg.jpCont, 0) AS JPCont
 FROM		summary.daily_summaries AS ds
 INNER JOIN	summary.game_summary_config AS cfg
 		ON	ds.gameId = cfg.gameId
@@ -200,14 +201,18 @@ WHERE	cfg.groupName = "Slots"
 	-- Reuse @Tmp_JPContribution for checking mismatch --
 	DELETE	@Tmp_JPContribution;
 	INSERT INTO	@Tmp_JPContribution (L, gameTypeId, gameId, gameType, currency, JPCont)
-	SELECT	[L]			= ISNULL(sb.L, 0)
+	SELECT	[L]				= ISNULL(sb.L, 0)
 		,	[gameTypeId]	= ISNULL(ow.gameTypeId, sb.gameTypeId)
-		,	[gameId]		= ISNULL(sb.gameId, 0)
-		,	[gameType]		= ISNULL(ow.gameType, sb.gameType)
+		,	[gameId]		= 0
+		,	[gameType]		= ow.gameType
 		,	[currency]		= ISNULL(ow.currency, sb.currency)
-		,	[JPCont]		= ISNULL(ow.JPCont, 0) -ISNULL(sb.JPCont, 0)
+		,	[JPCont]		= ISNULL(ow.JPCont, 0) - ISNULL(sb.JPCont, 0)
 	FROM			#OW_JPContribution AS ow
-	FULL OUTER JOIN	#DS_JPContribution AS sb
+	FULL OUTER JOIN	(
+		SELECT	ds.L, ds.gameTypeId, ds.currency, [JPCont] = SUM(ds.JPCont)
+		FROM	#DS_JPContribution AS ds
+		GROUP BY ds.L, ds.gameTypeId, ds.currency
+	) AS sb
 				ON	ow.gameTypeId = sb.gameTypeId
 				AND	ow.currency = sb.currency
 	WHERE	COALESCE(ow.currency, sb.currency) <> 'UUS'

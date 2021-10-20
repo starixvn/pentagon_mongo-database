@@ -1,6 +1,6 @@
 USE	SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'SabaClub.DailySummaryReport'
-	,	@Version	SYSNAME		= N'2.1.0'
+	,	@Version	SYSNAME		= N'2.1.1'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -13,7 +13,7 @@ AS
 /*
 	Creator:		20210529@Billy
 	Location:		DBDWCSS.SabaDB
-	Description:	Compare Daily Summary for vGaming
+	Description:	Compare Daily Summary for SabaClub
 					Send result via Noti telegram channel
 
 	Parameters:
@@ -24,8 +24,9 @@ AS
 				<DEFAULT>	NULL			- Treat as if testing
 
 
-	Version:	2.1.0
+	Version:	2.1.1
 	Revision:
+		- [2.1.1]	20211020@Billy		Group by currency code
 		- [2.1.0]	20210806@Billy		Migrate SC2 to vG2
 		- [2.0.1]	20210722@Billy		Base SP updated for SIT environment support
 		- [2.0.0]	20210531@Billy		Split into SabaClub & vGaming report
@@ -53,7 +54,7 @@ BEGIN;
 		SELECT	@isTest			= NULL;
 	END CATCH;
 
-	SELECT	@ReportDate		= ISNULL(@ReportDate, ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE)))
+	SELECT	@ReportDate		= ISNULL(@ReportDate, CAST(DATEADD(DAY, -1, GETUTCDATE()) AS DATE))
 		,	@isTest			= ISNULL(@isTest, 1)
 		;
 
@@ -100,6 +101,12 @@ BEGIN;
 			,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency, isCash)
 			);
 
+	DECLARE	@Exchanges AS TABLE (
+				currency		NVARCHAR(50)
+			,	code			VARCHAR(3)
+			,	PRIMARY KEY CLUSTERED (currency)
+			)
+
 	CREATE TABLE	#OW_DailySummary (
 						gameTypeId		INT
 					,	gameType		NVARCHAR(128)
@@ -130,6 +137,10 @@ BEGIN;
 			(SC, isExpanded, isCash, isDone)
 	VALUES	( 1,          0,      0,      0)
 		;
+
+	-- List of currencies --
+	INSERT INTO	@Exchanges (currency, code)
+	EXECUTE	dbr.OW_Exchanges;
 
 	BEGIN;	-- OW --
 		INSERT INTO	#OW_DailySummary (gameTypeId, gameType, currency, isCash, phienCount, betCount, stake, payOut)
@@ -276,13 +287,18 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
       - TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'
       - WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
+				LEFT JOIN	@Exchanges AS e
+						ON	sb.currency = e.currency
+				CROSS APPLY	(
+					SELECT	[currency]	= ISNULL(e.code, sb.currency)
+				) AS ex
 				CROSS APPLY	(
 					SELECT	[CurGrp]	= CASE dsb.isExpanded
-											WHEN 1 THEN N'(' + CASE sb.isCash WHEN 0 THEN N'Cre' WHEN 1 THEN N'Dep' WHEN 2 THEN N'nul' ELSE N'***' END + N') ' +  UPPER(sb.currency)
+											WHEN 1 THEN N'(' + CASE sb.isCash WHEN 0 THEN N'Cre' WHEN 1 THEN N'Dep' WHEN 2 THEN N'nul' ELSE N'***' END + N') ' +  UPPER(ex.currency)
 											ELSE N'Total'
 										  END
 				) AS grp
-				WHERE	sb.currency <> 'UUS'
+				WHERE	ex.currency <> 'UUS'
 					AND	sb.SC = dsb.SC
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
@@ -318,13 +334,18 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
       \- TO: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake AS MONEY)), 1) + N'  
       \- WL: ' + CONVERT(NVARCHAR(MAX), SUM(CAST(sb.stake - sb.payOut AS MONEY)), 1)
 				FROM		#DS_DailySummary AS sb
+				LEFT JOIN	@Exchanges AS e
+						ON	sb.currency = e.currency
+				CROSS APPLY	(
+					SELECT	[currency]	= ISNULL(e.code, sb.currency)
+				) AS ex
 				CROSS APPLY	(
 					SELECT	[CurGrp]	= CASE dsb.isExpanded
-											WHEN 1 THEN N'(' + CASE sb.isCash WHEN 0 THEN N'Cre' WHEN 1 THEN N'Dep' WHEN 2 THEN N'nul' ELSE N'***' END + N') ' +  UPPER(sb.currency)
+											WHEN 1 THEN N'(' + CASE sb.isCash WHEN 0 THEN N'Cre' WHEN 1 THEN N'Dep' WHEN 2 THEN N'nul' ELSE N'***' END + N') ' +  UPPER(ex.currency)
 											ELSE N'Total'
 										  END
 				) AS grp
-				WHERE	sb.currency <> 'UUS'
+				WHERE	ex.currency <> 'UUS'
 					AND	sb.SC = dsb.SC
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp

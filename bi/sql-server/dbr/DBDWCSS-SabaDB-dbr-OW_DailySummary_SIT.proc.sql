@@ -50,7 +50,7 @@ BEGIN;
 		SELECT	@_ReportDate = NULL;
 	END CATCH;
 
-	SELECT	@_ReportDate	= ISNULL(@_ReportDate, CONVERT(DATE, DATEADD(DAY, -1, GETUTCDATE())))
+	SELECT	@_ReportDate	= CONVERT(DATE, ISNULL(@_ReportDate, DATEADD(DAY, -1, GETUTCDATE())))
 		;
 
 	DECLARE	@Query			NVARCHAR(MAX)
