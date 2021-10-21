@@ -69,7 +69,7 @@ BEGIN;
 		RETURN;
 	END;
 
-	DECLARE	@SC				INT
+	DECLARE	@L				INT
 		,	@isCash			TINYINT
 		,	@GameId			INT
 		,	@GameType		NVARCHAR(128)
@@ -78,16 +78,16 @@ BEGIN;
 		,	@Title			NVARCHAR(512)
 		;
 
-	DECLARE	@SCs AS TABLE (
-				SC				TINYINT
+	DECLARE	@Ls AS TABLE (
+				L				TINYINT
 			,	isExpanded		BIT
 			,	isCash			TINYINT
 			,	isDone			BIT
-			,	PRIMARY KEY CLUSTERED (SC)
+			,	PRIMARY KEY CLUSTERED (L)
 			);
 
 	DECLARE	@Tmp_DailySummary AS TABLE (
-				SC				TINYINT
+				L				TINYINT
 			,	gameTypeId		INT
 			,	gameId			INT
 			,	gameType		NVARCHAR(128)
@@ -98,7 +98,7 @@ BEGIN;
 			,	stake			DECIMAL(19,4)
 			,	winLost			DECIMAL(19,4)
 			,	payOut			DECIMAL(19,4)
-			,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency, isCash)
+			,	PRIMARY KEY CLUSTERED (L, gameTypeId, currency, isCash)
 			);
 
 	DECLARE	@Exchanges AS TABLE (
@@ -120,7 +120,7 @@ BEGIN;
 					);
 
 	CREATE TABLE	#DS_DailySummary (
-						SC				TINYINT
+						L				TINYINT
 					,	gameId			INT
 					,	gameTypeId		INT
 					,	gameType		NVARCHAR(128)
@@ -129,12 +129,12 @@ BEGIN;
 					,	betCount		INT
 					,	stake			DECIMAL(19,4)
 					,	payOut			DECIMAL(19,4)
-					,	PRIMARY KEY CLUSTERED (SC, gameTypeId, currency, isCash)
+					,	PRIMARY KEY CLUSTERED (L, gameTypeId, currency, isCash)
 					);
 
-	-- List of SCs --
-	INSERT INTO	@SCs
-			(SC, isExpanded, isCash, isDone)
+	-- List of Ls --
+	INSERT INTO	@Ls
+			(L, isExpanded, isCash, isDone)
 	VALUES	( 1,          0,      0,      0)
 		;
 
@@ -145,29 +145,30 @@ BEGIN;
 	BEGIN;	-- OW --
 		INSERT INTO	#OW_DailySummary (gameTypeId, gameType, currency, isCash, phienCount, betCount, stake, payOut)
 		EXECUTE	dbr.OW_DailySummary @VendorId, @ReportDate;
-		RAISERROR('Executed on OW - L%d.', 0, 0, @VendorId) WITH NOWAIT;
+		RAISERROR(N'\
+[INFO]  Executed on OW - V%d.', 0, 0, @VendorId) WITH NOWAIT;
 	END;	-- OW --
 
 	BEGIN;	-- SB --
-		UPDATE	@SCs
+		UPDATE	@Ls
 		SET		isDone = 0;
 
-		WHILE	EXISTS (SELECT 1 FROM @SCs WHERE isDone = 0)
+		WHILE	EXISTS (SELECT 1 FROM @Ls WHERE isDone = 0)
 		BEGIN;
 			UPDATE	TOP(1)
-					@SCs
-			SET		@SC		= SC
+					@Ls
+			SET		@L		= L
 				,	@isCash	= isCash
 				,	isDone	= 1
 			WHERE	isDone = 0;
 
 			DELETE	@Tmp_DailySummary;
-			INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, payOut)
-			EXECUTE	dbr.SB_DailySummary @SC, 1, @ReportDate;
+			INSERT INTO	@Tmp_DailySummary (L, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, payOut)
+			EXECUTE	dbr.SB_DailySummary @L, 1, @ReportDate;
 
 			MERGE INTO	#DS_DailySummary AS ds
 			USING		@Tmp_DailySummary AS tmp
-					ON	ds.SC = @SC
+					ON	ds.L = @L
 					AND	COALESCE(NULLIF(ds.isCash, 2), @isCash, 2) = COALESCE(NULLIF(tmp.isCash, 2), @isCash, 2)
 					AND	ds.gameTypeId = tmp.gameTypeId
 					AND	ds.currency = tmp.currency
@@ -177,17 +178,18 @@ BEGIN;
 				,	ds.stake += tmp.stake
 				,	ds.payOut += tmp.payOut
 			WHEN NOT MATCHED THEN
-				INSERT	( SC,     gameTypeId,     gameId,     gameType,     currency,                     isCash                 ,     betCount,     stake,     payOut)
-				VALUES	(@SC, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, COALESCE(NULLIF(tmp.isCash, 2), @isCash, 2), tmp.betCount, tmp.stake, tmp.payOut)
+				INSERT	( L,     gameTypeId,     gameId,     gameType,     currency,                     isCash                 ,     betCount,     stake,     payOut)
+				VALUES	(@L, tmp.gameTypeId, tmp.gameId, tmp.gameType, tmp.currency, COALESCE(NULLIF(tmp.isCash, 2), @isCash, 2), tmp.betCount, tmp.stake, tmp.payOut)
 			;
-			RAISERROR('Executed on SC%d.', 0, 0, @SC) WITH NOWAIT;
+			RAISERROR(N'\
+[INFO]  Executed on L%d.', 0, 0, @L) WITH NOWAIT;
 		END;
 	END;	-- SB --
 
 	-- Reuse @Tmp_DailySummary for checking mismatch --
 	DELETE	@Tmp_DailySummary;
-	INSERT INTO	@Tmp_DailySummary (SC, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, winLost)
-	SELECT	[SC]			= ISNULL(sb.SC, 0)
+	INSERT INTO	@Tmp_DailySummary (L, gameTypeId, gameId, gameType, currency, isCash, betCount, stake, winLost)
+	SELECT	[L]			= ISNULL(sb.L, 0)
 		,	[gameTypeId]	= ISNULL(ow.gameTypeId, sb.gameTypeId)
 		,	[gameId]		= ISNULL(sb.gameId, 0)
 		,	[gameType]		= ISNULL(ow.gameType, sb.gameType)
@@ -215,15 +217,15 @@ BEGIN;
 		WHILE	EXISTS (SELECT 1 FROM @Tmp_DailySummary)
 		BEGIN;
 			SELECT	TOP(1)
-					@SC			= SC
+					@L			= L
 				,	@GameId		= gameId
 				,	@GameType	= gameType
 				,	@GameTypeId	= gameTypeId
 			FROM	@Tmp_DailySummary
-			ORDER BY SC, gameId;
+			ORDER BY L, gameId;
 
 			SELECT	@Title		= @Status + N'] [SabaClub Summary ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23)
-				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
+				,	@Message	= N'[SC' + CONVERT(NVARCHAR(MAX), @L) + N' (' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N')] ' + @GameType + N': (BC|TO|WL)' + msg.str
 			FROM	(
 				SELECT	N'
 [' + currency + N' (' + CASE isCash WHEN 0 THEN N'CRE' WHEN 1 THEN N'DEP' WHEN 2 THEN N'null' ELSE N'invalid' END + N')]'
@@ -231,7 +233,7 @@ BEGIN;
 + N'|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
 + N'|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
 				FROM	@Tmp_DailySummary
-				WHERE	SC = @SC
+				WHERE	L = @L
 					AND	gameId = @GameId
 				ORDER BY currency
 				FOR XML PATH ('')
@@ -243,7 +245,7 @@ BEGIN;
 			EXECUTE	Letstalk.SendNotification @Message, @Title, @isTest;
 
 			SELECT	@Message = N'\\\[' + @Status + N'\] \\\[SabaClub Summary ' + CONVERT(NVARCHAR(MAX), @ReportDate, 23) + N'\]  
-\\\[SC' + CONVERT(NVARCHAR(MAX), @SC) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(BC\|TO\|WL\)'
+\\\[SC' + CONVERT(NVARCHAR(MAX), @L) + N' \(' + CONVERT(NVARCHAR(MAX), @gameTypeId) + N'.' + CONVERT(NVARCHAR(MAX), @gameId) + N'\)\] ' + @GameType + N': \(BC\|TO\|WL\)'
 							 + msg.str
 			FROM	(
 				SELECT	N'  
@@ -252,7 +254,7 @@ BEGIN;
 + N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(stake AS MONEY), 1), '.00', '')
 + N'\|' + REPLACE(CONVERT(NVARCHAR(MAX), CAST(winLost AS MONEY), 1), '.00', '')
 				FROM	@Tmp_DailySummary
-				WHERE	SC = @SC
+				WHERE	L = @L
 					AND	gameId = @GameId
 				ORDER BY currency, isCash
 				FOR XML PATH ('')
@@ -264,7 +266,7 @@ BEGIN;
 			EXECUTE	Noti.SendNotification @Message, @isTest;
 
 			DELETE	@Tmp_DailySummary
-			WHERE	SC = @SC
+			WHERE	L = @L
 				AND	gameId = @GameId;
 		END;
 	END;	-- TRUE - Has mismatch --
@@ -275,10 +277,10 @@ BEGIN;
 		FROM	(
 			SELECT	N'
 
-SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+SC' + CONVERT(NVARCHAR(MAX), dsb.L) + N':' + c.str
 			FROM	(
-				SELECT	SC, isExpanded
-				FROM	@SCs
+				SELECT	L, isExpanded
+				FROM	@Ls
 			) AS dsb
 			CROSS APPLY	(
 				SELECT	N'
@@ -299,7 +301,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 										  END
 				) AS grp
 				WHERE	ex.currency <> 'UUS'
-					AND	sb.SC = dsb.SC
+					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
 				FOR XML PATH ('')
@@ -308,7 +310,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			CROSS APPLY	(
 				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 			) AS c(str)
-			ORDER BY dsb.SC
+			ORDER BY dsb.L
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
@@ -322,10 +324,10 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			SELECT	N'  
 
 ---
-SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
+SC' + CONVERT(NVARCHAR(MAX), dsb.L) + N':' + c.str
 			FROM	(
-				SELECT	SC, isExpanded
-				FROM	@SCs
+				SELECT	L, isExpanded
+				FROM	@Ls
 			) AS dsb
 			CROSS APPLY	(
 				SELECT	N'  
@@ -346,7 +348,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 										  END
 				) AS grp
 				WHERE	ex.currency <> 'UUS'
-					AND	sb.SC = dsb.SC
+					AND	sb.L = dsb.L
 				GROUP BY grp.CurGrp
 				ORDER BY grp.CurGrp
 				FOR XML PATH ('')
@@ -355,7 +357,7 @@ SC' + CONVERT(NVARCHAR(MAX), dsb.SC) + N':' + c.str
 			CROSS APPLY	(
 				SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 			) AS c(str)
-			ORDER BY dsb.SC
+			ORDER BY dsb.L
 			FOR XML PATH ('')
 			,	TYPE
 		) AS xmsg(xml)
