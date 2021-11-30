@@ -92,8 +92,6 @@ OPTION (RECOMPILE);
 		SELECT	xc.xml.value('.', 'NVARCHAR(MAX)')
 	) AS sc(str)
 	;
-	PRINT @Query;
-	PRINT @Param;
 	EXECUTE	DB061KBT.bodb02.sys.sp_executesql @Query, @Param, @ExchangeDate;
 
 	RETURN	DATEDIFF(MILLISECOND, @Timer, SYSUTCDATETIME());

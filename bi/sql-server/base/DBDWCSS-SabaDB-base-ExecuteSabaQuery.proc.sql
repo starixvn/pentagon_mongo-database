@@ -1,6 +1,6 @@
 USE	SabaDB;
 DECLARE	@Object		SYSNAME		= N'base.ExecuteSabaQuery'
-	,	@Version	SYSNAME		= N'1.1.0'
+	,	@Version	SYSNAME		= N'1.2.0'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Object;
 EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
@@ -34,8 +34,9 @@ AS
 							2				- Do nothing (UAT reserved)
 							3				- SIT
 
-	Version:	1.1.0
+	Version:	1.2.0
 	Revision:
+		- [1.2.0]	20211130@Billy		Support UAT Environment
 		- [1.1.0]	20210722@Billy		Support SIT Environment
 		- [1.0.2]	20210419@Billy		Do nothing if query is empty - [Gitlab: #060]
 		- [1.0.1]	20210322@Billy		Apply code convention - [Gitlab: #059]
@@ -89,17 +90,32 @@ BEGIN;
 		EXECUTE	(@Query) AT L3_SABAARCBI;
 
 	IF	@_L    = 1
-	AND	@_Type = 0 -- Active
+	AND	@_Type IN (0, 1) -- Mixxed
+	AND	@_Env  = 2 -- UAT
+		EXECUTE	(@Query) AT L1_SABAUATBI;
+
+	IF	@_L    = 2
+	AND	@_Type IN (0, 1) -- Mixxed
+	AND	@_Env  = 2 -- UAT
+		EXECUTE	(@Query) AT L2_SABAUATBI;
+
+	IF	@_L    = 3
+	AND	@_Type IN (0, 1) -- Mixxed
+	AND	@_Env  = 2 -- UAT
+		EXECUTE	(@Query) AT L3_SABAUATBI;
+
+	IF	@_L    = 1
+	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 3 -- SIT
 		EXECUTE	(@Query) AT L1_SABASITBI;
 
 	IF	@_L    = 2
-	AND	@_Type = 0 -- Active
+	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 3 -- SIT
 		EXECUTE	(@Query) AT L2_SABASITBI;
 
 	IF	@_L    = 3
-	AND	@_Type = 0 -- Active
+	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 3 -- SIT
 		EXECUTE	(@Query) AT L3_SABASITBI;
 END;
