@@ -1,6 +1,6 @@
 USE SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'gfn.StatsBigSmall'
-	,	@Version	SYSNAME		= N'0.0.1'
+	,	@Version	SYSNAME		= N'0.0.2'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -22,9 +22,10 @@ AS
 
 	Parameters:
 
-	Version:	0.0.1
+	Version:	0.0.2
 	Revision:
 		- [1.0.0]	20211201@Billy		Release dbr.StatsBigSmall
+		- [0.0.2]	20211201@Billy		Combine Stake|Refund & Stake|Payout
 		- [0.0.1]	20211201@Billy		Initital
 */
 BEGIN;
@@ -130,6 +131,7 @@ WHERE	time >= "' + CONVERT(NVARCHAR(MAX), @From, 127) + N'"
 SELECT	STR_TO_DATE(DATE_FORMAT(time, "' + f.fmtStr + N'"), "%Y-%m-%dT%TZ") AS time
 	,	SUM(refund) AS refund
 	,	SUM(stake - refund) AS valid
+	,	SUM(payout) AS payout
 FROM	minigame.' + @Coll + N'_tickets
 WHERE	currency <> "UUS"
 	AND	time >= "' + CONVERT(NVARCHAR(MAX), @From, 127) + N'"
@@ -157,27 +159,10 @@ ORDER BY time
 		FROM	dbr.tf_DateFormatByInterval(@Interval) AS f;
 		EXECUTE	base.ExecuteSabaQuery @Query, @L, 0, @Env;
 	END;
-	IF	@Type = 'StakePayout'
-	BEGIN;
-		SELECT	@Query = N'';
-		SELECT	@Query += N'\
-SELECT	STR_TO_DATE(DATE_FORMAT(time, "' + f.fmtStr + N'"), "%Y-%m-%dT%TZ") AS time
-	,	SUM(stake) AS stake
-	,	SUM(payout) AS payout
-FROM	minigame.' + @Coll + N'_tickets
-WHERE	currency <> "UUS"
-	AND	time >= "' + CONVERT(NVARCHAR(MAX), @From, 127) + N'"
-	AND	time <  "' + CONVERT(NVARCHAR(MAX), @To  , 127) + N'"
-GROUP BY DATE_FORMAT(time, "' + f.fmtStr + N'")
-ORDER BY time
-;'
-		FROM	dbr.tf_DateFormatByInterval(@Interval) AS f;
-		EXECUTE	base.ExecuteSabaQuery @Query, @L, 0, @Env;
-	END;
 
 	Finish:
 	RETURN	DATEDIFF(MILLISECOND, @Timer, SYSUTCDATETIME());
 END;
 GO
 EXECUTE	gfn.StatsBigSmall 'Big Small', NULL, NULL, 1, 1, 'BigSmall'
-EXECUTE	gfn.StatsBigSmall 'Big Small', '2021-11-30T08:00:00Z', 1, 1, 1, 'StakePayout', 'hour'
+EXECUTE	gfn.StatsBigSmall 'Big Small', '2021-11-30T08:00:00Z', 1, 1, 1, 'StakeRefund', 'hour'
