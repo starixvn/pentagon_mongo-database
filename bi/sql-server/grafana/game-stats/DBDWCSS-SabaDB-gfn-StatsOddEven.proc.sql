@@ -58,6 +58,7 @@ BEGIN;
 	FROM	(
 		VALUES	(N'Odd Even', N'chanle')
 			,	(N'Turbo Odd Even', N'chanleturbo')
+			,	(N'Special Se Die', N'specialsedie')
 	) AS g(name, coll)
 	WHERE	g.name = @Game;
 
