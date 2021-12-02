@@ -1,6 +1,6 @@
 USE SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'gfn.StatsBigSmall'
-	,	@Version	SYSNAME		= N'0.0.2'
+	,	@Version	SYSNAME		= N'0.0.3'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -22,9 +22,10 @@ AS
 
 	Parameters:
 
-	Version:	0.0.2
+	Version:	0.0.3
 	Revision:
 		- [1.0.0]	20211201@Billy		Release dbr.StatsBigSmall
+		- [0.0.3]	20211202@Billy		Using refund data from summary
 		- [0.0.2]	20211201@Billy		Combine Stake|Refund & Stake|Payout
 		- [0.0.1]	20211201@Billy		Initital
 */
@@ -38,6 +39,7 @@ BEGIN;
 
 	DECLARE	@Game		NVARCHAR(256)
 		,	@Coll		NVARCHAR(128)
+		,	@GameId		SMALLINT
 		,	@From		DATETIME
 		,	@To			DATETIME
 		,	@Days		SMALLINT
@@ -61,6 +63,10 @@ BEGIN;
 			,	(N'Turbo Big Small', N'txturbo')
 	) AS g(name, coll)
 	WHERE	g.name = @Game;
+
+	SELECT	@GameId	= gm.gameId
+	FROM	dbr.tf_GameTypeMapping(NULL, NULL, NULL) AS gm
+	WHERE	gm.baseName = @Coll;
 
 	IF	@Coll IS NULL OR @L IS NULL
 		GOTO Finish;
@@ -126,37 +132,59 @@ WHERE	time >= "' + CONVERT(NVARCHAR(MAX), @From, 127) + N'"
 	END;
 	IF	@Type = 'StakeRefund'
 	BEGIN;
+		SELECT	@Coll = NULL;
+		SELECT	@Coll = m.coll
+		FROM	(
+			VALUES	(N'hour', N'hourly_summaries')
+				,	(N'day' , N'daily_summaries')
+		) AS m(interval, coll)
+		WHERE	m.interval = @Interval;
+
+		IF	@Coll IS NULL
+			GOTO Finish;
+
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	STR_TO_DATE(DATE_FORMAT(time, "' + f.fmtStr + N'"), "%Y-%m-%dT%TZ") AS time
+SELECT	time AS time
 	,	SUM(refund) AS refund
 	,	SUM(stake - refund) AS valid
 	,	SUM(payout) AS payout
-FROM	minigame.' + @Coll + N'_tickets
+FROM	summary.' + @Coll + N'
 WHERE	currency <> "UUS"
+	AND	gameId = ' + CONVERT(NVARCHAR(MAX), @GameId) + N'
 	AND	time >= "' + CONVERT(NVARCHAR(MAX), @From, 127) + N'"
 	AND	time <  "' + CONVERT(NVARCHAR(MAX), @To  , 127) + N'"
-GROUP BY DATE_FORMAT(time, "' + f.fmtStr + N'")
+GROUP BY time
 ORDER BY time
-;'
-		FROM	dbr.tf_DateFormatByInterval(@Interval) AS f;
+;';
 		EXECUTE	base.ExecuteSabaQuery @Query, @L, 0, @Env;
 	END;
 	IF	@Type = 'StakeRefundPercent'
 	BEGIN;
+		SELECT	@Coll = NULL;
+		SELECT	@Coll = m.coll
+		FROM	(
+			VALUES	(N'hour', N'hourly_summaries')
+				,	(N'day' , N'daily_summaries')
+		) AS m(interval, coll)
+		WHERE	m.interval = @Interval;
+
+		IF	@Coll IS NULL
+			GOTO Finish;
+
 		SELECT	@Query = N'';
 		SELECT	@Query += N'\
-SELECT	STR_TO_DATE(DATE_FORMAT(time, "' + f.fmtStr + N'"), "%Y-%m-%dT%TZ") AS time
+SELECT	time AS time
 	,	SUM(refund) / SUM(stake) AS refund
 	,	SUM(stake - refund) / SUM(stake) AS valid
-FROM	minigame.' + @Coll + N'_tickets
+FROM	summary.' + @Coll + N'
 WHERE	currency <> "UUS"
+	AND	gameId = ' + CONVERT(NVARCHAR(MAX), @GameId) + N'
 	AND	time >= "' + CONVERT(NVARCHAR(MAX), @From, 127) + N'"
 	AND	time <  "' + CONVERT(NVARCHAR(MAX), @To  , 127) + N'"
-GROUP BY DATE_FORMAT(time, "' + f.fmtStr + N'")
+GROUP BY time
 ORDER BY time
-;'
-		FROM	dbr.tf_DateFormatByInterval(@Interval) AS f;
+;';
 		EXECUTE	base.ExecuteSabaQuery @Query, @L, 0, @Env;
 	END;
 
