@@ -1,6 +1,6 @@
 USE	SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'SysHealth.SummaryCrossCheck'
-	,	@Version	SYSNAME		= N'0.0.1'
+	,	@Version	SYSNAME		= N'0.0.2'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -19,9 +19,10 @@ AS
 		@Var1:				[optional]		- Is this testing execution?
 				<DEFAULT>	NULL			- Treat as if testing
 
-	Version:	0.0.1
+	Version:	0.0.2
 	Revision:
 		- [1.0.0]	20211201@Billy		Release SysHealth.SummaryCrossCheck
+		- [0.0.2]	20211202@Billy		Include refund data
 		- [0.0.1]	20211201@Billy		Initital
 */
 BEGIN;
@@ -56,6 +57,7 @@ BEGIN;
 			,	currency		VARCHAR(10)
 			,	isCash			BIT
 			,	stake			MONEY
+			,	refund			MONEY
 			,	payout			MONEY
 			,	tickets			INT
 			,	PRIMARY KEY CLUSTERED (L, time, gameId, currency, isCash)
@@ -68,6 +70,7 @@ BEGIN;
 			,	currency		VARCHAR(10)
 			,	isCash			BIT
 			,	stake			MONEY
+			,	refund			MONEY
 			,	payout			MONEY
 			,	tickets			INT
 			,	PRIMARY KEY CLUSTERED (L, time, gameId, currency, isCash)
@@ -80,6 +83,7 @@ BEGIN;
 			,	currency		VARCHAR(10)
 			,	isCash			BIT
 			,	stake			MONEY
+			,	refund			MONEY
 			,	payout			MONEY
 			,	tickets			INT
 			,	PRIMARY KEY CLUSTERED (L, time, gameId, currency, isCash)
@@ -101,10 +105,10 @@ BEGIN;
 		-- Daily Summary --
 		SELECT	@LQuery = N'';
 		SELECT	@LQuery += N'\
-SELECT	' + CAST(@L AS NVARCHAR(MAX)) + N' AS L, time, gameId, currency, isCash, stake, payout, tickets
+SELECT	' + CAST(@L AS NVARCHAR(MAX)) + N' AS L, time, gameId, currency, isCash, stake, refund, payout, tickets
 FROM	summary.daily_summaries;
 ';
-		INSERT INTO	@Daily (L, time, gameId, currency, isCash, stake, payout, tickets)
+		INSERT INTO	@Daily (L, time, gameId, currency, isCash, stake, refund, payout, tickets)
 		EXECUTE	base.ExecuteSabaQuery @LQuery, @L, 0, 1;
 
 		-- Hourly Summary --
@@ -114,23 +118,25 @@ SELECT	' + CAST(@L AS NVARCHAR(MAX)) + N' AS L
 	,	DATE(DATE_FORMAT(time, "%Y-%m-%d")) AS time
 	,	gameId, currency, isCash
 	,	SUM(stake) AS stake
+	,	SUM(refund) AS refund
 	,	SUM(payout) AS payout
 	,	SUM(tickets) AS tickets
 FROM	summary.hourly_summaries
 WHERE	time >= DATE(DATE_ADD(UTC_TIMESTAMP(), INTERVAL -7 DAY))
 GROUP BY DATE_FORMAT(time, "%Y-%m-%d"), gameId, currency, isCash;
 ';
-		INSERT INTO	@Hourly (L, time, gameId, currency, isCash, stake, payout, tickets)
+		INSERT INTO	@Hourly (L, time, gameId, currency, isCash, stake, refund, payout, tickets)
 		EXECUTE	base.ExecuteSabaQuery @LQuery, @L, 0, 1;
 	END;
 
-	INSERT INTO	@Diff (L, time, gameId, currency, isCash, stake, payout, tickets)
+	INSERT INTO	@Diff (L, time, gameId, currency, isCash, stake, refund, payout, tickets)
 	SELECT	[L]			= ISNULL(d.L, h.L)
 		,	[time]		= ISNULL(d.time, h.time)
 		,	[gameId]	= ISNULL(d.gameId, h.gameId)
 		,	[currency]	= ISNULL(d.currency, h.currency)
 		,	[isCash]	= ISNULL(d.isCash, h.isCash)
 		,	[stake]		= ISNULL(d.stake, 0) - ISNULL(h.stake, 0)
+		,	[refund]	= ISNULL(d.refund, 0) - ISNULL(h.refund, 0)
 		,	[payout]	= ISNULL(d.payout, 0) - ISNULL(h.payout, 0)
 		,	[tickets]	= ISNULL(d.tickets, 0) - ISNULL(h.tickets, 0)
 	FROM			@Daily AS d
@@ -142,6 +148,7 @@ GROUP BY DATE_FORMAT(time, "%Y-%m-%d"), gameId, currency, isCash;
 				AND	d.isCash	= h.isCash
 	WHERE	ISNULL(d.time, h.time) < CAST(GETUTCDATE() AS DATE)
 		AND	(	ISNULL(d.stake, -1) <> ISNULL(h.stake, -2)
+			OR	ISNULL(d.refund, -1) <> ISNULL(h.refund, -2)
 			OR	ISNULL(d.payout, -1) <> ISNULL(h.payout, -2)
 			OR	ISNULL(d.tickets, -1) <> ISNULL(h.tickets, -2)
 			)
@@ -168,6 +175,8 @@ GROUP BY DATE_FORMAT(time, "%Y-%m-%d"), gameId, currency, isCash;
 			CROSS APPLY	(
 				SELECT	CASE WHEN df.stake <> 0 THEN N'  
     \- stake: ' + CONVERT(NVARCHAR(MAX), df.stake) ELSE N'' END +
+						CASE WHEN df.refund <> 0 THEN N'  
+    \- refund: ' + CONVERT(NVARCHAR(MAX), df.refund) ELSE N'' END +
 						CASE WHEN df.payout <> 0 THEN N'  
     \- payout: ' + CONVERT(NVARCHAR(MAX), df.payout) ELSE N'' END +
 						CASE WHEN df.tickets <> 0 THEN N'  
