@@ -1,6 +1,6 @@
 USE SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'dbr.SB_GetExchangeCodeList'
-	,	@Version	SYSNAME		= N'1.0.0'
+	,	@Version	SYSNAME		= N'1.0.1'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -17,8 +17,9 @@ AS
 
 	Parameters:
 
-	Version:	1.0.0
+	Version:	1.0.1
 	Revision:
+		- [1.0.1]	20211214@Billy		Fetch [base] currency
 		- [1.0.0]	20211122@Billy		Release dbr.SB_GetExchangeCodeList
 		- [0.0.1]	20211122@Billy		Initital
 */
@@ -43,7 +44,7 @@ BEGIN;
 		;
 
 	SELECT	@Query += N'\
-SELECT	name
+SELECT	base, name
 FROM	minigame.exchange_codes
 '
 		;
@@ -52,9 +53,6 @@ FROM	minigame.exchange_codes
 	RETURN	DATEDIFF(MILLISECOND, @Timer, SYSUTCDATETIME());
 END;
 GO
-EXECUTE	dbr.SB_GetExchangeCodeList 1, 3;
-EXECUTE	dbr.SB_GetExchangeCodeList 2, 3;
-EXECUTE	dbr.SB_GetExchangeCodeList 3, 3;
 EXECUTE	dbr.SB_GetExchangeCodeList 1, 1;
 EXECUTE	dbr.SB_GetExchangeCodeList 2, 1;
 EXECUTE	dbr.SB_GetExchangeCodeList 3, 1;
