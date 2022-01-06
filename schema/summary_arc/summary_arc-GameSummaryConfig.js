@@ -1167,6 +1167,33 @@ db.getSiblingDB('summary_arc').game_summary_config.insertMany([
         }
     }
 
+,   {   gameId: 39
+    ,   owGameTypeId: 3836
+    ,   name: {
+            en: `Casino Hold'em Poker`
+        ,   vi: `Casino Hold'em Poker`
+        ,   grp: `Card Games`
+        }
+    ,   coll: {
+            db: `minigame_arc`
+        ,   group: `casinoholdempoker`
+        ,   round: `_phiens_bk`
+        ,   postfix: `_cuocs_bk`
+        }
+    ,   fields: {
+            local: `id`
+        ,   map: `phien`
+        ,   time: `$time`
+        ,   memberId: `memberId`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$bet`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: true
+        }
+    }
+
 ,   {   gameId: 99
     ,   owGameTypeId: (
         (2 ** Saba.env() & 2) > 0 ? 1699

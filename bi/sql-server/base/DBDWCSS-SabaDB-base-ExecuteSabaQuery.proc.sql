@@ -1,6 +1,6 @@
 USE	SabaDB;
 DECLARE	@Object		SYSNAME		= N'base.ExecuteSabaQuery'
-	,	@Version	SYSNAME		= N'1.2.0'
+	,	@Version	SYSNAME		= N'1.3.1'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Object;
 EXECUTE	dbo.sp_MSR_SetVersion @Object, @Version;
@@ -31,21 +31,41 @@ AS
 		@Var3:				[optional]		- The environment of system.
 				<DEFAULT>	NULL			- Do nothing
 							1				- Production
-							2				- Do nothing (UAT reserved)
+							2				- UAT
 							3				- SIT
 
-	Version:	1.2.0
+	Version:	1.3.1
 	Revision:
+		- [1.3.1]	20211222@Billy		Normal user cannot access DMV, fallback to @@VERSION to detect OS type
+		- [1.3.0]	20211221@Billy		Forward execution to bridge on Linux instance
+										Support Local Environment
 		- [1.2.0]	20211130@Billy		Support UAT Environment
 		- [1.1.0]	20210722@Billy		Support SIT Environment
 		- [1.0.2]	20210419@Billy		Do nothing if query is empty - [Gitlab: #060]
 		- [1.0.1]	20210322@Billy		Apply code convention - [Gitlab: #059]
 		- [1.0.0]	20210208@Billy		Release base.ExecuteSabaQuery - [Gitlab: #058]
-		- [0.0.1]	20210208@Billy		Initital - [Gitlab: #058]
+		- [0.0.1]	20210208@Billy		Initial - [Gitlab: #058]
 */
 BEGIN;
 	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 	SET NOCOUNT ON;
+
+	/** Forward execution to Windows SQL Server instance due to lack of external linked server
+	    support on Linux SQL Server.
+	*/
+	DECLARE	@Win	BIT
+		;
+	SELECT	@Win = CASE WHEN val LIKE N'%Windows%' THEN 1 WHEN val LIKE N'%Linux%' THEN 0 ELSE NULL END
+	FROM	base.tf_SplitString(@@VERSION, N' on ', 2);
+
+	IF	@Win IS NULL
+		RETURN;
+
+	IF	@Win = 0
+	BEGIN;
+		EXECUTE	DBBRIDGE.SabaDB.base.ExecuteSabaQuery @Query, @Var1, @Var2, @Var3;
+		RETURN;
+	END;
 
 	DECLARE	@_L		INT
 		,	@_Type	INT
@@ -62,61 +82,109 @@ BEGIN;
 	IF	@_L    = 1
 	AND	@_Type = 0 -- Active
 	AND	@_Env  = 1 -- PRO
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L1_SABABI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L1BI;
+	END CATCH;
 
 	IF	@_L    = 2
 	AND	@_Type = 0 -- Active
 	AND	@_Env  = 1 -- PRO
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L2_SABABI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L2BI;
+	END CATCH;
 
 	IF	@_L    = 3
 	AND	@_Type = 0 -- Active
 	AND	@_Env  = 1 -- PRO
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L3_SABABI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L3aBI;
+	END CATCH;
 
 	IF	@_L    = 1
 	AND	@_Type = 1 -- Archive
 	AND	@_Env  = 1 -- PRO
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L1_SABAARCBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L1BI;
+	END CATCH;
 
 	IF	@_L    = 2
 	AND	@_Type = 1 -- Archive
 	AND	@_Env  = 1 -- PRO
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L2_SABAARCBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L2BI;
+	END CATCH;
 
 	IF	@_L    = 3
 	AND	@_Type = 1 -- Archive
 	AND	@_Env  = 1 -- PRO
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L3_SABAARCBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L3aBI;
+	END CATCH;
 
 	IF	@_L    = 1
 	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 2 -- UAT
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L1_SABAUATBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L1pBI;
+	END CATCH;
 
 	IF	@_L    = 2
 	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 2 -- UAT
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L2_SABAUATBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L2pBI;
+	END CATCH;
 
 	IF	@_L    = 3
 	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 2 -- UAT
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L3_SABAUATBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L3bBI;
+	END CATCH;
 
 	IF	@_L    = 1
 	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 3 -- SIT
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L1_SABASITBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L1ppBI;
+	END CATCH;
 
 	IF	@_L    = 2
 	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 3 -- SIT
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L2_SABASITBI;
+	END TRY BEGIN CATCH;
+		RETURN;
+	END CATCH;
 
 	IF	@_L    = 3
 	AND	@_Type IN (0, 1) -- Mixxed
 	AND	@_Env  = 3 -- SIT
+	BEGIN TRY;
 		EXECUTE	(@Query) AT L3_SABASITBI;
+	END TRY BEGIN CATCH;
+		EXECUTE	(@Query) AT L3cBI;
+	END CATCH;
 END;
 GO

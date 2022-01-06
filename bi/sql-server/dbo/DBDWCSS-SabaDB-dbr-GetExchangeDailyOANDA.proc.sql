@@ -1,6 +1,6 @@
 USE SabaDB;
 DECLARE	@Procedure	SYSNAME		= N'dbr.GetExchangeDailyOANDA'
-	,	@Version	SYSNAME		= N'1.0.1'
+	,	@Version	SYSNAME		= N'2.0.0'
 	;
 EXECUTE	dbo.sp_MSR_InitProcedure @Procedure;
 EXECUTE	dbo.sp_MSR_SetVersion @Procedure, @Version;
@@ -19,9 +19,9 @@ AS
 		@Var1				[optional]		- The date of data that will be selected. The time is in UTC-4 timezone.
 				<DEFAULT>	NULL			- Newest date from OW OANDA
 
-	Version:	1.0.1
+	Version:	2.0.0
 	Revision:
-		- [1.0.1]	20211214@Billy		Support multiple L system
+		- [2.0.0]	20211214@Billy		Support multiple L system
 		- [1.0.0]	20211018@Billy		Release dbr.GetExchangeDailyOANDA
 		- [0.0.1]	20211018@Billy		Initital
 */

@@ -995,6 +995,7 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
         }
     ,   config: {
             hasCurrency: false
+        ,   jpCont: 0.025
         }
     }
 
@@ -1165,6 +1166,33 @@ db.getSiblingDB('summary').game_summary_config.insertMany([
         ,   memberId: `memberId`
         ,   settled: `$thanhtoan`
         ,   stake: [`$red`, `$black`, `$diamonds`, `$hearts`, `$spades`, `$clubs`]
+        ,   payout: [`$betwin`]
+        }
+    ,   config: {
+            hasCurrency: false
+        }
+    }
+
+,   {   gameId: 39
+    ,   owGameTypeId: 3836
+    ,   name: {
+            en: `Casino Hold'em Poker`
+        ,   vi: `Casino Hold'em Poker`
+        ,   grp: `Card Games`
+        }
+    ,   coll: {
+            db: `minigame`
+        ,   group: `casinoholdempoker`
+        ,   round: `_phiens`
+        ,   postfix: `_cuocs`
+        }
+    ,   fields: {
+            local: `id`
+        ,   map: `phien`
+        ,   time: `$time`
+        ,   memberId: `memberId`
+        ,   settled: `$thanhtoan`
+        ,   stake: [`$bet`]
         ,   payout: [`$betwin`]
         }
     ,   config: {

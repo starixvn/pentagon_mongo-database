@@ -89,7 +89,8 @@ FROM	(
 			ON	ds.gameId = cfg.gameId
 	WHERE	ds.currency <> "UUS"
 		AND	ds.time >= "' + CONVERT(NVARCHAR(MAX), @DateFrom, 121) + N'"
-		AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"' + ISNULL(N'
+		AND	ds.time <= "' + CONVERT(NVARCHAR(MAX), @DateTo, 121) + N'"
+		AND	ds.time < "' + CONVERT(NVARCHAR(MAX), @Yesterday, 121) + N'"' + ISNULL(N'
 		AND	ds.currency = "' + @Currency + N'"', N'') + N'
 	GROUP BY ds.`time`, ' + @Group + N'
 ) AS q
@@ -173,13 +174,13 @@ Query from L' + CONVERT(NVARCHAR(MAX), @L) + N'_SABABI
 			,	[value]		= CASE WHEN r.value < 0 THEN r.value ELSE NULL END
 		FROM	@Return AS r;
 
-		UPDATE	@Return
-		SET		value = NULL
+		DELETE	@Return
 		WHERE	value < 0;
 
 		INSERT INTO	@Return (time, metric, value)
 		SELECT	t.time, t.metric, t.value
-		FROM	@Temporary AS t;
+		FROM	@Temporary AS t
+		WHERE	t.value IS NOT NULL;
 	END;
 
 	SELECT	r.time, r.metric, r.value

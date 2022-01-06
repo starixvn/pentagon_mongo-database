@@ -204,7 +204,7 @@ BEGIN;
 				ON	ow.gameTypeId = sb.gameTypeId
 				AND	ow.currency = sb.currency
 				AND	ow.isCash = sb.isCash
-	WHERE	COALESCE(ow.currency, sb.currency) <> 'UUS'
+	WHERE	COALESCE(ow.currency, sb.currency, N'') <> 'UUS'
 		AND	ISNULL(ow.gameTypeId, sb.gameTypeId) NOT IN (3898)
 		AND	(	ISNULL(ow.betCount, 0) <> ISNULL(sb.betCount, 0)
 			OR	ISNULL(ow.stake, 0) <> ISNULL(sb.stake, 0)
